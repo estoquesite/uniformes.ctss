@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitação de Uniformes - VALE (v29)</title>
+    <title>Solicitação de Uniformes - VALE (v31)</title>
     <style>
         :root {
             --primary-color: #007a5e;
@@ -93,24 +93,24 @@
             margin: 25px auto;
             padding: 0 15px;
         }
-        /* Cards de Categoria Dinâmicos */
         .category-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
             margin-bottom: 20px;
         }
         .cat-card {
             background: white;
             border: 2px solid #ddd;
             border-radius: 8px;
-            padding: 12px;
+            padding: 10px 18px;
             text-align: center;
             cursor: pointer;
             font-weight: 600;
             color: var(--secondary-color);
             transition: all 0.2s;
             box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            font-size: 13px;
         }
         .cat-card:hover {
             border-color: var(--primary-color);
@@ -356,7 +356,7 @@
     <header>
         <div class="logo-container">
             <h1>VALE - Sistema de Uniformes</h1>
-            <span class="version-tag">v29</span>
+            <span class="version-tag">v31</span>
         </div>
         <div class="header-actions">
             <button class="btn-header" onclick="toggleCart()">
@@ -429,7 +429,7 @@
         <div class="modal-content">
             <div>
                 <div class="modal-header">
-                    <h3>Painel do Administrador (v29)</h3>
+                    <h3>Painel do Administrador (v31)</h3>
                     <button class="close-modal" onclick="closeAdminModal()">&times;</button>
                 </div>
 
@@ -454,8 +454,8 @@
                         
                         <div style="background: #eaf3ed; border: 1px solid #c2e0d1; padding: 14px; border-radius: 6px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                             <div>
-                                <strong style="color: var(--primary-dark); font-size: 13px;">📥 Template Excel com Colunas Separadas</strong>
-                                <p style="font-size: 11px; color: #555; margin: 3px 0 0 0;">Cada tamanho e Cód. Vale fica em sua própria linha e coluna no Excel.</p>
+                                <strong style="color: var(--primary-dark); font-size: 13px;">📥 Template Excel (Cód. Vale Unificado)</strong>
+                                <p style="font-size: 11px; color: #555; margin: 3px 0 0 0;">Cada tamanho e respetivo Cód. Vale alinhados perfeitamente no Excel.</p>
                             </div>
                             <div style="display: flex; gap: 8px; align-items: center;">
                                 <button class="btn-add" onclick="exportCatalogCSV()" style="background: var(--secondary-color); padding: 8px 14px; font-size: 12px;">⬇️ Baixar Template</button>
@@ -483,7 +483,7 @@
         </div>
     </div>
 
-    <!-- Modal de Edição ou Adição Fluida com Categoria e Género Livres -->
+    <!-- Modal de Edição ou Adição Fluida -->
     <div class="modal" id="editItemModal" style="z-index: 3000;">
         <div class="modal-content" style="width: 580px; height: auto; max-height: 90vh;">
             <div class="modal-header">
@@ -499,7 +499,7 @@
 
                 <div style="display: flex; gap: 10px;">
                     <div style="flex: 1;">
-                        <label>Referência:</label>
+                        <label>Cód. Vale:</label>
                         <input type="text" id="modalEditRef" placeholder="CM-444">
                     </div>
                     <div style="flex: 1;">
@@ -533,11 +533,11 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v29)</p>
+        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v31)</p>
     </footer>
 
     <script>
-        const defaultCatalog_v29 = [
+        const defaultCatalog_v31 = [
             {
                 title: "📂 Linha Administrativa - Masculino",
                 category: "Administrativa",
@@ -628,8 +628,8 @@
             }
         ];
 
-        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v29'));
-        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v29;
+        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v31'));
+        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v31;
 
         let selectedCategoryFilter = "";
         let cart = [];
@@ -638,7 +638,6 @@
             const container = document.getElementById('categoryCardsContainer');
             if(!container) return;
 
-            // Obter categorias únicas existentes no catálogo
             let categories = [...new Set(catalogSections.map(s => s.category))];
 
             let html = `<div class="cat-card ${selectedCategoryFilter === '' ? 'active' : ''}" id="card-all" onclick="selectCategoryCard('')">📂 Todas as Categorias</div>`;
@@ -842,7 +841,7 @@
 
             const dataAtual = new Date().toLocaleString();
 
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v29') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v31') || '[]');
             orders.push({
                 nome: nome,
                 matricula: matricula,
@@ -854,7 +853,7 @@
                 dataStatus: '',
                 itens: [...cart]
             });
-            localStorage.setItem('vale_orders_v29', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v31', JSON.stringify(orders));
 
             alert(`Sucesso! Pedido enviado em nome de ${nome} (Retirada prevista para: ${retirada}). Registado no sistema.`);
             
@@ -922,19 +921,19 @@
             let matAp = prompt('Insira a sua Matrícula:');
             if(!matAp || !matAp.trim()) return;
 
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v29') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v31') || '[]');
             orders[idx].status = novoStatus;
             orders[idx].aprovadorNome = nomeAp.trim();
             orders[idx].aprovadorMatricula = matAp.trim();
             orders[idx].dataStatus = new Date().toLocaleString();
 
-            localStorage.setItem('vale_orders_v29', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v31', JSON.stringify(orders));
             loadAdminOrders();
             alert(`Pedido marcado como ${novoStatus} com sucesso!`);
         }
 
         function exportCatalogCSV() {
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFFCategoria;Genero;Nome;Referencia;Cor;Tamanho;CodVale\r\n";
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFFCategoria;Genero;Nome;CodVale;Cor;Tamanho;CodValeTamanho\r\n";
             catalogSections.forEach(sec => {
                 sec.items.forEach(item => {
                     item.tamanhos.forEach(t => {
@@ -1030,7 +1029,7 @@
                 let newSections = Object.values(sectionsMap);
                 if(newSections.length > 0) {
                     catalogSections = newSections;
-                    localStorage.setItem('vale_catalog_v29', JSON.stringify(catalogSections));
+                    localStorage.setItem('vale_catalog_v31', JSON.stringify(catalogSections));
                     renderCatalog();
                     loadAdminCatalogTable();
                     alert('Catálogo importado com sucesso via Excel!');
@@ -1050,7 +1049,7 @@
                     <thead>
                         <tr>
                             <th>Foto</th>
-                            <th>Referência</th>
+                            <th>Cód. Vale</th>
                             <th>Nome do Item</th>
                             <th>Categoria / Género</th>
                             <th>Ação</th>
@@ -1145,7 +1144,6 @@
                 return;
             }
 
-            // Se for edição, remover o item antigo se mudou de secção
             if (secIdxVal !== 'new') {
                 const sIdx = parseInt(secIdxVal);
                 const iIdx = parseInt(document.getElementById('modalEditItemIdx').value);
@@ -1153,7 +1151,6 @@
             }
 
             const processSave = (fotoUrl) => {
-                // Procurar se já existe uma secção com esta Categoria e Género
                 let targetSec = catalogSections.find(s => s.category.toLowerCase() === category.toLowerCase() && s.gender.toLowerCase() === gender.toLowerCase());
                 
                 if (!targetSec) {
@@ -1166,25 +1163,18 @@
                     catalogSections.push(targetSec);
                 }
 
-                // Se era edição e tínhamos foto antiga, manter se nenhuma nova foi enviada
-                let finalFoto = fotoUrl;
-                if (!finalFoto && secIdxVal !== 'new') {
-                    // Tenta recuperar do item original se necessário ou mantém vazio
-                }
-
                 targetSec.items.push({
                     id: Date.now(),
                     nome: nome,
                     ref: ref,
                     cor: cor,
-                    foto: finalFoto || '',
+                    foto: fotoUrl || '',
                     tamanhos: tamanhos
                 });
 
-                // Limpar secções vazias
                 catalogSections = catalogSections.filter(s => s.items.length > 0);
 
-                localStorage.setItem('vale_catalog_v29', JSON.stringify(catalogSections));
+                localStorage.setItem('vale_catalog_v31', JSON.stringify(catalogSections));
                 renderCatalog();
                 loadAdminCatalogTable();
                 closeEditModal();
@@ -1199,9 +1189,6 @@
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 let existingFoto = '';
-                if (secIdxVal !== 'new') {
-                    // se necessário, mantinha a foto
-                }
                 processSave(existingFoto);
             }
         }
@@ -1210,7 +1197,7 @@
             if(confirm('Tem certeza que deseja excluir este item do catálogo?')) {
                 catalogSections[secIdx].items.splice(itemIdx, 1);
                 catalogSections = catalogSections.filter(s => s.items.length > 0);
-                localStorage.setItem('vale_catalog_v29', JSON.stringify(catalogSections));
+                localStorage.setItem('vale_catalog_v31', JSON.stringify(catalogSections));
                 renderCatalog();
                 loadAdminCatalogTable();
                 alert('Item excluído com sucesso!');
@@ -1220,7 +1207,7 @@
         function loadAdminOrders() {
             const container = document.getElementById('adminOrdersList');
             if(!container) return;
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v29') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v31') || '[]');
 
             if (orders.length === 0) {
                 container.innerHTML = `<p style="color: #777; text-align: center;">Nenhum pedido registado.</p>`;
