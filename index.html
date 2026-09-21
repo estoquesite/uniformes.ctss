@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitação de Uniformes - VALE (v17)</title>
+    <title>Solicitação de Uniformes - VALE (v20)</title>
     <style>
         :root {
             --primary-color: #007a5e;
@@ -89,7 +89,7 @@
             opacity: 0.9;
         }
         .container {
-            max-width: 1250px;
+            max-width: 1300px;
             margin: 25px auto;
             padding: 0 15px;
         }
@@ -168,8 +168,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 12px;
-            max-width: 290px;
-            width: 100%;
+            width: 110px;
         }
         .table-input {
             width: 50px;
@@ -331,7 +330,7 @@
     <header>
         <div class="logo-container">
             <h1>VALE - Sistema de Uniformes</h1>
-            <span class="version-tag">v17</span>
+            <span class="version-tag">v20</span>
         </div>
         <div class="header-actions">
             <button class="btn-header" onclick="toggleCart()">
@@ -344,15 +343,15 @@
     </header>
 
     <div class="hero">
-        <h2>Catálogo Estilo Excel</h2>
-        <p>Selecione o tamanho na caixinha de seleção e adicione ao carrinho[span_1](start_span)[span_1](end_span).</p>
+        <h2>Catálogo de Uniformes</h2>
+        <p>Selecione o tamanho na caixinha dedicada e adicione ao carrinho.</p>
     </div>
 
     <div class="container">
         
         <!-- Filtros -->
         <div class="filter-box">
-            <input type="text" id="searchFilter" placeholder="Pesquisar por nome ou referência..." onkeyup="renderCatalog()">
+            <input type="text" id="searchFilter" placeholder="Pesquisar por nome, código ou referência..." onkeyup="renderCatalog()">
             <select id="categoryFilter" onchange="renderCatalog()">
                 <option value="">Todas as Categorias</option>
                 <option value="Administrativa">Linha Administrativa</option>
@@ -400,26 +399,16 @@
         </div>
     </div>
 
-    <!-- Painel Administrador Largo (Senha: admin123) -->
+    <!-- Painel Administrador (Acesso Direto) -->
     <div class="modal" id="adminModal">
         <div class="modal-content">
             <div>
                 <div class="modal-header">
-                    <h3>Painel do Administrador (v17)</h3>
+                    <h3>Painel do Administrador (v20)</h3>
                     <button class="close-modal" onclick="closeAdminModal()">&times;</button>
                 </div>
 
-                <div id="adminLoginSection" style="margin-top: 50px; text-align: center;">
-                    <p>Área restrita. Digite a senha de Administrador (admin123):</p>
-                    <div style="position: relative; display: inline-block; width: 50%; margin-bottom: 10px;">
-                        <input type="password" id="adminPassword" placeholder="Senha ADM" style="padding: 10px; width: 100%; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-                        <span onclick="togglePasswordVisibility()" style="position: absolute; right: 10px; top: 10px; cursor: pointer; font-size: 18px;" id="eyeIcon" title="Mostrar/Ocultar Senha">👁️</span>
-                    </div>
-                    <br>
-                    <button class="btn-add" onclick="checkAdminPassword()" style="padding: 10px 24px; font-size: 14px;">Entrar</button>
-                </div>
-
-                <div id="adminPanelContent" style="display: none; margin-top: 15px; height: calc(100% - 60px); display: flex; flex-direction: column;">
+                <div id="adminPanelContent" style="margin-top: 15px; height: calc(100% - 40px); display: flex; flex-direction: column;">
                     <div class="admin-tabs">
                         <button class="admin-tab-btn active" onclick="switchAdminTab('manage')">Gerir Catálogo (Tabela)</button>
                         <button class="admin-tab-btn" onclick="switchAdminTab('orders')">Pedidos Recebidos</button>
@@ -465,6 +454,13 @@
                         <input type="text" id="modalEditRef" placeholder="CM-444">
                     </div>
                     <div style="flex: 1;">
+                        <label>Cor:</label>
+                        <input type="text" id="modalEditColor" placeholder="Verde Vale">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <div style="flex: 1;">
                         <label>Género:</label>
                         <select id="modalEditGender">
                             <option value="Masculino">Masculino</option>
@@ -472,9 +468,6 @@
                             <option value="Unissex">Unissex</option>
                         </select>
                     </div>
-                </div>
-
-                <div style="display: flex; gap: 10px; margin-top: 5px;">
                     <div style="flex: 1;">
                         <label>Categoria:</label>
                         <select id="modalEditCategory">
@@ -488,8 +481,8 @@
                 <label>Foto do Aparelho (Deixe em branco para manter a atual):</label>
                 <input type="file" id="modalEditPhotoFile" accept="image/*" style="font-size: 12px; padding: 6px;">
 
-                <label>Tamanhos, Cores e Códigos VALE (Formato: Tamanho:Código (Cor)):</label>
-                <textarea id="modalEditVars" rows="4" placeholder="01:16724398 (Verde Vale), 02:16725077 (Verde Vale)"></textarea>
+                <label>Tamanhos e Códigos VALE (Formato: Tamanho:Código, ex: 01:16724398, 02:16725077):</label>
+                <textarea id="modalEditVars" rows="4" placeholder="01:16724398, 02:16725077"></textarea>
             </div>
             <div style="border-top: 1px solid #eee; padding-top: 12px; display: flex; justify-content: flex-end; gap: 10px;">
                 <button class="btn-add" onclick="closeEditModal()" style="background: #999; padding: 8px 16px;">Cancelar</button>
@@ -499,11 +492,11 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v17)</p>
+        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v20)</p>
     </footer>
 
     <script>
-        const defaultCatalog_v17 = [
+        const defaultCatalog_v20 = [
             {
                 title: "📂 Linha Administrativa - Masculino",
                 category: "Administrativa",
@@ -513,37 +506,38 @@
                         id: 1, 
                         nome: 'Camisa Administrativa Masculina Manga Longa', 
                         ref: 'CM-444', 
+                        cor: 'Verde Vale',
                         foto: '',
-                        variacoes: [
-                            { id: 101, cod: '16724398', tamanho: '01', cor: 'Verde Vale' },
-                            { id: 102, cod: '16725077', tamanho: '02', cor: 'Verde Vale' },
-                            { id: 103, cod: '16724307', tamanho: '03', cor: 'Verde Vale' },
-                            { id: 104, cod: '13192040', tamanho: '01', cor: 'Cinza' },
-                            { id: 105, cod: '13192330', tamanho: '02', cor: 'Cinza' }
+                        tamanhos: [
+                            { cod: '16724398', tamanho: '01' },
+                            { cod: '16725077', tamanho: '02' },
+                            { cod: '16724307', tamanho: '03' },
+                            { cod: '16724431', tamanho: '04' }
                         ]
                     },
                     { 
                         id: 2, 
                         nome: 'Camisa Administrativa Masculina Manga Curta', 
                         ref: 'CM-443', 
+                        cor: 'Verde Vale',
                         foto: '',
-                        variacoes: [
-                            { id: 106, cod: '16724400', tamanho: '01', cor: 'Verde Vale' },
-                            { id: 107, cod: '16724412', tamanho: '02', cor: 'Verde Vale' },
-                            { id: 108, cod: '16724642', tamanho: '03', cor: 'Verde Vale' },
-                            { id: 109, cod: '13192356', tamanho: '01', cor: 'Cinza' },
-                            { id: 110, cod: '13192127', tamanho: '02', cor: 'Cinza' }
+                        tamanhos: [
+                            { cod: '16724400', tamanho: '01' },
+                            { cod: '16724412', tamanho: '02' },
+                            { cod: '16724642', tamanho: '03' },
+                            { cod: '16724406', tamanho: '04' }
                         ]
                     },
                     { 
                         id: 3, 
                         nome: 'Calça Jeans Administrativa Masculina', 
                         ref: 'CL-93', 
+                        cor: 'Azul Marinho',
                         foto: '',
-                        variacoes: [
-                            { id: 111, cod: '13315310', tamanho: '34', cor: 'Azul Marinho' },
-                            { id: 112, cod: '13315309', tamanho: '36', cor: 'Azul Marinho' },
-                            { id: 113, cod: '13315308', tamanho: '38', cor: 'Azul Marinho' }
+                        tamanhos: [
+                            { cod: '13315310', tamanho: '34' },
+                            { cod: '13315309', tamanho: '36' },
+                            { cod: '13315308', tamanho: '38' }
                         ]
                     }
                 ]
@@ -557,44 +551,44 @@
                         id: 4, 
                         nome: 'Camisa Administrativa Feminina Manga Longa', 
                         ref: 'CM-919', 
+                        cor: 'Verde Vale',
                         foto: '',
-                        variacoes: [
-                            { id: 114, cod: '16724553', tamanho: '36', cor: 'Verde Vale' },
-                            { id: 115, cod: '16724512', tamanho: '38', cor: 'Verde Vale' },
-                            { id: 116, cod: '13192248', tamanho: '36', cor: 'Cinza' },
-                            { id: 117, cod: '13192244', tamanho: '38', cor: 'Cinza' }
+                        tamanhos: [
+                            { cod: '16724553', tamanho: '36' },
+                            { cod: '16724512', tamanho: '38' },
+                            { cod: '16724680', tamanho: '40' }
                         ]
                     },
                     { 
                         id: 5, 
                         nome: 'Camisa Administrativa Feminina Manga Curta', 
                         ref: 'CM-918', 
+                        cor: 'Verde Vale',
                         foto: '',
-                        variacoes: [
-                            { id: 118, cod: '16724419', tamanho: '36', cor: 'Verde Vale' },
-                            { id: 119, cod: '16724632', tamanho: '38', cor: 'Verde Vale' },
-                            { id: 120, cod: '15500269', tamanho: '40', cor: 'Verde Vale' },
-                            { id: 121, cod: '13192069', tamanho: '36', cor: 'Cinza' },
-                            { id: 122, cod: '13192148', tamanho: '38', cor: 'Cinza' }
+                        tamanhos: [
+                            { cod: '16724419', tamanho: '36' },
+                            { cod: '16724632', tamanho: '38' },
+                            { cod: '15500269', tamanho: '40' }
                         ]
                     },
                     { 
                         id: 6, 
                         nome: 'Calça Jeans Administrativa Feminina', 
                         ref: 'CL-285', 
+                        cor: 'Azul Marinho',
                         foto: '',
-                        variacoes: [
-                            { id: 123, cod: '13315330', tamanho: '34', cor: 'Azul Marinho' },
-                            { id: 124, cod: '13315329', tamanho: '36', cor: 'Azul Marinho' },
-                            { id: 125, cod: '13315328', tamanho: '38', cor: 'Azul Marinho' }
+                        tamanhos: [
+                            { cod: '13315330', tamanho: '34' },
+                            { cod: '13315329', tamanho: '36' },
+                            { cod: '13315328', tamanho: '38' }
                         ]
                     }
                 ]
             }
         ];
 
-        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v17'));
-        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v17;
+        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v20'));
+        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v20;
 
         let cart = [];
 
@@ -616,7 +610,8 @@
                 const filteredItems = section.items.filter(prod => {
                     return prod.nome.toLowerCase().includes(query) || 
                            prod.ref.toLowerCase().includes(query) ||
-                           prod.variacoes.some(v => v.cod.includes(query) || v.cor.toLowerCase().includes(query));
+                           prod.cor.toLowerCase().includes(query) ||
+                           prod.tamanhos.some(t => t.cod.includes(query) || t.tamanho.toLowerCase().includes(query));
                 });
 
                 if (filteredItems.length === 0) return;
@@ -626,18 +621,20 @@
 
                 filteredItems.forEach(prod => {
                     let thumbSrc = prod.foto ? prod.foto : 'https://via.placeholder.com/40?text=Foto';
-                    let optionsHtml = prod.variacoes.map(v => 
-                        `<option value="${v.id}">Tam: ${v.tamanho} | Cor: ${v.cor} (Cód: ${v.cod})</option>`
+                    let firstTam = prod.tamanhos[0] || { cod: '-', tamanho: '-' };
+                    let optionsHtml = prod.tamanhos.map(t => 
+                        `<option value="${t.cod}">${t.tamanho}</option>`
                     ).join('');
 
                     rowsHtml += `
                         <tr>
                             <td><img src="${thumbSrc}" class="item-thumb" alt="Foto" onerror="this.src='https://via.placeholder.com/40?text=Foto'"></td>
-                            <td><strong>${prod.ref}</strong></td>
+                            <td><strong id="cod-display-${prod.id}" style="color: var(--primary-color);">${firstTam.cod}</strong></td>
                             <td>${prod.nome}</td>
+                            <td>${prod.cor}</td>
                             <td><span class="gender-badge">${section.gender}</span></td>
                             <td>
-                                <select class="table-select" id="select-var-${prod.id}">
+                                <select class="table-select" id="select-tam-${prod.id}" onchange="updateCodDisplay(${prod.id})">
                                     ${optionsHtml}
                                 </select>
                             </td>
@@ -654,10 +651,11 @@
                             <thead>
                                 <tr>
                                     <th>Foto</th>
-                                    <th>Ref.</th>
+                                    <th>Cód. VALE</th>
                                     <th>Descrição do Item</th>
+                                    <th>Cor</th>
                                     <th>Género</th>
-                                    <th>Selecione o Tamanho / Cor / Cód. VALE</th>
+                                    <th>Tamanho (Lista)</th>
                                     <th>Qtd</th>
                                     <th>Ação</th>
                                 </tr>
@@ -675,35 +673,36 @@
             }
         }
 
-        function togglePasswordVisibility() {
-            const passInput = document.getElementById('adminPassword');
-            const eyeIcon = document.getElementById('eyeIcon');
-            if (passInput.type === 'password') {
-                passInput.type = 'text';
-                eyeIcon.textContent = '🙈';
-            } else {
-                passInput.type = 'password';
-                eyeIcon.textContent = '👁️';
+        function updateCodDisplay(prodId) {
+            const select = document.getElementById(`select-tam-${prodId}`);
+            const codDisplay = document.getElementById(`cod-display-${prodId}`);
+            if (select && codDisplay) {
+                codDisplay.textContent = select.value;
             }
         }
 
         function addToCart(prodId) {
             let foundProd = null;
+            let foundSec = null;
             catalogSections.forEach(sec => {
                 const match = sec.items.find(i => i.id === prodId);
-                if(match) foundProd = match;
+                if(match) {
+                    foundProd = match;
+                    foundSec = sec;
+                }
             });
 
             if(!foundProd) return;
 
-            const selectVar = document.getElementById(`select-var-${prodId}`);
+            const selectTam = document.getElementById(`select-tam-${prodId}`);
             const qtyInput = document.getElementById(`qty-${prodId}`);
             
-            const varId = parseInt(selectVar.value);
+            const selectedCod = selectTam.value;
             const qty = parseInt(qtyInput.value);
-            const variacao = foundProd.variacoes.find(v => v.id === varId);
+            const selectedObj = foundProd.tamanhos.find(t => t.cod === selectedCod);
+            const tamanhoStr = selectedObj ? selectedObj.tamanho : '-';
 
-            const cartKey = `${prodId}-${varId}`;
+            const cartKey = `${prodId}-${selectedCod}`;
             const existing = cart.find(c => c.cartKey === cartKey);
             if (existing) {
                 existing.qty += qty;
@@ -712,15 +711,15 @@
                     cartKey: cartKey,
                     nome: foundProd.nome,
                     ref: foundProd.ref,
-                    cor: variacao.cor,
-                    cod: variacao.cod,
-                    tamanho: variacao.tamanho,
+                    cor: foundProd.cor,
+                    cod: selectedCod,
+                    tamanho: tamanhoStr,
                     qty: qty
                 });
             }
 
             updateCartUI();
-            alert(`Adicionado: ${qty}x ${foundProd.nome} (${variacao.cor}, Tam: ${variacao.tamanho})`);
+            alert(`Adicionado: ${qty}x ${foundProd.nome} (Tam: ${tamanhoStr}, Cód: ${selectedCod})`);
         }
 
         function updateCartUI() {
@@ -773,16 +772,18 @@
                 return;
             }
 
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v17') || '[]');
+            const dataAtual = new Date().toLocaleString();
+
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v20') || '[]');
             orders.push({
                 nome: nome,
                 matricula: matricula,
-                data: new Date().toLocaleString(),
+                data: dataAtual,
                 itens: [...cart]
             });
-            localStorage.setItem('vale_orders_v17', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v20', JSON.stringify(orders));
 
-            alert(`Sucesso! Pedido enviado em nome de ${nome} (Matrícula: ${matricula}). Registado no sistema.`);
+            alert(`Sucesso! Pedido enviado em nome de ${nome} (Matrícula: ${matricula}) em ${dataAtual}. Registado no sistema.`);
             
             cart = [];
             document.getElementById('userName').value = '';
@@ -793,27 +794,12 @@
 
         function openAdminModal() {
             document.getElementById('adminModal').style.display = 'flex';
+            loadAdminCatalogTable();
+            loadAdminOrders();
         }
 
         function closeAdminModal() {
             document.getElementById('adminModal').style.display = 'none';
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('adminPassword').type = 'password';
-            document.getElementById('eyeIcon').textContent = '👁️';
-            document.getElementById('adminLoginSection').style.display = 'block';
-            document.getElementById('adminPanelContent').style.display = 'none';
-        }
-
-        function checkAdminPassword() {
-            const pass = document.getElementById('adminPassword').value.trim();
-            if (pass === 'admin123') {
-                document.getElementById('adminLoginSection').style.display = 'none';
-                document.getElementById('adminPanelContent').style.display = 'block';
-                loadAdminCatalogTable();
-                loadAdminOrders();
-            } else {
-                alert('Senha incorreta! (Use: admin123)');
-            }
         }
 
         function switchAdminTab(tab) {
@@ -842,6 +828,7 @@
                             <th>Foto</th>
                             <th>Ref</th>
                             <th>Nome do Item</th>
+                            <th>Cor</th>
                             <th>Género</th>
                             <th>Ação</th>
                         </tr>
@@ -857,6 +844,7 @@
                             <td><img src="${thumb}" style="width:30px; height:30px; object-fit:contain; border:1px solid #ccc; border-radius:3px;"></td>
                             <td><strong>${item.ref}</strong></td>
                             <td>${item.nome}</td>
+                            <td>${item.cor}</td>
                             <td><span class="gender-badge">${sec.gender}</span></td>
                             <td>
                                 <button class="btn-add" onclick="openFluidEditModal(${sIdx}, ${iIdx})" style="padding:5px 10px; font-size:11px;">Editar</button>
@@ -877,6 +865,7 @@
                 document.getElementById('modalEditItemIdx').value = '';
                 document.getElementById('modalEditName').value = '';
                 document.getElementById('modalEditRef').value = '';
+                document.getElementById('modalEditColor').value = 'Verde Vale';
                 document.getElementById('modalEditGender').value = 'Masculino';
                 document.getElementById('modalEditCategory').value = 'Administrativa';
                 document.getElementById('modalEditVars').value = '';
@@ -887,10 +876,11 @@
                 document.getElementById('modalEditItemIdx').value = itemIdx;
                 document.getElementById('modalEditName').value = item.nome;
                 document.getElementById('modalEditRef').value = item.ref;
+                document.getElementById('modalEditColor').value = item.cor;
                 document.getElementById('modalEditGender').value = catalogSections[secIdx].gender;
                 document.getElementById('modalEditCategory').value = catalogSections[secIdx].category;
 
-                let varsStr = item.variacoes.map(v => `${v.tamanho}:${v.cod} (${v.cor})`).join(', ');
+                let varsStr = item.tamanhos.map(t => `${t.tamanho}:${t.cod}`).join(', ');
                 document.getElementById('modalEditVars').value = varsStr;
                 document.getElementById('editModalTitle').innerText = `A editar: ${item.nome}`;
             }
@@ -907,6 +897,7 @@
             const secIdxVal = document.getElementById('modalEditSecIdx').value;
             const nome = document.getElementById('modalEditName').value.trim();
             const ref = document.getElementById('modalEditRef').value.trim();
+            const cor = document.getElementById('modalEditColor').value.trim();
             const gender = document.getElementById('modalEditGender').value;
             const category = document.getElementById('modalEditCategory').value;
             const varsStr = document.getElementById('modalEditVars').value.trim();
@@ -917,26 +908,23 @@
                 return;
             }
 
-            let variacoes = [];
-            varsStr.split(',').forEach((p, idx) => {
+            let tamanhos = [];
+            varsStr.split(',').forEach((p) => {
                 let sub = p.trim().split(':');
                 if(sub.length >= 2) {
                     let tam = sub[0].trim();
-                    let resto = sub[1].trim().split('(');
-                    let cod = resto[0].trim();
-                    let cor = resto[1] ? resto[1].replace(')', '').trim() : 'Padrão';
-                    variacoes.push({
-                        id: Date.now() + idx,
-                        cod: cod,
-                        tamanho: tam,
-                        cor: cor
-                    });
+                    let cod = sub[1].trim();
+                    tamanhos.push({ tamanho: tam, cod: cod });
                 }
             });
 
+            if (tamanhos.length === 0) {
+                alert('Insira pelo menos um tamanho e código válido (ex: 01:16724398)');
+                return;
+            }
+
             const processSave = (fotoUrl) => {
                 if (secIdxVal === 'new') {
-                    // Procurar ou criar secção correspondente a Categoria e Género
                     let targetSec = catalogSections.find(s => s.category === category && s.gender === gender);
                     if (!targetSec) {
                         targetSec = {
@@ -951,8 +939,9 @@
                         id: Date.now(),
                         nome: nome,
                         ref: ref,
+                        cor: cor,
                         foto: fotoUrl || '',
-                        variacoes: variacoes
+                        tamanhos: tamanhos
                     });
                 } else {
                     const sIdx = parseInt(secIdxVal);
@@ -960,13 +949,14 @@
                     
                     catalogSections[sIdx].items[iIdx].nome = nome;
                     catalogSections[sIdx].items[iIdx].ref = ref;
-                    catalogSections[sIdx].items[iIdx].variacoes = variacoes;
+                    catalogSections[sIdx].items[iIdx].cor = cor;
+                    catalogSections[sIdx].items[iIdx].tamanhos = tamanhos;
                     if(fotoUrl) {
                         catalogSections[sIdx].items[iIdx].foto = fotoUrl;
                     }
                 }
 
-                localStorage.setItem('vale_catalog_v17', JSON.stringify(catalogSections));
+                localStorage.setItem('vale_catalog_v20', JSON.stringify(catalogSections));
                 renderCatalog();
                 loadAdminCatalogTable();
                 closeEditModal();
@@ -993,7 +983,7 @@
         function deleteAdminItem(secIdx, itemIdx) {
             if(confirm('Tem certeza que deseja excluir este item do catálogo?')) {
                 catalogSections[secIdx].items.splice(itemIdx, 1);
-                localStorage.setItem('vale_catalog_v17', JSON.stringify(catalogSections));
+                localStorage.setItem('vale_catalog_v20', JSON.stringify(catalogSections));
                 renderCatalog();
                 loadAdminCatalogTable();
                 alert('Item excluído com sucesso!');
@@ -1003,7 +993,7 @@
         function loadAdminOrders() {
             const container = document.getElementById('adminOrdersList');
             if(!container) return;
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v17') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v20') || '[]');
 
             if (orders.length === 0) {
                 container.innerHTML = `<p style="color: #777; text-align: center;">Nenhum pedido registado.</p>`;
@@ -1016,7 +1006,7 @@
                 container.innerHTML += `
                     <div class="admin-order-card">
                         <strong>Pedido #${idx+1} - ${ord.nome} (Mat: ${ord.matricula})</strong><br>
-                        <small>Data: ${ord.data}</small>
+                        <small>Data do Pedido: <strong>${ord.data}</strong></small>
                         <ul style="margin: 3px 0 0 12px; padding: 0;">${itensStr}</ul>
                     </div>
                 `;
