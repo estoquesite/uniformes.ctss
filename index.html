@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitação de Uniformes - VALE (v22)</title>
+    <title>Solicitação de Uniformes - VALE (v24)</title>
     <style>
         :root {
             --primary-color: #007a5e;
@@ -250,7 +250,7 @@
             overflow-y: auto;
         }
         #adminModal .modal-content {
-            width: 900px;
+            width: 950px;
             height: 85vh;
         }
         .modal-header {
@@ -359,7 +359,7 @@
     <header>
         <div class="logo-container">
             <h1>VALE - Sistema de Uniformes</h1>
-            <span class="version-tag">v22</span>
+            <span class="version-tag">v24</span>
         </div>
         <div class="header-actions">
             <button class="btn-header" onclick="toggleCart()">
@@ -437,12 +437,12 @@
         <div class="modal-content">
             <div>
                 <div class="modal-header">
-                    <h3>Painel do Administrador (v22)</h3>
+                    <h3>Painel do Administrador (v24)</h3>
                     <button class="close-modal" onclick="closeAdminModal()">&times;</button>
                 </div>
 
                 <div id="adminLoginSection" style="margin-top: 50px; text-align: center;">
-                    <p>Área restrita. Digite a senha de Administrador (admin123):</p>
+                    <p>Área restrita.</p>
                     <div style="position: relative; display: inline-block; width: 50%; margin-bottom: 10px;">
                         <input type="password" id="adminPassword" placeholder="Senha ADM" style="padding: 10px; width: 100%; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
                         <span onclick="togglePasswordVisibility()" style="position: absolute; right: 10px; top: 10px; cursor: pointer; font-size: 18px;" id="eyeIcon" title="Mostrar/Ocultar Senha">👁️</span>
@@ -453,14 +453,29 @@
 
                 <div id="adminPanelContent" style="display: none; margin-top: 15px; height: calc(100% - 60px); display: flex; flex-direction: column;">
                     <div class="admin-tabs">
-                        <button class="admin-tab-btn active" onclick="switchAdminTab('manage')">Gerir Catálogo (Tabela)</button>
+                        <button class="admin-tab-btn active" onclick="switchAdminTab('manage')">Gerir / Template Excel</button>
                         <button class="admin-tab-btn" onclick="switchAdminTab('orders')">Pedidos Recebidos</button>
                     </div>
 
-                    <!-- Aba Gerir Catálogo em Tabela -->
+                    <!-- Aba Gerir Catálogo & Template -->
                     <div id="tabManageContent" style="flex-grow: 1; overflow-y: auto;" class="modal-body">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <p style="font-size: 13px; color: #666; margin: 0;">Lista de produtos. Edite ou adicione novos itens facilmente:</p>
+                        
+                        <!-- Área de Template CSV para Edição em Lote -->
+                        <div style="background: #eaf3ed; border: 1px solid #c2e0d1; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <strong style="color: var(--primary-dark); font-size: 13px;">📥 Edição em Lote (Template Excel/CSV)</strong>
+                                <p style="font-size: 11px; color: #555; margin: 2px 0 0 0;">Descarregue o modelo, edite no Excel e volte a carregar para atualizar tudo de uma vez.</p>
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <button class="btn-add" onclick="exportCatalogCSV()" style="background: var(--secondary-color); padding: 7px 12px; font-size: 11px;">⬇️ Descarregar Template</button>
+                                <label class="btn-add" style="cursor: pointer; padding: 7px 12px; font-size: 11px; background: var(--accent-color);">
+                                    ⬆️ Enviar Template Editado <input type="file" accept=".csv" onchange="importCatalogCSV(event)" style="display: none;">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <p style="font-size: 13px; color: #666; margin: 0;">Ou adicione/edite itens individualmente:</p>
                             <button class="btn-add" onclick="openFluidEditModal('new', null)" style="background-color: var(--accent-color); padding: 7px 14px; font-size: 12px;">➕ Adicionar Novo Item</button>
                         </div>
                         <div id="adminCatalogTableList"></div>
@@ -535,11 +550,11 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v22)</p>
+        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v24)</p>
     </footer>
 
     <script>
-        const defaultCatalog_v22 = [
+        const defaultCatalog_v24 = [
             {
                 title: "📂 Linha Administrativa - Masculino",
                 category: "Administrativa",
@@ -630,8 +645,8 @@
             }
         ];
 
-        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v22'));
-        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v22;
+        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v24'));
+        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v24;
 
         let selectedCategoryFilter = "";
         let cart = [];
@@ -639,7 +654,6 @@
         function selectCategoryCard(cat) {
             selectedCategoryFilter = cat;
             
-            // Atualizar classes visuais dos cards
             document.querySelectorAll('.cat-card').forEach(card => card.classList.remove('active'));
             if(cat === "") document.getElementById('card-all').classList.add('active');
             if(cat === "Administrativa") document.getElementById('card-adm').classList.add('active');
@@ -836,7 +850,7 @@
 
             const dataAtual = new Date().toLocaleString();
 
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v22') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v24') || '[]');
             orders.push({
                 nome: nome,
                 matricula: matricula,
@@ -844,7 +858,7 @@
                 dataPedido: dataAtual,
                 itens: [...cart]
             });
-            localStorage.setItem('vale_orders_v22', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v24', JSON.stringify(orders));
 
             alert(`Sucesso! Pedido enviado em nome de ${nome} (Retirada prevista para: ${retirada}). Registado no sistema.`);
             
@@ -906,6 +920,100 @@
             }
         }
 
+        function exportCatalogCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,Categoria,Genero,Nome,Referencia,Cor,TamanhosCodigos\r\n";
+            catalogSections.forEach(sec => {
+                sec.items.forEach(item => {
+                    let tamStr = item.tamanhos.map(t => `${t.tamanho}:${t.cod}`).join(';');
+                    let row = [sec.category, sec.gender, `"${item.nome}"`, item.ref, `"${item.cor}"`, `"${tamStr}"`];
+                    csvContent += row.join(",") + "\r\n";
+                });
+            });
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "catalogo_uniformes_vale.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function importCatalogCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split(/\r\n|\n/);
+                let newItemsMap = {};
+                for (let i = 1; i < lines.length; i++) {
+                    let line = lines[i].trim();
+                    if(!line) continue;
+                    let row = [];
+                    let inQuotes = false;
+                    let currentVal = '';
+                    for (let char of line) {
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                        } else if (char === ',' && !inQuotes) {
+                            row.push(currentVal.trim());
+                            currentVal = '';
+                        } else {
+                            currentVal += char;
+                        }
+                    }
+                    row.push(currentVal.trim());
+
+                    if (row.length >= 6) {
+                        let cat = row[0].replace(/"/g, '');
+                        let gen = row[1].replace(/"/g, '');
+                        let nome = row[2].replace(/"/g, '');
+                        let ref = row[3].replace(/"/g, '');
+                        let cor = row[4].replace(/"/g, '');
+                        let tamRaw = row[5].replace(/"/g, '');
+
+                        let tamanhos = [];
+                        tamRaw.split(';').forEach(pair => {
+                            let parts = pair.trim().split(':');
+                            if(parts.length >= 2) {
+                                tamanhos.push({ tamanho: parts[0].trim(), cod: parts[1].trim() });
+                            }
+                        });
+
+                        let secKey = `${cat}_${gen}`;
+                        if(!newItemsMap[secKey]) {
+                            newItemsMap[secKey] = {
+                                title: `📂 Linha ${cat} - ${gen}`,
+                                category: cat,
+                                gender: gen,
+                                items: []
+                            };
+                        }
+                        newItemsMap[secKey].items.push({
+                            id: Date.now() + Math.random(),
+                            nome: nome,
+                            ref: ref,
+                            cor: cor,
+                            foto: '',
+                            tamanhos: tamanhos
+                        });
+                    }
+                }
+                
+                let newSections = Object.values(newItemsMap);
+                if(newSections.length > 0) {
+                    catalogSections = newSections;
+                    localStorage.setItem('vale_catalog_v24', JSON.stringify(catalogSections));
+                    renderCatalog();
+                    loadAdminCatalogTable();
+                    alert('Catálogo importado com sucesso via CSV!');
+                } else {
+                    alert('Erro ao processar o ficheiro CSV.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
         function loadAdminCatalogTable() {
             const container = document.getElementById('adminCatalogTableList');
             if(!container) return;
@@ -915,7 +1023,7 @@
                     <thead>
                         <tr>
                             <th>Foto</th>
-                            <th>Cód / Ref</th>
+                            <th>Ref</th>
                             <th>Nome do Item</th>
                             <th>Cor</th>
                             <th>Género</th>
@@ -1045,7 +1153,7 @@
                     }
                 }
 
-                localStorage.setItem('vale_catalog_v22', JSON.stringify(catalogSections));
+                localStorage.setItem('vale_catalog_v24', JSON.stringify(catalogSections));
                 renderCatalog();
                 loadAdminCatalogTable();
                 closeEditModal();
@@ -1072,7 +1180,7 @@
         function deleteAdminItem(secIdx, itemIdx) {
             if(confirm('Tem certeza que deseja excluir este item do catálogo?')) {
                 catalogSections[secIdx].items.splice(itemIdx, 1);
-                localStorage.setItem('vale_catalog_v22', JSON.stringify(catalogSections));
+                localStorage.setItem('vale_catalog_v24', JSON.stringify(catalogSections));
                 renderCatalog();
                 loadAdminCatalogTable();
                 alert('Item excluído com sucesso!');
@@ -1082,7 +1190,7 @@
         function loadAdminOrders() {
             const container = document.getElementById('adminOrdersList');
             if(!container) return;
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v22') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v24') || '[]');
 
             if (orders.length === 0) {
                 container.innerHTML = `<p style="color: #777; text-align: center;">Nenhum pedido registado.</p>`;
