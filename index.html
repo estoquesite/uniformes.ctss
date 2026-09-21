@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitação de Uniformes - VALE (v16)</title>
+    <title>Solicitação de Uniformes - VALE (v17)</title>
     <style>
         :root {
             --primary-color: #007a5e;
@@ -168,7 +168,8 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 12px;
-            max-width: 280px;
+            max-width: 290px;
+            width: 100%;
         }
         .table-input {
             width: 50px;
@@ -330,7 +331,7 @@
     <header>
         <div class="logo-container">
             <h1>VALE - Sistema de Uniformes</h1>
-            <span class="version-tag">v16</span>
+            <span class="version-tag">v17</span>
         </div>
         <div class="header-actions">
             <button class="btn-header" onclick="toggleCart()">
@@ -344,7 +345,7 @@
 
     <div class="hero">
         <h2>Catálogo Estilo Excel</h2>
-        <p>Selecione o tamanho na caixinha de seleção e adicione ao carrinho[span_0](start_span)[span_0](end_span).</p>
+        <p>Selecione o tamanho na caixinha de seleção e adicione ao carrinho[span_1](start_span)[span_1](end_span).</p>
     </div>
 
     <div class="container">
@@ -404,7 +405,7 @@
         <div class="modal-content">
             <div>
                 <div class="modal-header">
-                    <h3>Painel do Administrador (v16)</h3>
+                    <h3>Painel do Administrador (v17)</h3>
                     <button class="close-modal" onclick="closeAdminModal()">&times;</button>
                 </div>
 
@@ -426,7 +427,10 @@
 
                     <!-- Aba Gerir Catálogo em Tabela -->
                     <div id="tabManageContent" style="flex-grow: 1; overflow-y: auto;" class="modal-body">
-                        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Lista completa de produtos. Clique em <strong>Editar</strong> para abrir a janela fluida de alteração de dados e fotos:</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <p style="font-size: 13px; color: #666; margin: 0;">Lista de produtos. Edite ou adicione novos itens facilmente:</p>
+                            <button class="btn-add" onclick="openFluidEditModal('new', null)" style="background-color: var(--accent-color); padding: 7px 14px; font-size: 12px;">➕ Adicionar Novo Item</button>
+                        </div>
                         <div id="adminCatalogTableList"></div>
                     </div>
 
@@ -441,7 +445,7 @@
         </div>
     </div>
 
-    <!-- Modal de Edição Individual Fluida -->
+    <!-- Modal de Edição ou Adição Fluida -->
     <div class="modal" id="editItemModal" style="z-index: 3000;">
         <div class="modal-content" style="width: 550px; height: auto; max-height: 90vh;">
             <div class="modal-header">
@@ -470,6 +474,17 @@
                     </div>
                 </div>
 
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <div style="flex: 1;">
+                        <label>Categoria:</label>
+                        <select id="modalEditCategory">
+                            <option value="Administrativa">Administrativa</option>
+                            <option value="Operacional">Operacional</option>
+                            <option value="Inverno/Acessórios">Inverno e Acessórios</option>
+                        </select>
+                    </div>
+                </div>
+
                 <label>Foto do Aparelho (Deixe em branco para manter a atual):</label>
                 <input type="file" id="modalEditPhotoFile" accept="image/*" style="font-size: 12px; padding: 6px;">
 
@@ -478,17 +493,17 @@
             </div>
             <div style="border-top: 1px solid #eee; padding-top: 12px; display: flex; justify-content: flex-end; gap: 10px;">
                 <button class="btn-add" onclick="closeEditModal()" style="background: #999; padding: 8px 16px;">Cancelar</button>
-                <button class="btn-add" onclick="saveFluidEditItem()" style="padding: 8px 20px;">Guardar Alterações</button>
+                <button class="btn-add" onclick="saveFluidEditItem()" style="padding: 8px 20px;">Guardar</button>
             </div>
         </div>
     </div>
 
     <footer>
-        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v16)</p>
+        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v17)</p>
     </footer>
 
     <script>
-        const defaultCatalog_v16 = [
+        const defaultCatalog_v17 = [
             {
                 title: "📂 Linha Administrativa - Masculino",
                 category: "Administrativa",
@@ -578,8 +593,8 @@
             }
         ];
 
-        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v16'));
-        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v16;
+        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v17'));
+        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v17;
 
         let cart = [];
 
@@ -758,14 +773,14 @@
                 return;
             }
 
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v16') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v17') || '[]');
             orders.push({
                 nome: nome,
                 matricula: matricula,
                 data: new Date().toLocaleString(),
                 itens: [...cart]
             });
-            localStorage.setItem('vale_orders_v16', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v17', JSON.stringify(orders));
 
             alert(`Sucesso! Pedido enviado em nome de ${nome} (Matrícula: ${matricula}). Registado no sistema.`);
             
@@ -843,7 +858,10 @@
                             <td><strong>${item.ref}</strong></td>
                             <td>${item.nome}</td>
                             <td><span class="gender-badge">${sec.gender}</span></td>
-                            <td><button class="btn-add" onclick="openFluidEditModal(${sIdx}, ${iIdx})" style="padding:5px 12px; font-size:11px;">Editar</button></td>
+                            <td>
+                                <button class="btn-add" onclick="openFluidEditModal(${sIdx}, ${iIdx})" style="padding:5px 10px; font-size:11px;">Editar</button>
+                                <button class="btn-add" onclick="deleteAdminItem(${sIdx}, ${iIdx})" style="padding:5px 10px; font-size:11px; background:#d9534f; margin-left:4px;">Excluir</button>
+                            </td>
                         </tr>
                     `;
                 });
@@ -854,17 +872,28 @@
         }
 
         function openFluidEditModal(secIdx, itemIdx) {
-            const item = catalogSections[secIdx].items[itemIdx];
-            
-            document.getElementById('modalEditSecIdx').value = secIdx;
-            document.getElementById('modalEditItemIdx').value = itemIdx;
-            document.getElementById('modalEditName').value = item.nome;
-            document.getElementById('modalEditRef').value = item.ref;
-            document.getElementById('modalEditGender').value = catalogSections[secIdx].gender;
+            if (secIdx === 'new') {
+                document.getElementById('modalEditSecIdx').value = 'new';
+                document.getElementById('modalEditItemIdx').value = '';
+                document.getElementById('modalEditName').value = '';
+                document.getElementById('modalEditRef').value = '';
+                document.getElementById('modalEditGender').value = 'Masculino';
+                document.getElementById('modalEditCategory').value = 'Administrativa';
+                document.getElementById('modalEditVars').value = '';
+                document.getElementById('editModalTitle').innerText = 'Adicionar Novo Item ao Catálogo';
+            } else {
+                const item = catalogSections[secIdx].items[itemIdx];
+                document.getElementById('modalEditSecIdx').value = secIdx;
+                document.getElementById('modalEditItemIdx').value = itemIdx;
+                document.getElementById('modalEditName').value = item.nome;
+                document.getElementById('modalEditRef').value = item.ref;
+                document.getElementById('modalEditGender').value = catalogSections[secIdx].gender;
+                document.getElementById('modalEditCategory').value = catalogSections[secIdx].category;
 
-            let varsStr = item.variacoes.map(v => `${v.tamanho}:${v.cod} (${v.cor})`).join(', ');
-            document.getElementById('modalEditVars').value = varsStr;
-            document.getElementById('editModalTitle').innerText = `A editar: ${item.nome}`;
+                let varsStr = item.variacoes.map(v => `${v.tamanho}:${v.cod} (${v.cor})`).join(', ');
+                document.getElementById('modalEditVars').value = varsStr;
+                document.getElementById('editModalTitle').innerText = `A editar: ${item.nome}`;
+            }
             
             document.getElementById('editItemModal').style.display = 'flex';
         }
@@ -875,12 +904,11 @@
         }
 
         function saveFluidEditItem() {
-            const sIdx = parseInt(document.getElementById('modalEditSecIdx').value);
-            const iIdx = parseInt(document.getElementById('modalEditItemIdx').value);
-            
+            const secIdxVal = document.getElementById('modalEditSecIdx').value;
             const nome = document.getElementById('modalEditName').value.trim();
             const ref = document.getElementById('modalEditRef').value.trim();
             const gender = document.getElementById('modalEditGender').value;
+            const category = document.getElementById('modalEditCategory').value;
             const varsStr = document.getElementById('modalEditVars').value.trim();
             const fileInput = document.getElementById('modalEditPhotoFile');
 
@@ -906,37 +934,76 @@
                 }
             });
 
-            const processUpdate = (fotoUrl) => {
-                catalogSections[sIdx].items[iIdx].nome = nome;
-                catalogSections[sIdx].items[iIdx].ref = ref;
-                catalogSections[sIdx].items[iIdx].variacoes = variacoes;
-                catalogSections[sIdx].gender = gender;
-                if(fotoUrl) {
-                    catalogSections[sIdx].items[iIdx].foto = fotoUrl;
+            const processSave = (fotoUrl) => {
+                if (secIdxVal === 'new') {
+                    // Procurar ou criar secção correspondente a Categoria e Género
+                    let targetSec = catalogSections.find(s => s.category === category && s.gender === gender);
+                    if (!targetSec) {
+                        targetSec = {
+                            title: `📂 Linha ${category} - ${gender}`,
+                            category: category,
+                            gender: gender,
+                            items: []
+                        };
+                        catalogSections.push(targetSec);
+                    }
+                    targetSec.items.push({
+                        id: Date.now(),
+                        nome: nome,
+                        ref: ref,
+                        foto: fotoUrl || '',
+                        variacoes: variacoes
+                    });
+                } else {
+                    const sIdx = parseInt(secIdxVal);
+                    const iIdx = parseInt(document.getElementById('modalEditItemIdx').value);
+                    
+                    catalogSections[sIdx].items[iIdx].nome = nome;
+                    catalogSections[sIdx].items[iIdx].ref = ref;
+                    catalogSections[sIdx].items[iIdx].variacoes = variacoes;
+                    if(fotoUrl) {
+                        catalogSections[sIdx].items[iIdx].foto = fotoUrl;
+                    }
                 }
 
-                localStorage.setItem('vale_catalog_v16', JSON.stringify(catalogSections));
+                localStorage.setItem('vale_catalog_v17', JSON.stringify(catalogSections));
                 renderCatalog();
                 loadAdminCatalogTable();
                 closeEditModal();
-                alert('Item atualizado com sucesso!');
+                alert('Guardado com sucesso!');
             };
 
             if (fileInput.files && fileInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    processUpdate(e.target.result);
+                    processSave(e.target.result);
                 };
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
-                processUpdate(null);
+                let existingFoto = '';
+                if (secIdxVal !== 'new') {
+                    const sIdx = parseInt(secIdxVal);
+                    const iIdx = parseInt(document.getElementById('modalEditItemIdx').value);
+                    existingFoto = catalogSections[sIdx].items[iIdx].foto;
+                }
+                processSave(existingFoto);
+            }
+        }
+
+        function deleteAdminItem(secIdx, itemIdx) {
+            if(confirm('Tem certeza que deseja excluir este item do catálogo?')) {
+                catalogSections[secIdx].items.splice(itemIdx, 1);
+                localStorage.setItem('vale_catalog_v17', JSON.stringify(catalogSections));
+                renderCatalog();
+                loadAdminCatalogTable();
+                alert('Item excluído com sucesso!');
             }
         }
 
         function loadAdminOrders() {
             const container = document.getElementById('adminOrdersList');
             if(!container) return;
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v16') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v17') || '[]');
 
             if (orders.length === 0) {
                 container.innerHTML = `<p style="color: #777; text-align: center;">Nenhum pedido registado.</p>`;
