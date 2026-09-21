@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitação de Uniformes - VALE (v33)</title>
+    <title>Solicitação de Uniformes - VALE (v35)</title>
     <style>
         :root {
             --primary-color: #007a5e;
@@ -150,6 +150,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: #e9f5f1;
+            padding: 10px 15px;
+            border-radius: 6px;
         }
         .table-container {
             background: white;
@@ -232,6 +235,17 @@
         .btn-add:hover {
             background-color: var(--primary-dark);
         }
+        .btn-move {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 3px 6px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-right: 2px;
+        }
+        .btn-move:hover { background: #5a6268; }
         .size-row {
             display: flex;
             gap: 6px;
@@ -355,7 +369,7 @@
     <header>
         <div class="logo-container">
             <h1>VALE - Sistema de Uniformes</h1>
-            <span class="version-tag">v33</span>
+            <span class="version-tag">v35</span>
         </div>
         <div class="header-actions">
             <!-- Botão Cadeado para Edição Direta -->
@@ -381,7 +395,7 @@
         <!-- Banner de Edição Ativa -->
         <div id="editModeBanner" style="display:none; background: #eaf3ed; border: 2px dashed var(--primary-color); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
             <strong style="color: var(--primary-dark); font-size: 14px;">🔓 MODO DE EDIÇÃO ATIVO</strong>
-            <p style="margin: 5px 0 0 0; font-size: 12px; color: #333;">Pode editar nomes, referências, cores, géneros e gerir os tamanhos e códigos separadamente em cada linha.</p>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #333;">Edite títulos, mova secções/itens com as setas, adicione tamanhos e códigos individualmente ou exclua livremente.</p>
         </div>
 
         <!-- Cards de Categoria Dinâmicos no Topo -->
@@ -449,11 +463,11 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v33)</p>
+        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v35)</p>
     </footer>
 
     <script>
-        const defaultCatalog_v33 = [
+        const defaultCatalog_v35 = [
             {
                 title: "📂 Linha Administrativa - Masculino",
                 category: "Administrativa",
@@ -544,8 +558,8 @@
             }
         ];
 
-        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v33'));
-        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v33;
+        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v35'));
+        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v35;
 
         let isEditUnlocked = false;
         let selectedCategoryFilter = "";
@@ -561,7 +575,7 @@
                     document.getElementById('lockBtn').style.borderColor = "#28a745";
                     document.getElementById('editModeBanner').style.display = "block";
                     renderCatalog();
-                    alert("Cadeado aberto! Pode editar, adicionar e apagar diretamente.");
+                    alert("Cadeado aberto! Pode editar títulos, mover secções/itens e gerir tamanhos separadamente.");
                 } else if (pass !== null) {
                     alert("Senha incorreta!");
                 }
@@ -629,13 +643,12 @@
                     ).join('');
 
                     if (isEditUnlocked) {
-                        // Renderização separada e limpa para edição de cada tamanho e código
                         let tamanhosRowsHtml = '';
                         prod.tamanhos.forEach((t, tIdx) => {
                             tamanhosRowsHtml += `
                                 <div class="size-row">
                                     <input type="text" class="editable-input" value="${t.tamanho}" onchange="updateSizeValue(${sIdx}, ${iIdx}, ${tIdx}, 'tamanho', this.value)" style="width:45px;" placeholder="Tam">
-                                    <input type="text" class="editable-input" value="${t.cod}" onchange="updateSizeValue(${sIdx}, ${iIdx}, ${tIdx}, 'cod', this.value)" style="width:90px;" placeholder="Cód Vale">
+                                    <input type="text" class="editable-input" value="${t.cod}" onchange="updateSizeValue(${sIdx}, ${iIdx}, ${tIdx}, 'cod', this.value)" style="width:105px;" placeholder="Cód Vale">
                                     <button onclick="removeSizeRow(${sIdx}, ${iIdx}, ${tIdx})" style="background:#d9534f; color:white; border:none; border-radius:3px; cursor:pointer; padding:2px 6px;">×</button>
                                 </div>
                             `;
@@ -651,7 +664,11 @@
                                 <td><input type="text" class="editable-input" value="${section.gender}" onchange="updateItemGender(${sIdx}, ${iIdx}, this.value)" style="width:90px;"></td>
                                 <td><input type="text" class="editable-input" value="${section.category}" onchange="updateItemCategory(${sIdx}, ${iIdx}, this.value)" style="width:90px;"></td>
                                 <td>${tamanhosRowsHtml}</td>
-                                <td><button class="btn-add" onclick="deleteItem(${sIdx}, ${iIdx})" style="background:#d9534f; padding:5px 8px;">Excluir</button></td>
+                                <td>
+                                    <button class="btn-move" onclick="moveItem(${sIdx}, ${iIdx}, -1)" title="Mover para cima">⬆️</button>
+                                    <button class="btn-move" onclick="moveItem(${sIdx}, ${iIdx}, 1)" title="Mover para baixo">⬇️</button>
+                                    <button class="btn-add" onclick="deleteItem(${sIdx}, ${iIdx})" style="background:#d9534f; padding:5px 8px; margin-top:2px;">Excluir</button>
+                                </td>
                             </tr>
                         `;
                     } else {
@@ -682,7 +699,7 @@
                         <th>Cor</th>
                         <th>Género</th>
                         <th>Categoria</th>
-                        <th>Tamanhos & Códigos Separados</th>
+                        <th>Tamanhos & Cód. Vale (Separados)</th>
                         <th>Ação</th>
                     </tr>
                 ` : `
@@ -698,14 +715,22 @@
                     </tr>
                 `;
 
-                let addBtnHtml = isEditUnlocked ? `
-                    <button class="btn-add" onclick="addNewItemToSection(${sIdx})" style="background: var(--accent-color); padding: 5px 12px; font-size: 11px;">➕ Adicionar Item</button>
-                ` : '';
+                let sectionControlsHtml = isEditUnlocked ? `
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <input type="text" class="editable-input" value="${section.category}" onchange="updateSectionMeta(${sIdx}, 'category', this.value)" style="width:110px;" title="Editar Categoria">
+                        <input type="text" class="editable-input" value="${section.gender}" onchange="updateSectionMeta(${sIdx}, 'gender', this.value)" style="width:100px;" title="Editar Género">
+                        <button class="btn-move" onclick="moveSection(${sIdx}, -1)" title="Mover Secção para Cima">⬆️</button>
+                        <button class="btn-move" onclick="moveSection(${sIdx}, 1)" title="Mover Secção para Baixo">⬇️</button>
+                        <button class="btn-add" onclick="addNewItemToSection(${sIdx})" style="padding:4px 8px; font-size:11px; background:var(--accent-color);">+ Item</button>
+                        <button class="btn-add" onclick="deleteSection(${sIdx})" style="background:#d9534f; padding:4px 8px; font-size:11px;" title="Apagar Linha/Secção">🗑️</button>
+                    </div>
+                ` : `
+                    <span>📂 Linha ${section.category} - ${section.gender}</span>
+                `;
 
                 container.innerHTML += `
                     <div class="section-title">
-                        <span>📂 Linha ${section.category} - ${section.gender}</span>
-                        ${addBtnHtml}
+                        ${sectionControlsHtml}
                     </div>
                     <div class="table-container">
                         <table>
@@ -722,6 +747,38 @@
                         <button class="btn-add" onclick="addNewSection()" style="background: var(--primary-color); padding: 10px 20px; font-size: 14px;">📁 Criar Nova Categoria / Linha</button>
                     </div>
                 `;
+            }
+        }
+
+        function updateSectionMeta(sIdx, field, val) {
+            val = val.trim() || 'Geral';
+            catalogSections[sIdx][field] = val;
+            catalogSections[sIdx].title = `📂 Linha ${catalogSections[sIdx].category} - ${catalogSections[sIdx].gender}`;
+            saveAndRefresh();
+        }
+
+        function moveSection(sIdx, direction) {
+            let targetIdx = sIdx + direction;
+            if (targetIdx < 0 || targetIdx >= catalogSections.length) return;
+            let temp = catalogSections[sIdx];
+            catalogSections[sIdx] = catalogSections[targetIdx];
+            catalogSections[targetIdx] = temp;
+            saveAndRefresh();
+        }
+
+        function moveItem(sIdx, iIdx, direction) {
+            let targetIdx = iIdx + direction;
+            if (targetIdx < 0 || targetIdx >= catalogSections[sIdx].items.length) return;
+            let temp = catalogSections[sIdx].items[iIdx];
+            catalogSections[sIdx].items[iIdx] = catalogSections[sIdx].items[targetIdx];
+            catalogSections[sIdx].items[targetIdx] = temp;
+            saveAndRefresh();
+        }
+
+        function deleteSection(sIdx) {
+            if (confirm('Tem certeza que deseja apagar toda esta secção e os seus itens?')) {
+                catalogSections.splice(sIdx, 1);
+                saveAndRefresh();
             }
         }
 
@@ -837,7 +894,7 @@
         }
 
         function saveAndRefresh() {
-            localStorage.setItem('vale_catalog_v33', JSON.stringify(catalogSections));
+            localStorage.setItem('vale_catalog_v35', JSON.stringify(catalogSections));
             renderCatalog();
         }
 
@@ -928,7 +985,7 @@
                 return;
             }
 
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v33') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v35') || '[]');
             orders.push({
                 nome: nome,
                 matricula: matricula,
@@ -940,7 +997,7 @@
                 dataStatus: '',
                 itens: [...cart]
             });
-            localStorage.setItem('vale_orders_v33', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v35', JSON.stringify(orders));
 
             alert(`Sucesso! Pedido enviado em nome de ${nome}.`);
             cart = [];
@@ -968,7 +1025,7 @@
         function loadAdminOrders() {
             const container = document.getElementById('adminOrdersList');
             if(!container) return;
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v33') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v35') || '[]');
 
             if (orders.length === 0) {
                 container.innerHTML = `<p style="color: #777; text-align: center;">Nenhum pedido registado.</p>`;
@@ -1011,13 +1068,13 @@
             let matAp = prompt('Insira a sua Matrícula:');
             if(!matAp || !matAp.trim()) return;
 
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v33') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v35') || '[]');
             orders[idx].status = novoStatus;
             orders[idx].aprovadorNome = nomeAp.trim();
             orders[idx].aprovadorMatricula = matAp.trim();
             orders[idx].dataStatus = new Date().toLocaleString();
 
-            localStorage.setItem('vale_orders_v33', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v35', JSON.stringify(orders));
             loadAdminOrders();
             alert(`Pedido marcado como ${novoStatus} com sucesso!`);
         }
