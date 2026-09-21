@@ -1,1 +1,937 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitação de Uniformes - VALE (v14)</title>
+    <style>
+        :root {
+            --primary-color: #007a5e;
+            --primary-dark: #005a43;
+            --secondary-color: #2c3e50;
+            --light-bg: #f4f7f6;
+            --accent-color: #ff8c00;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: #333;
+        }
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-container h1 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 600;
+            color: white;
+        }
+        .version-tag {
+            background: #ff8c00;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 900;
+        }
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-header {
+            background: white;
+            color: var(--primary-color);
+            border: none;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-header:hover {
+            background: #e2f0d9;
+        }
+        .hero {
+            background: linear-gradient(rgba(0,122,94,0.9), rgba(0,122,94,0.9)), url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            padding: 25px 15px;
+        }
+        .hero h2 {
+            margin: 0 0 5px 0;
+            font-size: 20px;
+        }
+        .hero p {
+            margin: 0;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 1250px;
+            margin: 25px auto;
+            padding: 0 15px;
+        }
+        .filter-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .filter-box input, .filter-box select {
+            flex: 1;
+            min-width: 200px;
+            padding: 9px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .section-title {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 6px;
+            margin: 35px 0 15px 0;
+            font-size: 17px;
+            font-weight: bold;
+        }
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: #fcfcfc;
+        }
+        .item-thumb {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 2px;
+        }
+        .gender-badge {
+            background: #e2f0d9;
+            color: #274e13;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+            display: inline-block;
+        }
+        .table-select {
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 12px;
+            max-width: 280px;
+        }
+        .table-input {
+            width: 50px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .btn-add {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        .btn-add:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        /* Modais */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: flex-end;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: white;
+            width: 540px;
+            height: 100%;
+            padding: 25px;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 12px;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .modal-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin: 12px 0;
+        }
+        .form-user {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+        .form-user label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            margin-top: 6px;
+        }
+        .form-user input, .form-user select, .form-user textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 12px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f1f1;
+            font-size: 12px;
+        }
+        .btn-action-main {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 11px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+        }
+        .btn-action-main:hover {
+            background-color: #e07b00;
+        }
+        .admin-order-card {
+            background: #f8f9fa;
+            border-left: 4px solid var(--primary-color);
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .admin-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+        .admin-tab-btn {
+            flex: 1;
+            padding: 7px;
+            background: #e0e0e0;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        .admin-tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            text-align: center;
+            padding: 18px;
+            margin-top: 40px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
 
+    <header>
+        <div class="logo-container">
+            <h1>VALE - Sistema de Uniformes</h1>
+            <span class="version-tag">v14</span>
+        </div>
+        <div class="header-actions">
+            <button class="btn-header" onclick="toggleCart()">
+                🛒 Carrinho (<span id="cart-count">0</span>)
+            </button>
+            <button class="btn-header" onclick="openAdminModal()" style="background-color: #2c3e50; color: white;">
+                🔒 Painel ADM
+            </button>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h2>Catálogo Estilo Excel</h2>
+        <p>Selecione o tamanho na caixinha de seleção e adicione ao carrinho[span_2](start_span)[span_2](end_span).</p>
+    </div>
+
+    <div class="container">
+        
+        <!-- Filtros -->
+        <div class="filter-box">
+            <input type="text" id="searchFilter" placeholder="Pesquisar por nome ou referência..." onkeyup="renderCatalog()">
+            <select id="categoryFilter" onchange="renderCatalog()">
+                <option value="">Todas as Categorias</option>
+                <option value="Administrativa">Linha Administrativa</option>
+                <option value="Operacional">Linha Operacional</option>
+                <option value="Inverno/Acessórios">Inverno e Acessórios</option>
+            </select>
+            <select id="genderFilter" onchange="renderCatalog()">
+                <option value="">Todos os Géneros</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Feminino">Feminino</option>
+                <option value="Unissex">Unissex</option>
+            </select>
+        </div>
+
+        <div id="tablesContainer"></div>
+
+    </div>
+
+    <!-- Carrinho Modal -->
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <div>
+                <div class="modal-header">
+                    <h3>Carrinho e Identificação</h3>
+                    <button class="close-modal" onclick="toggleCart()">&times;</button>
+                </div>
+                
+                <div style="margin-top: 10px;">
+                    <div class="form-user">
+                        <label for="userName">Nome Completo:</label>
+                        <input type="text" id="userName" placeholder="Insira seu nome">
+                        <label for="userMatricula">Matrícula:</label>
+                        <input type="text" id="userMatricula" placeholder="Insira sua matrícula">
+                    </div>
+                </div>
+
+                <h4>Itens Selecionados:</h4>
+                <div class="modal-body" id="cartItemsContainer" style="max-height: 200px;">
+                    <p style="color: #777; text-align: center; margin-top: 15px;">O carrinho está vazio.</p>
+                </div>
+            </div>
+            <div>
+                <button class="btn-action-main" onclick="enviarPedido()">Confirmar e Enviar Pedido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Painel Administrador (Senha: admin123) -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content" style="width: 560px;">
+            <div>
+                <div class="modal-header">
+                    <h3>Painel do Administrador (v14)</h3>
+                    <button class="close-modal" onclick="closeAdminModal()">&times;</button>
+                </div>
+
+                <div id="adminLoginSection" style="margin-top: 25px; text-align: center;">
+                    <p>Área restrita. Digite a senha de Administrador (admin123):</p>
+                    <div style="position: relative; display: inline-block; width: 70%; margin-bottom: 10px;">
+                        <input type="password" id="adminPassword" placeholder="Senha ADM" style="padding: 9px; width: 100%; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                        <span onclick="togglePasswordVisibility()" style="position: absolute; right: 8px; top: 8px; cursor: pointer; font-size: 16px;" id="eyeIcon" title="Mostrar/Ocultar Senha">👁️</span>
+                    </div>
+                    <br>
+                    <button class="btn-add" onclick="checkAdminPassword()" style="padding: 8px 16px; font-size: 13px;">Entrar</button>
+                </div>
+
+                <div id="adminPanelContent" style="display: none; margin-top: 12px;">
+                    <div class="admin-tabs">
+                        <button class="admin-tab-btn active" onclick="switchAdminTab('manage')">Gerir / Editar Itens</button>
+                        <button class="admin-tab-btn" onclick="switchAdminTab('orders')">Pedidos Recebidos</button>
+                    </div>
+
+                    <!-- Aba Gerir / Editar Itens -->
+                    <div id="tabManageContent" class="form-user" style="max-height: 330px; overflow-y: auto;">
+                        <input type="hidden" id="editCatalogId" value="">
+                        
+                        <div style="background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 12px;">
+                            <strong id="formTitleMode" style="color: var(--primary-color); font-size: 12px;">Editar Item Selecionado:</strong>
+                            <div style="display: flex; gap: 8px; margin-top: 6px;">
+                                <div style="flex: 2;">
+                                    <label>Nome do Item:</label>
+                                    <input type="text" id="editItemName" placeholder="Ex: Camisa Administrativa...">
+                                </div>
+                                <div style="flex: 1;">
+                                    <label>Referência:</label>
+                                    <input type="text" id="editItemRef" placeholder="CM-444">
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 8px;">
+                                <div style="flex: 1;">
+                                    <label>Categoria:</label>
+                                    <select id="editItemCat">
+                                        <option value="Administrativa">Administrativa</option>
+                                        <option value="Operacional">Operacional</option>
+                                        <option value="Inverno/Acessórios">Inverno/Acessórios</option>
+                                    </select>
+                                </div>
+                                <div style="flex: 1;">
+                                    <label>Género:</label>
+                                    <select id="editItemGender">
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Feminino">Feminino</option>
+                                        <option value="Unissex">Unissex</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <label>Foto do Aparelho:</label>
+                            <input type="file" id="editItemPhotoFile" accept="image/*" style="font-size: 11px; padding: 4px;">
+
+                            <label>Tamanhos, Cores e Códigos (Formato: Tamanho:Código (Cor)):</label>
+                            <textarea id="editItemVars" rows="3" placeholder="01:16724398 (Verde Vale), 02:16725077 (Verde Vale)"></textarea>
+
+                            <button class="btn-add" onclick="saveAdminItem()" style="width: 100%; margin-top: 10px; padding: 8px;">Guardar Alterações do Item</button>
+                        </div>
+
+                        <h4 style="margin: 10px 0 5px 0; font-size: 12px; color: var(--secondary-color);">Lista de Produtos para Editar:</h4>
+                        <div id="adminItemsList"></div>
+                    </div>
+
+                    <!-- Aba Pedidos -->
+                    <div id="tabOrdersContent" style="display: none;" class="modal-body">
+                        <div id="adminOrdersList" style="max-height: 310px;">
+                            <p style="color: #777; text-align: center;">Nenhum pedido registado.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v14)</p>
+    </footer>
+
+    <script>
+        const defaultCatalog_v14 = [
+            {
+                title: "📂 Linha Administrativa - Masculino",
+                category: "Administrativa",
+                gender: "Masculino",
+                items: [
+                    { 
+                        id: 1, 
+                        nome: 'Camisa Administrativa Masculina Manga Longa', 
+                        ref: 'CM-444', 
+                        foto: '',
+                        variacoes: [
+                            { id: 101, cod: '16724398', tamanho: '01', cor: 'Verde Vale' },
+                            { id: 102, cod: '16725077', tamanho: '02', cor: 'Verde Vale' },
+                            { id: 103, cod: '16724307', tamanho: '03', cor: 'Verde Vale' },
+                            { id: 104, cod: '13192040', tamanho: '01', cor: 'Cinza' },
+                            { id: 105, cod: '13192330', tamanho: '02', cor: 'Cinza' }
+                        ]
+                    },
+                    { 
+                        id: 2, 
+                        nome: 'Camisa Administrativa Masculina Manga Curta', 
+                        ref: 'CM-443', 
+                        foto: '',
+                        variacoes: [
+                            { id: 106, cod: '16724400', tamanho: '01', cor: 'Verde Vale' },
+                            { id: 107, cod: '16724412', tamanho: '02', cor: 'Verde Vale' },
+                            { id: 108, cod: '16724642', tamanho: '03', cor: 'Verde Vale' },
+                            { id: 109, cod: '13192356', tamanho: '01', cor: 'Cinza' },
+                            { id: 110, cod: '13192127', tamanho: '02', cor: 'Cinza' }
+                        ]
+                    },
+                    { 
+                        id: 3, 
+                        nome: 'Calça Jeans Administrativa Masculina', 
+                        ref: 'CL-93', 
+                        foto: '',
+                        variacoes: [
+                            { id: 111, cod: '13315310', tamanho: '34', cor: 'Azul Marinho' },
+                            { id: 112, cod: '13315309', tamanho: '36', cor: 'Azul Marinho' },
+                            { id: 113, cod: '13315308', tamanho: '38', cor: 'Azul Marinho' }
+                        ]
+                    }
+                ]
+            },
+            {
+                title: "📂 Linha Administrativa - Feminino",
+                category: "Administrativa",
+                gender: "Feminino",
+                items: [
+                    { 
+                        id: 4, 
+                        nome: 'Camisa Administrativa Feminina Manga Longa', 
+                        ref: 'CM-919', 
+                        foto: '',
+                        variacoes: [
+                            { id: 114, cod: '16724553', tamanho: '36', cor: 'Verde Vale' },
+                            { id: 115, cod: '16724512', tamanho: '38', cor: 'Verde Vale' },
+                            { id: 116, cod: '13192248', tamanho: '36', cor: 'Cinza' },
+                            { id: 117, cod: '13192244', tamanho: '38', cor: 'Cinza' }
+                        ]
+                    },
+                    { 
+                        id: 5, 
+                        nome: 'Camisa Administrativa Feminina Manga Curta', 
+                        ref: 'CM-918', 
+                        foto: '',
+                        variacoes: [
+                            { id: 118, cod: '16724419', tamanho: '36', cor: 'Verde Vale' },
+                            { id: 119, cod: '16724632', tamanho: '38', cor: 'Verde Vale' },
+                            { id: 120, cod: '15500269', tamanho: '40', cor: 'Verde Vale' },
+                            { id: 121, cod: '13192069', tamanho: '36', cor: 'Cinza' },
+                            { id: 122, cod: '13192148', tamanho: '38', cor: 'Cinza' }
+                        ]
+                    },
+                    { 
+                        id: 6, 
+                        nome: 'Calça Jeans Administrativa Feminina', 
+                        ref: 'CL-285', 
+                        foto: '',
+                        variacoes: [
+                            { id: 123, cod: '13315330', tamanho: '34', cor: 'Azul Marinho' },
+                            { id: 124, cod: '13315329', tamanho: '36', cor: 'Azul Marinho' },
+                            { id: 125, cod: '13315328', tamanho: '38', cor: 'Azul Marinho' }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v14'));
+        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v14;
+
+        let cart = [];
+
+        function renderCatalog() {
+            const container = document.getElementById('tablesContainer');
+            if(!container) return;
+            container.innerHTML = '';
+
+            const query = document.getElementById('searchFilter').value.toLowerCase();
+            const catFilter = document.getElementById('categoryFilter').value;
+            const genderFilter = document.getElementById('genderFilter').value;
+
+            let hasVisible = false;
+
+            catalogSections.forEach((section) => {
+                if (catFilter !== "" && section.category !== catFilter) return;
+                if (genderFilter !== "" && section.gender !== genderFilter) return;
+
+                const filteredItems = section.items.filter(prod => {
+                    return prod.nome.toLowerCase().includes(query) || 
+                           prod.ref.toLowerCase().includes(query) ||
+                           prod.variacoes.some(v => v.cod.includes(query) || v.cor.toLowerCase().includes(query));
+                });
+
+                if (filteredItems.length === 0) return;
+
+                hasVisible = true;
+                let rowsHtml = '';
+
+                filteredItems.forEach(prod => {
+                    let thumbSrc = prod.foto ? prod.foto : 'https://via.placeholder.com/40?text=Foto';
+                    let optionsHtml = prod.variacoes.map(v => 
+                        `<option value="${v.id}">Tam: ${v.tamanho} | Cor: ${v.cor} (Cód: ${v.cod})</option>`
+                    ).join('');
+
+                    rowsHtml += `
+                        <tr>
+                            <td><img src="${thumbSrc}" class="item-thumb" alt="Foto" onerror="this.src='https://via.placeholder.com/40?text=Foto'"></td>
+                            <td><strong>${prod.ref}</strong></td>
+                            <td>${prod.nome}</td>
+                            <td><span class="gender-badge">${section.gender}</span></td>
+                            <td>
+                                <select class="table-select" id="select-var-${prod.id}">
+                                    ${optionsHtml}
+                                </select>
+                            </td>
+                            <td><input type="number" class="table-input" id="qty-${prod.id}" value="1" min="1" max="50"></td>
+                            <td><button class="btn-add" onclick="addToCart(${prod.id})">Adicionar</button></td>
+                        </tr>
+                    `;
+                });
+
+                container.innerHTML += `
+                    <div class="section-title">${section.title}</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>Ref.</th>
+                                    <th>Descrição do Item</th>
+                                    <th>Género</th>
+                                    <th>Selecione o Tamanho / Cor / Cód. VALE</th>
+                                    <th>Qtd</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            });
+
+            if (!hasVisible) {
+                container.innerHTML = `<p style="text-align:center; color:#777; padding:30px;">Nenhum item encontrado com os filtros aplicados.</p>`;
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById('adminPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeIcon.textContent = '🙈';
+            } else {
+                passInput.type = 'password';
+                eyeIcon.textContent = '👁️';
+            }
+        }
+
+        function addToCart(prodId) {
+            let foundProd = null;
+            catalogSections.forEach(sec => {
+                const match = sec.items.find(i => i.id === prodId);
+                if(match) foundProd = match;
+            });
+
+            if(!foundProd) return;
+
+            const selectVar = document.getElementById(`select-var-${prodId}`);
+            const qtyInput = document.getElementById(`qty-${prodId}`);
+            
+            const varId = parseInt(selectVar.value);
+            const qty = parseInt(qtyInput.value);
+            const variacao = foundProd.variacoes.find(v => v.id === varId);
+
+            const cartKey = `${prodId}-${varId}`;
+            const existing = cart.find(c => c.cartKey === cartKey);
+            if (existing) {
+                existing.qty += qty;
+            } else {
+                cart.push({
+                    cartKey: cartKey,
+                    nome: foundProd.nome,
+                    ref: foundProd.ref,
+                    cor: variacao.cor,
+                    cod: variacao.cod,
+                    tamanho: variacao.tamanho,
+                    qty: qty
+                });
+            }
+
+            updateCartUI();
+            alert(`Adicionado: ${qty}x ${foundProd.nome} (${variacao.cor}, Tam: ${variacao.tamanho})`);
+        }
+
+        function updateCartUI() {
+            const countSpan = document.getElementById('cart-count');
+            const container = document.getElementById('cartItemsContainer');
+
+            const total = cart.reduce((sum, i) => sum + i.qty, 0);
+            countSpan.innerText = total;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p style="color: #777; text-align: center; margin-top: 15px;">O carrinho está vazio.</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            cart.forEach((c, index) => {
+                container.innerHTML += `
+                    <div class="cart-item">
+                        <div>
+                            <strong>${c.nome}</strong><br>
+                            <small>Cód: ${c.cod} | Cor: ${c.cor} | Tam: ${c.tamanho} | Qtd: ${c.qty}</small>
+                        </div>
+                        <button onclick="removeCart(${index})" style="background:none; border:none; color:red; cursor:pointer; font-weight:bold;">X</button>
+                    </div>
+                `;
+            });
+        }
+
+        function removeCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cartModal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarPedido() {
+            const nome = document.getElementById('userName').value.trim();
+            const matricula = document.getElementById('userMatricula').value.trim();
+
+            if (!nome || !matricula) {
+                alert('Por favor, preencha o seu Nome e a Matrícula.');
+                return;
+            }
+
+            if (cart.length === 0) {
+                alert('O carrinho está vazio!');
+                return;
+            }
+
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v14') || '[]');
+            orders.push({
+                nome: nome,
+                matricula: matricula,
+                data: new Date().toLocaleString(),
+                itens: [...cart]
+            });
+            localStorage.setItem('vale_orders_v14', JSON.stringify(orders));
+
+            alert(`Sucesso! Pedido enviado em nome de ${nome} (Matrícula: ${matricula}). Registado no sistema.`);
+            
+            cart = [];
+            document.getElementById('userName').value = '';
+            document.getElementById('userMatricula').value = '';
+            updateCartUI();
+            toggleCart();
+        }
+
+        function openAdminModal() {
+            document.getElementById('adminModal').style.display = 'flex';
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminPassword').type = 'password';
+            document.getElementById('eyeIcon').textContent = '👁️';
+            document.getElementById('adminLoginSection').style.display = 'block';
+            document.getElementById('adminPanelContent').style.display = 'none';
+        }
+
+        function checkAdminPassword() {
+            const pass = document.getElementById('adminPassword').value.trim();
+            if (pass === 'admin123') {
+                document.getElementById('adminLoginSection').style.display = 'none';
+                document.getElementById('adminPanelContent').style.display = 'block';
+                loadAdminItemsList();
+                loadAdminOrders();
+            } else {
+                alert('Senha incorreta! (Use: admin123)');
+            }
+        }
+
+        function switchAdminTab(tab) {
+            document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+            if(tab === 'manage') {
+                document.getElementById('tabManageContent').style.display = 'block';
+                document.getElementById('tabOrdersContent').style.display = 'none';
+                event.target.classList.add('active');
+                loadAdminItemsList();
+            } else {
+                document.getElementById('tabManageContent').style.display = 'none';
+                document.getElementById('tabOrdersContent').style.display = 'block';
+                event.target.classList.add('active');
+                loadAdminOrders();
+            }
+        }
+
+        function loadAdminItemsList() {
+            const container = document.getElementById('adminItemsList');
+            if(!container) return;
+            container.innerHTML = '';
+
+            catalogSections.forEach((sec, sIdx) => {
+                container.innerHTML += `<div style="font-weight:bold; color:var(--primary-color); margin-top:8px; font-size:11px;">${sec.title}</div>`;
+                sec.items.forEach((item, iIdx) => {
+                    let thumb = item.foto ? item.foto : 'https://via.placeholder.com/25?text=Foto';
+                    container.innerHTML += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding:4px 6px; margin-top:3px; border-radius:4px; border:1px solid #ddd; font-size:11px;">
+                            <div style="display:flex; align-items:center; gap:5px;">
+                                <img src="${thumb}" style="width:22px; height:22px; object-fit:contain; border:1px solid #ccc;">
+                                <span>${item.nome} (${item.ref})</span>
+                            </div>
+                            <button class="btn-add" onclick="editAdminItem(${sIdx}, ${iIdx})" style="padding:3px 6px; font-size:10px;">Editar</button>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function editAdminItem(secIdx, itemIdx) {
+            const item = catalogSections[secIdx].items[itemIdx];
+            const sec = catalogSections[secIdx];
+
+            document.getElementById('editCatalogId').value = `${secIdx}-${itemIdx}`;
+            document.getElementById('editItemName').value = item.nome;
+            document.getElementById('editItemRef').value = item.ref;
+            document.getElementById('editItemCat').value = sec.category;
+            document.getElementById('editItemGender').value = sec.gender;
+
+            let varsStr = item.variacoes.map(v => `${v.tamanho}:${v.cod} (${v.cor})`).join(', ');
+            document.getElementById('editItemVars').value = varsStr;
+            document.getElementById('formTitleMode').innerText = `A editar: ${item.nome}`;
+        }
+
+        function saveAdminItem() {
+            const targetId = document.getElementById('editCatalogId').value;
+            if(!targetId) {
+                alert('Selecione um item da lista abaixo para editar primeiro.');
+                return;
+            }
+
+            const [sIdx, iIdx] = targetId.split('-').map(Number);
+            const nome = document.getElementById('editItemName').value.trim();
+            const ref = document.getElementById('editItemRef').value.trim();
+            const cat = document.getElementById('editItemCat').value;
+            const gender = document.getElementById('editItemGender').value;
+            const varsStr = document.getElementById('editItemVars').value.trim();
+            const fileInput = document.getElementById('editItemPhotoFile');
+
+            if(!nome || !ref || !varsStr) {
+                alert('Preencha o nome, referência e as variações.');
+                return;
+            }
+
+            let variacoes = [];
+            varsStr.split(',').forEach((p, idx) => {
+                let sub = p.trim().split(':');
+                if(sub.length >= 2) {
+                    let tam = sub[0].trim();
+                    let resto = sub[1].trim().split('(');
+                    let cod = resto[0].trim();
+                    let cor = resto[1] ? resto[1].replace(')', '').trim() : 'Padrão';
+                    variacoes.push({
+                        id: Date.now() + idx,
+                        cod: cod,
+                        tamanho: tam,
+                        cor: cor
+                    });
+                }
+            });
+
+            const processUpdate = (fotoUrl) => {
+                // Atualizar dados do item
+                catalogSections[sIdx].items[iIdx].nome = nome;
+                catalogSections[sIdx].items[iIdx].ref = ref;
+                catalogSections[sIdx].items[iIdx].variacoes = variacoes;
+                if(fotoUrl) {
+                    catalogSections[sIdx].items[iIdx].foto = fotoUrl;
+                }
+
+                // Se mudou de categoria ou género, realocar se necessário (simplificado: atualiza a secção correspondente)
+                localStorage.setItem('vale_catalog_v14', JSON.stringify(catalogSections));
+                renderCatalog();
+                loadAdminItemsList();
+                alert('Item atualizado com sucesso!');
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    processUpdate(e.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                processUpdate(null);
+            }
+        }
+
+        function loadAdminOrders() {
+            const container = document.getElementById('adminOrdersList');
+            if(!container) return;
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v14') || '[]');
+
+            if (orders.length === 0) {
+                container.innerHTML = `<p style="color: #777; text-align: center;">Nenhum pedido registado.</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            orders.forEach((ord, idx) => {
+                let itensStr = ord.itens.map(i => `<li>${i.qty}x ${i.nome} (Cor: ${i.cor}, Cód: ${i.cod}, Tam: ${i.tamanho})</li>`).join('');
+                container.innerHTML += `
+                    <div class="admin-order-card">
+                        <strong>Pedido #${idx+1} - ${ord.nome} (Mat: ${ord.matricula})</strong><br>
+                        <small>Data: ${ord.data}</small>
+                        <ul style="margin: 3px 0 0 12px; padding: 0;">${itensStr}</ul>
+                    </div>
+                `;
+            });
+        }
+
+        window.onload = renderCatalog;
+    </script>
+</body>
+</html>
