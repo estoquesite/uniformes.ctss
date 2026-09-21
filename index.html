@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VALE - Sistema de Uniformes (v40)</title>
+    <title>VALE - Sistema de Uniformes (v41)</title>
     <style>
         :root {
             --primary: #007a5e;
@@ -73,7 +73,7 @@
         }
         
         .main-wrapper {
-            max-width: 1350px;
+            max-width: 1400px;
             margin: 30px auto;
             padding: 0 24px;
         }
@@ -81,7 +81,6 @@
         .view-section { display: none; }
         .view-section.active { display: block; }
 
-        /* Barra de Pesquisa e Filtros Moderna */
         .toolbar {
             background: var(--card-bg);
             padding: 20px 24px;
@@ -103,14 +102,8 @@
             font-size: 13px;
             outline: none;
             background: #fff;
-            transition: border 0.2s, box-shadow 0.2s;
-        }
-        .toolbar input:focus, .toolbar select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0,122,94,0.1);
         }
 
-        /* Pills de Categoria Limpos e Elegantes */
         .categories-bar {
             display: flex;
             gap: 10px;
@@ -129,19 +122,9 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
             transition: all 0.2s ease;
         }
-        .cat-pill:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: translateY(-1px);
-        }
-        .cat-pill.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(0,122,94,0.2);
-        }
+        .cat-pill:hover { border-color: var(--primary); color: var(--primary); }
+        .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* Tabelas Estilizadas */
         .table-card {
             background: var(--card-bg);
             border-radius: 12px;
@@ -168,7 +151,7 @@
             font-size: 13px;
         }
         th, td {
-            padding: 14px 20px;
+            padding: 14px 18px;
             border-bottom: 1px solid #f1f5f9;
             vertical-align: middle;
         }
@@ -183,7 +166,7 @@
         tr:hover { background-color: #f8fafc; }
         
         .item-img {
-            width: 44px; height: 44px; object-fit: contain;
+            width: 45px; height: 45px; object-fit: contain;
             border: 1px solid var(--border-color); border-radius: 8px; background: #fff; padding: 2px;
         }
         .badge {
@@ -205,13 +188,12 @@
             cursor: pointer; font-size: 12px; transition: all 0.2s;
             box-shadow: 0 2px 4px rgba(0,122,94,0.15);
         }
-        .btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
-        .btn-danger { background: #ef4444; box-shadow: 0 2px 4px rgba(239,68,68,0.15); }
+        .btn:hover { background: var(--primary-dark); }
+        .btn-danger { background: #ef4444; }
         .btn-danger:hover { background: #dc2626; }
-        .btn-accent { background: var(--accent); box-shadow: 0 2px 4px rgba(249,115,22,0.15); }
+        .btn-accent { background: var(--accent); }
         .btn-accent:hover { background: #ea580c; }
 
-        /* Edição Inline */
         .edit-input {
             width: 100%; padding: 8px 12px; border: 1px solid var(--primary);
             border-radius: 6px; font-size: 12px; background: #fffdf5; box-sizing: border-box;
@@ -222,11 +204,10 @@
         .btn-move {
             background: #64748b; color: white; border: none;
             border-radius: 6px; padding: 6px 10px; cursor: pointer;
-            font-size: 11px; margin-right: 4px; transition: background 0.2s;
+            font-size: 11px; margin-right: 4px;
         }
         .btn-move:hover { background: #475569; }
 
-        /* Cart & Admin Layouts */
         .cart-layout {
             display: grid; grid-template-columns: 2fr 1fr; gap: 24px;
         }
@@ -243,7 +224,6 @@
         .form-field input, .form-field select {
             width: 100%; padding: 11px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; outline: none;
         }
-        .form-field input:focus { border-color: var(--primary); }
 
         .order-card {
             background: #fff; border-left: 5px solid var(--primary);
@@ -253,7 +233,7 @@
 
         footer {
             background-color: var(--secondary); color: #94a3b8; text-align: center;
-            padding: 24px; margin-top: 60px; font-size: 12px; letter-spacing: 0.5px;
+            padding: 24px; margin-top: 60px; font-size: 12px;
         }
     </style>
 </head>
@@ -262,12 +242,12 @@
     <header>
         <div class="brand">
             <h1>VALE - Sistema de Uniformes</h1>
-            <span class="version-tag">v40</span>
+            <span class="version-tag">v41</span>
         </div>
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchView('catalog')">📦 Catálogo</button>
             <button class="tab-btn" onclick="switchView('cart')">🛒 Carrinho (<span id="cart-counter">0</span>)</button>
-            <button class="tab-btn" onclick="openAdminPortal()">🔒 Painel ADM</button>
+            <button class="tab-btn" id="lockBtn" onclick="openAdminPortal()">🔒 Painel ADM</button>
         </div>
     </header>
 
@@ -337,11 +317,11 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v40)</p>
+        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v41)</p>
     </footer>
 
     <script>
-        const defaultCatalog_v40 = [
+        const defaultCatalog_v41 = [
             {
                 category: "Administrativa",
                 gender: "Masculino",
@@ -349,7 +329,7 @@
                     { 
                         id: 1, 
                         nome: 'Camisa Administrativa Masculina Manga Longa', 
-                        ref: 'CM-444', 
+                        ref: '16724398', 
                         cor: 'Verde Vale',
                         foto: '',
                         tamanhos: [
@@ -361,7 +341,7 @@
                     { 
                         id: 2, 
                         nome: 'Camisa Administrativa Masculina Manga Curta', 
-                        ref: 'CM-443', 
+                        ref: '16724400', 
                         cor: 'Verde Vale',
                         foto: '',
                         tamanhos: [
@@ -370,28 +350,11 @@
                         ]
                     }
                 ]
-            },
-            {
-                category: "Administrativa",
-                gender: "Feminino",
-                items: [
-                    { 
-                        id: 3, 
-                        nome: 'Camisa Administrativa Feminina Manga Longa', 
-                        ref: 'CM-919', 
-                        cor: 'Verde Vale',
-                        foto: '',
-                        tamanhos: [
-                            { cod: '16724553', tamanho: '36' },
-                            { cod: '16724512', tamanho: '38' }
-                        ]
-                    }
-                ]
             }
         ];
 
-        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v40'));
-        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v40;
+        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v41'));
+        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v41;
         
         let isEditUnlocked = false;
         let selectedCategoryFilter = "";
@@ -476,8 +439,8 @@
 
                 let rowsHtml = '';
                 section.items.forEach((prod, iIdx) => {
-                    let thumb = prod.foto || 'https://via.placeholder.com/44?text=Foto';
-                    let firstCod = prod.tamanhos[0] ? prod.tamanhos[0].cod : '-';
+                    let thumb = prod.foto || 'https://via.placeholder.com/45?text=Foto';
+                    let firstCod = prod.tamanhos[0] ? prod.tamanhos[0].cod : prod.ref;
                     let options = prod.tamanhos.map(t => `<option value="${t.cod}">${t.tamanho} (Cód: ${t.cod})</option>`).join('');
 
                     if (isEditUnlocked) {
@@ -486,7 +449,7 @@
                             sizesHtml += `
                                 <div class="size-edit-row">
                                     <input type="text" class="edit-input" value="${t.tamanho}" onchange="updateSize(${sIdx}, ${iIdx}, ${tIdx}, 'tamanho', this.value)" style="width:45px;" placeholder="Tam">
-                                    <input type="text" class="edit-input" value="${t.cod}" onchange="updateSize(${sIdx}, ${iIdx}, ${tIdx}, 'cod', this.value)" style="width:110px;" placeholder="Cód Vale">
+                                    <input type="text" class="edit-input" value="${t.cod}" onchange="updateSize(${sIdx}, ${iIdx}, ${tIdx}, 'cod', this.value)" style="width:110px;" placeholder="Cód Vale (16...)">
                                     <button class="btn btn-danger" onclick="removeSize(${sIdx}, ${iIdx}, ${tIdx})" style="padding:4px 8px;">×</button>
                                 </div>
                             `;
@@ -495,11 +458,14 @@
 
                         rowsHtml += `
                             <tr>
-                                <td><img src="${thumb}" class="item-img"></td>
-                                <td><input type="text" class="edit-input" value="${prod.ref}" onchange="updateItem(${sIdx}, ${iIdx}, 'ref', this.value)" style="width:80px;"></td>
+                                <td>
+                                    <img src="${thumb}" class="item-img" style="margin-bottom:4px;"><br>
+                                    <input type="file" accept="image/*" onchange="updateItemPhoto(${sIdx}, ${iIdx}, event)" style="font-size:10px; width:90px;">
+                                </td>
+                                <td><input type="text" class="edit-input" value="${prod.ref}" onchange="updateItem(${sIdx}, ${iIdx}, 'ref', this.value)" style="width:110px;" placeholder="16..."></td>
                                 <td><input type="text" class="edit-input" value="${prod.nome}" onchange="updateItem(${sIdx}, ${iIdx}, 'nome', this.value)"></td>
-                                <td><input type="text" class="edit-input" value="${prod.cor}" onchange="updateItem(${sIdx}, ${iIdx}, 'cor', this.value)" style="width:100px;"></td>
-                                <td><input type="text" class="edit-input" value="${section.gender}" onchange="updateGender(${sIdx}, ${iIdx}, this.value)" style="width:100px;"></td>
+                                <td><input type="text" class="edit-input" value="${prod.cor}" onchange="updateItem(${sIdx}, ${iIdx}, 'cor', this.value)" style="width:90px;"></td>
+                                <td><input type="text" class="edit-input" value="${section.gender}" onchange="updateGender(${sIdx}, ${iIdx}, this.value)" style="width:90px;"></td>
                                 <td>${sizesHtml}</td>
                                 <td style="white-space: nowrap;">
                                     <button class="btn-move" onclick="moveItem(${sIdx}, ${iIdx}, -1)">⬆️</button>
@@ -511,8 +477,8 @@
                     } else {
                         rowsHtml += `
                             <tr>
-                                <td><img src="${thumb}" class="item-img" onerror="this.src='https://via.placeholder.com/44?text=Foto'"></td>
-                                <td><strong style="color: var(--primary);">${firstCod}</strong></td>
+                                <td><img src="${thumb}" class="item-img" onerror="this.src='https://via.placeholder.com/45?text=Foto'"></td>
+                                <td><strong style="color: var(--primary);">${prod.ref || firstCod}</strong></td>
                                 <td>${prod.nome}</td>
                                 <td>${prod.cor}</td>
                                 <td><span class="badge">${section.gender}</span></td>
@@ -525,7 +491,7 @@
                 });
 
                 let headers = isEditUnlocked ? 
-                    `<tr><th>Foto</th><th>Cód. Vale</th><th>Nome do Item</th><th>Cor</th><th>Género</th><th>Tamanhos & Códigos Separados</th><th>Ações</th></tr>` :
+                    `<tr><th>Foto</th><th>Cód. Vale (16...)</th><th>Nome do Item</th><th>Cor</th><th>Género</th><th>Tamanhos & Códigos (Separados)</th><th>Ações</th></tr>` :
                     `<tr><th>Foto</th><th>Cód. Vale</th><th>Descrição do Item</th><th>Cor</th><th>Género</th><th>Tamanho</th><th>Qtd</th><th>Ação</th></tr>`;
 
                 let secHeader = isEditUnlocked ? `
@@ -551,22 +517,32 @@
 
         function updateItem(s, i, f, v) { catalogSections[s].items[i][f] = v.trim(); saveAndSync(); }
         function updateSize(s, i, t, f, v) { catalogSections[s].items[i].tamanhos[t][f] = v.trim(); saveAndSync(); }
-        function addSize(s, i) { catalogSections[s].items[i].tamanhos.push({tamanho: 'Único', cod: '000000'}); saveAndSync(); }
+        function addSize(s, i) { catalogSections[s].items[i].tamanhos.push({tamanho: 'Único', cod: '16700000'}); saveAndSync(); }
         function removeSize(s, i, t) {
             if(catalogSections[s].items[i].tamanhos.length <= 1) { alert('Mínimo 1 tamanho.'); return; }
             catalogSections[s].items[i].tamanhos.splice(t, 1); saveAndSync();
         }
         function deleteItem(s, i) { if(confirm('Excluir item?')) { catalogSections[s].items.splice(i,1); saveAndSync(); } }
+        function updateItemPhoto(s, i, event) {
+            let file = event.target.files[0];
+            if(!file) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                catalogSections[s].items[i].foto = e.target.result;
+                saveAndSync();
+            };
+            reader.readAsDataURL(file);
+        }
         function addItem(s) {
             let nome = prompt('Nome do item:'); if(!nome) return;
-            let ref = prompt('Cód. Vale:', 'CM-000');
-            catalogSections[s].items.push({ id: Date.now(), nome: nome, ref: ref, cor: 'Verde Vale', foto: '', tamanhos: [{tamanho:'01', cod:'123456'}] });
+            let ref = prompt('Cód. Vale (começado por 16...):', '16724398');
+            catalogSections[s].items.push({ id: Date.now(), nome: nome, ref: ref || '16700000', cor: 'Verde Vale', foto: '', tamanhos: [{tamanho:'01', cod: ref || '16724398'}] });
             saveAndSync();
         }
         function addNewSection() {
             let cat = prompt('Nome da Categoria:'); if(!cat) return;
             let gen = prompt('Género:', 'Unissex'); if(!gen) return;
-            catalogSections.push({ category: cat, gender: gen, items: [{ id: Date.now(), nome: 'Novo Uniforme', ref: 'REF-01', cor: 'Padrão', foto:'', tamanhos:[{tamanho:'Único', cod:'000000'}] }] });
+            catalogSections.push({ category: cat, gender: gen, items: [{ id: Date.now(), nome: 'Novo Uniforme', ref: '16700000', cor: 'Padrão', foto:'', tamanhos:[{tamanho:'Único', cod:'16700000'}] }] });
             saveAndSync();
         }
         function deleteSec(s) { if(confirm('Apagar secção inteira?')) { catalogSections.splice(s, 1); saveAndSync(); } }
@@ -578,7 +554,7 @@
         }
 
         function saveAndSync() {
-            localStorage.setItem('vale_catalog_v40', JSON.stringify(catalogSections));
+            localStorage.setItem('vale_catalog_v41', JSON.stringify(catalogSections));
             renderCatalog();
         }
 
@@ -606,7 +582,7 @@
             cart.forEach((c, idx) => {
                 html += `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px;">
-                        <div><strong>${c.nome}</strong><br><small style="color:#64748b;">Cód: ${c.cod} | Cor: ${c.cor} | Tam: ${c.tamanho} | Qtd: ${c.qty}</small></div>
+                        <div><strong>${c.nome}</strong><br><small style="color:#64748b;">Cód. Vale: ${c.cod} | Cor: ${c.cor} | Tam: ${c.tamanho} | Qtd: ${c.qty}</small></div>
                         <button class="btn btn-danger" onclick="removeFromCart(${idx})" style="padding:5px 10px;">Remover</button>
                     </div>
                 `;
@@ -624,9 +600,9 @@
             if(!nome || !mat || !ret) { alert('Preencha todos os campos de identificação e data de retirada.'); return; }
             if(cart.length === 0) { alert('Carrinho vazio!'); return; }
 
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v40') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v41') || '[]');
             orders.push({ nome, matricula: mat, dataRetirada: ret, dataPedido: new Date().toLocaleString(), status: 'Pendente', itens: [...cart] });
-            localStorage.setItem('vale_orders_v40', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v41', JSON.stringify(orders));
 
             alert('Pedido enviado com sucesso!');
             cart = []; document.getElementById('userName').value=''; document.getElementById('userMatricula').value=''; document.getElementById('userRetirada').value='';
@@ -636,12 +612,12 @@
 
         function renderAdminOrders() {
             let container = document.getElementById('adminOrdersContainer');
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v40') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v41') || '[]');
             if(orders.length === 0) { container.innerHTML = `<p style="color: #64748b; text-align: center; padding: 30px;">Nenhum pedido registado.</p>`; return; }
 
             let html = '';
             orders.forEach((o, idx) => {
-                let itensStr = o.itens.map(i => `<li>${i.qty}x ${i.nome} (Cód: ${i.cod}, Tam: ${i.tamanho})</li>`).join('');
+                let itensStr = o.itens.map(i => `<li>${i.qty}x ${i.nome} (Cód. Vale: ${i.cod}, Tam: ${i.tamanho})</li>`).join('');
                 let st = o.status === 'Aprovado' ? `<span style="color:#047857; font-weight:bold;">✅ Aprovado por ${o.aprovador}</span>` :
                          o.status === 'Reprovado' ? `<span style="color:#dc2626; font-weight:bold;">❌ Reprovado por ${o.aprovador}</span>` :
                          `<button class="btn" onclick="aprovar(${idx}, 'Aprovado')">Aprovar</button> <button class="btn btn-danger" onclick="aprovar(${idx}, 'Reprovado')">Reprovar</button>`;
@@ -661,10 +637,10 @@
         function aprovar(idx, status) {
             let nome = prompt('Seu Nome:'); if(!nome) return;
             let mat = prompt('Sua Matrícula:'); if(!mat) return;
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v40') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v41') || '[]');
             orders[idx].status = status;
             orders[idx].aprovador = `${nome} (Mat: ${mat})`;
-            localStorage.setItem('vale_orders_v40', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v41', JSON.stringify(orders));
             renderAdminOrders();
         }
 
