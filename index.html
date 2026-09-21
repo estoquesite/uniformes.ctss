@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitação de Uniformes - VALE (v32)</title>
+    <title>Solicitação de Uniformes - VALE (v33)</title>
     <style>
         :root {
             --primary-color: #007a5e;
@@ -232,6 +232,12 @@
         .btn-add:hover {
             background-color: var(--primary-dark);
         }
+        .size-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 4px;
+        }
         .modal {
             display: none;
             position: fixed;
@@ -349,7 +355,7 @@
     <header>
         <div class="logo-container">
             <h1>VALE - Sistema de Uniformes</h1>
-            <span class="version-tag">v32</span>
+            <span class="version-tag">v33</span>
         </div>
         <div class="header-actions">
             <!-- Botão Cadeado para Edição Direta -->
@@ -375,7 +381,7 @@
         <!-- Banner de Edição Ativa -->
         <div id="editModeBanner" style="display:none; background: #eaf3ed; border: 2px dashed var(--primary-color); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
             <strong style="color: var(--primary-dark); font-size: 14px;">🔓 MODO DE EDIÇÃO ATIVO</strong>
-            <p style="margin: 5px 0 0 0; font-size: 12px; color: #333;">Pode editar qualquer campo diretamente na tabela abaixo, alterar tamanhos/códigos ou adicionar novos itens livremente.</p>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #333;">Pode editar nomes, referências, cores, géneros e gerir os tamanhos e códigos separadamente em cada linha.</p>
         </div>
 
         <!-- Cards de Categoria Dinâmicos no Topo -->
@@ -427,7 +433,7 @@
         </div>
     </div>
 
-    <!-- Modal de Pedidos (Aprovados / Reprovados) -->
+    <!-- Modal de Pedidos -->
     <div class="modal" id="ordersModal">
         <div class="modal-content">
             <div>
@@ -443,11 +449,11 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v32)</p>
+        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v33)</p>
     </footer>
 
     <script>
-        const defaultCatalog_v32 = [
+        const defaultCatalog_v33 = [
             {
                 title: "📂 Linha Administrativa - Masculino",
                 category: "Administrativa",
@@ -538,8 +544,8 @@
             }
         ];
 
-        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v32'));
-        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v32;
+        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v33'));
+        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v33;
 
         let isEditUnlocked = false;
         let selectedCategoryFilter = "";
@@ -555,7 +561,7 @@
                     document.getElementById('lockBtn').style.borderColor = "#28a745";
                     document.getElementById('editModeBanner').style.display = "block";
                     renderCatalog();
-                    alert("Cadeado aberto com sucesso! Pode editar diretamente no catálogo.");
+                    alert("Cadeado aberto! Pode editar, adicionar e apagar diretamente.");
                 } else if (pass !== null) {
                     alert("Senha incorreta!");
                 }
@@ -623,8 +629,19 @@
                     ).join('');
 
                     if (isEditUnlocked) {
-                        // Modo de Edição Direta Inline
-                        let tamanhosStr = prod.tamanhos.map(t => `${t.tamanho}:${t.cod}`).join(', ');
+                        // Renderização separada e limpa para edição de cada tamanho e código
+                        let tamanhosRowsHtml = '';
+                        prod.tamanhos.forEach((t, tIdx) => {
+                            tamanhosRowsHtml += `
+                                <div class="size-row">
+                                    <input type="text" class="editable-input" value="${t.tamanho}" onchange="updateSizeValue(${sIdx}, ${iIdx}, ${tIdx}, 'tamanho', this.value)" style="width:45px;" placeholder="Tam">
+                                    <input type="text" class="editable-input" value="${t.cod}" onchange="updateSizeValue(${sIdx}, ${iIdx}, ${tIdx}, 'cod', this.value)" style="width:90px;" placeholder="Cód Vale">
+                                    <button onclick="removeSizeRow(${sIdx}, ${iIdx}, ${tIdx})" style="background:#d9534f; color:white; border:none; border-radius:3px; cursor:pointer; padding:2px 6px;">×</button>
+                                </div>
+                            `;
+                        });
+                        tamanhosRowsHtml += `<button class="btn-add" onclick="addSizeRow(${sIdx}, ${iIdx})" style="padding:2px 8px; font-size:10px; margin-top:2px;">+ Add Tamanho</button>`;
+
                         rowsHtml += `
                             <tr>
                                 <td><img src="${thumbSrc}" class="item-thumb" alt="Foto"></td>
@@ -632,12 +649,12 @@
                                 <td><input type="text" class="editable-input" value="${prod.nome}" onchange="updateItemField(${sIdx}, ${iIdx}, 'nome', this.value)"></td>
                                 <td><input type="text" class="editable-input" value="${prod.cor}" onchange="updateItemField(${sIdx}, ${iIdx}, 'cor', this.value)" style="width:90px;"></td>
                                 <td><input type="text" class="editable-input" value="${section.gender}" onchange="updateItemGender(${sIdx}, ${iIdx}, this.value)" style="width:90px;"></td>
-                                <td><input type="text" class="editable-input" value="${tamanhosStr}" onchange="updateItemTamanhos(${sIdx}, ${iIdx}, this.value)" title="Formato: Tam:Cod, Tam:Cod"></td>
+                                <td><input type="text" class="editable-input" value="${section.category}" onchange="updateItemCategory(${sIdx}, ${iIdx}, this.value)" style="width:90px;"></td>
+                                <td>${tamanhosRowsHtml}</td>
                                 <td><button class="btn-add" onclick="deleteItem(${sIdx}, ${iIdx})" style="background:#d9534f; padding:5px 8px;">Excluir</button></td>
                             </tr>
                         `;
                     } else {
-                        // Modo Normal de Compra
                         rowsHtml += `
                             <tr>
                                 <td><img src="${thumbSrc}" class="item-thumb" alt="Foto" onerror="this.src='https://via.placeholder.com/40?text=Foto'"></td>
@@ -664,7 +681,8 @@
                         <th>Nome do Item</th>
                         <th>Cor</th>
                         <th>Género</th>
-                        <th>Tamanhos & Códigos (Tam:Cód, ...)</th>
+                        <th>Categoria</th>
+                        <th>Tamanhos & Códigos Separados</th>
                         <th>Ação</th>
                     </tr>
                 ` : `
@@ -681,7 +699,7 @@
                 `;
 
                 let addBtnHtml = isEditUnlocked ? `
-                    <button class="btn-add" onclick="addNewItemToSection(${sIdx})" style="background: var(--accent-color); padding: 5px 12px; font-size: 11px;">➕ Adicionar Item nesta Linha</button>
+                    <button class="btn-add" onclick="addNewItemToSection(${sIdx})" style="background: var(--accent-color); padding: 5px 12px; font-size: 11px;">➕ Adicionar Item</button>
                 ` : '';
 
                 container.innerHTML += `
@@ -701,13 +719,12 @@
             if (isEditUnlocked) {
                 container.innerHTML += `
                     <div style="text-align: center; margin-top: 20px;">
-                        <button class="btn-add" onclick="addNewSection()" style="background: var(--primary-color); padding: 10px 20px; font-size: 14px;">📁 Criar Nova Categoria/Género</button>
+                        <button class="btn-add" onclick="addNewSection()" style="background: var(--primary-color); padding: 10px 20px; font-size: 14px;">📁 Criar Nova Categoria / Linha</button>
                     </div>
                 `;
             }
         }
 
-        // Funções de Edição Direta (Inline)
         function updateItemField(sIdx, iIdx, field, val) {
             catalogSections[sIdx].items[iIdx][field] = val.trim();
             saveAndRefresh();
@@ -733,20 +750,43 @@
             saveAndRefresh();
         }
 
-        function updateItemTamanhos(sIdx, iIdx, val) {
-            let tamanhos = [];
-            val.split(',').forEach(p => {
-                let sub = p.trim().split(':');
-                if(sub.length >= 2) {
-                    tamanhos.push({ tamanho: sub[0].trim(), cod: sub[1].trim() });
-                }
-            });
-            if (tamanhos.length > 0) {
-                catalogSections[sIdx].items[iIdx].tamanhos = tamanhos;
-                saveAndRefresh();
-            } else {
-                alert('Formato inválido. Use ex: 01:16724398, 02:16725077');
+        function updateItemCategory(sIdx, iIdx, newCat) {
+            newCat = newCat.trim() || 'Geral';
+            let item = catalogSections[sIdx].items[iIdx];
+            catalogSections[sIdx].items.splice(iIdx, 1);
+            
+            let targetSec = catalogSections.find(s => s.category.toLowerCase() === newCat.toLowerCase() && s.gender === catalogSections[sIdx].gender);
+            if (!targetSec) {
+                targetSec = {
+                    title: `📂 Linha ${newCat} - ${catalogSections[sIdx].gender}`,
+                    category: newCat,
+                    gender: catalogSections[sIdx].gender,
+                    items: []
+                };
+                catalogSections.push(targetSec);
             }
+            targetSec.items.push(item);
+            catalogSections = catalogSections.filter(s => s.items.length > 0);
+            saveAndRefresh();
+        }
+
+        function updateSizeValue(sIdx, iIdx, tIdx, field, val) {
+            catalogSections[sIdx].items[iIdx].tamanhos[tIdx][field] = val.trim();
+            saveAndRefresh();
+        }
+
+        function addSizeRow(sIdx, iIdx) {
+            catalogSections[sIdx].items[iIdx].tamanhos.push({ tamanho: 'Novo', cod: '000000' });
+            saveAndRefresh();
+        }
+
+        function removeSizeRow(sIdx, iIdx, tIdx) {
+            if (catalogSections[sIdx].items[iIdx].tamanhos.length <= 1) {
+                alert('O item precisa de ter pelo menos um tamanho.');
+                return;
+            }
+            catalogSections[sIdx].items[iIdx].tamanhos.splice(tIdx, 1);
+            saveAndRefresh();
         }
 
         function deleteItem(sIdx, iIdx) {
@@ -762,13 +802,6 @@
             if(!nome) return;
             let ref = prompt('Cód. Vale (Ref):', 'CM-000');
             let cor = prompt('Cor:', 'Verde Vale');
-            let tam = prompt('Tamanhos e Códigos (ex: 01:16724398, 02:16725077):', '01:16724398');
-
-            let tamanhos = [];
-            tam.split(',').forEach(p => {
-                let sub = p.trim().split(':');
-                if(sub.length >= 2) tamanhos.push({ tamanho: sub[0].trim(), cod: sub[1].trim() });
-            });
 
             catalogSections[sIdx].items.push({
                 id: Date.now(),
@@ -776,13 +809,13 @@
                 ref: ref ? ref.trim() : 'REF',
                 cor: cor ? cor.trim() : 'Padrão',
                 foto: '',
-                tamanhos: tamanhos.length > 0 ? tamanhos : [{ tamanho: 'Único', cod: '123456' }]
+                tamanhos: [{ tamanho: '01', cod: '123456' }]
             });
             saveAndRefresh();
         }
 
         function addNewSection() {
-            let cat = prompt('Nome da Nova Categoria (ex: EPI, Administrativa):');
+            let cat = prompt('Nome da Nova Categoria (ex: Administrativa, Operacional, EPI):');
             if(!cat) return;
             let gen = prompt('Género (ex: Masculino, Feminino, Unissex):', 'Unissex');
             if(!gen) return;
@@ -793,7 +826,7 @@
                 gender: gen.trim(),
                 items: [{
                     id: Date.now(),
-                    nome: 'Novo Uniforme Exemplo',
+                    nome: 'Novo Uniforme',
                     ref: 'REF-01',
                     cor: 'Padrão',
                     foto: '',
@@ -804,7 +837,7 @@
         }
 
         function saveAndRefresh() {
-            localStorage.setItem('vale_catalog_v32', JSON.stringify(catalogSections));
+            localStorage.setItem('vale_catalog_v33', JSON.stringify(catalogSections));
             renderCatalog();
         }
 
@@ -895,7 +928,7 @@
                 return;
             }
 
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v32') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v33') || '[]');
             orders.push({
                 nome: nome,
                 matricula: matricula,
@@ -907,7 +940,7 @@
                 dataStatus: '',
                 itens: [...cart]
             });
-            localStorage.setItem('vale_orders_v32', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v33', JSON.stringify(orders));
 
             alert(`Sucesso! Pedido enviado em nome de ${nome}.`);
             cart = [];
@@ -935,7 +968,7 @@
         function loadAdminOrders() {
             const container = document.getElementById('adminOrdersList');
             if(!container) return;
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v32') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v33') || '[]');
 
             if (orders.length === 0) {
                 container.innerHTML = `<p style="color: #777; text-align: center;">Nenhum pedido registado.</p>`;
@@ -978,13 +1011,13 @@
             let matAp = prompt('Insira a sua Matrícula:');
             if(!matAp || !matAp.trim()) return;
 
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v32') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v33') || '[]');
             orders[idx].status = novoStatus;
             orders[idx].aprovadorNome = nomeAp.trim();
             orders[idx].aprovadorMatricula = matAp.trim();
             orders[idx].dataStatus = new Date().toLocaleString();
 
-            localStorage.setItem('vale_orders_v32', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v33', JSON.stringify(orders));
             loadAdminOrders();
             alert(`Pedido marcado como ${novoStatus} com sucesso!`);
         }
