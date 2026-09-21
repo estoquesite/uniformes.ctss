@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitação de Uniformes - VALE (v24)</title>
+    <title>Solicitação de Uniformes - VALE (v26)</title>
     <style>
         :root {
             --primary-color: #007a5e;
@@ -93,7 +93,6 @@
             margin: 25px auto;
             padding: 0 15px;
         }
-        /* Cards de Filtro por Categoria */
         .category-cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -121,7 +120,6 @@
             color: white;
             border-color: var(--primary-dark);
         }
-
         .filter-box {
             background: white;
             padding: 15px;
@@ -221,8 +219,6 @@
         .btn-add:hover {
             background-color: var(--primary-dark);
         }
-        
-        /* Modais */
         .modal {
             display: none;
             position: fixed;
@@ -359,7 +355,7 @@
     <header>
         <div class="logo-container">
             <h1>VALE - Sistema de Uniformes</h1>
-            <span class="version-tag">v24</span>
+            <span class="version-tag">v26</span>
         </div>
         <div class="header-actions">
             <button class="btn-header" onclick="toggleCart()">
@@ -388,7 +384,7 @@
 
         <!-- Filtros -->
         <div class="filter-box">
-            <input type="text" id="searchFilter" placeholder="Pesquisar por nome, código ou referência..." onkeyup="renderCatalog()">
+            <input type="text" id="searchFilter" placeholder="Pesquisar por nome, cor ou Cód. Vale..." onkeyup="renderCatalog()">
             <select id="genderFilter" onchange="renderCatalog()">
                 <option value="">Todos os Géneros</option>
                 <option value="Masculino">Masculino</option>
@@ -437,7 +433,7 @@
         <div class="modal-content">
             <div>
                 <div class="modal-header">
-                    <h3>Painel do Administrador (v24)</h3>
+                    <h3>Painel do Administrador (v26)</h3>
                     <button class="close-modal" onclick="closeAdminModal()">&times;</button>
                 </div>
 
@@ -460,16 +456,16 @@
                     <!-- Aba Gerir Catálogo & Template -->
                     <div id="tabManageContent" style="flex-grow: 1; overflow-y: auto;" class="modal-body">
                         
-                        <!-- Área de Template CSV para Edição em Lote -->
-                        <div style="background: #eaf3ed; border: 1px solid #c2e0d1; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <!-- Área de Template Excel -->
+                        <div style="background: #eaf3ed; border: 1px solid #c2e0d1; padding: 14px; border-radius: 6px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                             <div>
-                                <strong style="color: var(--primary-dark); font-size: 13px;">📥 Edição em Lote (Template Excel/CSV)</strong>
-                                <p style="font-size: 11px; color: #555; margin: 2px 0 0 0;">Descarregue o modelo, edite no Excel e volte a carregar para atualizar tudo de uma vez.</p>
+                                <strong style="color: var(--primary-dark); font-size: 13px;">📥 Importar e Exportar em Lote (Excel/CSV)</strong>
+                                <p style="font-size: 11px; color: #555; margin: 3px 0 0 0;">Baixe o modelo, edite diretamente no Excel (separado por ponto e vírgula) e reenvie para cadastrar em massa.</p>
                             </div>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <button class="btn-add" onclick="exportCatalogCSV()" style="background: var(--secondary-color); padding: 7px 12px; font-size: 11px;">⬇️ Descarregar Template</button>
-                                <label class="btn-add" style="cursor: pointer; padding: 7px 12px; font-size: 11px; background: var(--accent-color);">
-                                    ⬆️ Enviar Template Editado <input type="file" accept=".csv" onchange="importCatalogCSV(event)" style="display: none;">
+                                <button class="btn-add" onclick="exportCatalogCSV()" style="background: var(--secondary-color); padding: 8px 14px; font-size: 12px;">⬇️ Baixar Template</button>
+                                <label class="btn-add" style="cursor: pointer; padding: 8px 14px; font-size: 12px; background: var(--accent-color);">
+                                    ⬆️ Enviar Template Preenchido <input type="file" accept=".csv" onchange="importCatalogCSV(event)" style="display: none;">
                                 </label>
                             </div>
                         </div>
@@ -494,7 +490,7 @@
 
     <!-- Modal de Edição ou Adição Fluida -->
     <div class="modal" id="editItemModal" style="z-index: 3000;">
-        <div class="modal-content" style="width: 550px; height: auto; max-height: 90vh;">
+        <div class="modal-content" style="width: 580px; height: auto; max-height: 90vh;">
             <div class="modal-header">
                 <h3 id="editModalTitle" style="margin:0; font-size: 16px; color: var(--primary-color);">Editar Item</h3>
                 <button class="close-modal" onclick="closeEditModal()">&times;</button>
@@ -508,8 +504,8 @@
 
                 <div style="display: flex; gap: 10px;">
                     <div style="flex: 1;">
-                        <label>Referência (Código):</label>
-                        <input type="text" id="modalEditRef" placeholder="CM-444">
+                        <label>Cód. Vale:</label>
+                        <input type="text" id="modalEditRef" placeholder="16724398">
                     </div>
                     <div style="flex: 1;">
                         <label>Cor:</label>
@@ -526,20 +522,21 @@
                             <option value="Unissex">Unissex</option>
                         </select>
                     </div>
-                    <div style="flex: 1;">
-                        <label>Categoria:</label>
-                        <select id="modalEditCategory">
-                            <option value="Administrativa">Administrativa</option>
-                            <option value="Operacional">Operacional</option>
-                            <option value="Inverno/Acessórios">Inverno e Acessórios</option>
-                        </select>
-                    </div>
                 </div>
+
+                <!-- Cards de Categoria dentro do Modal de Edição -->
+                <label style="margin-top: 10px;">Categoria do Item:</label>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px;">
+                    <div class="modal-cat-card" data-cat="Administrativa" onclick="selectModalCategory('Administrativa')" style="background:#fff; border:2px solid #ccc; padding:8px; text-align:center; border-radius:4px; cursor:pointer; font-size:11px; font-weight:bold;">👔 Administrativa</div>
+                    <div class="modal-cat-card" data-cat="Operacional" onclick="selectModalCategory('Operacional')" style="background:#fff; border:2px solid #ccc; padding:8px; text-align:center; border-radius:4px; cursor:pointer; font-size:11px; font-weight:bold;">⚙️ Operacional</div>
+                    <div class="modal-cat-card" data-cat="Inverno/Acessórios" onclick="selectModalCategory('Inverno/Acessórios')" style="background:#fff; border:2px solid #ccc; padding:8px; text-align:center; border-radius:4px; cursor:pointer; font-size:11px; font-weight:bold;">❄️ Inverno/Acessórios</div>
+                </div>
+                <input type="hidden" id="modalEditCategory" value="Administrativa">
 
                 <label>Foto do Aparelho (Deixe em branco para manter a atual):</label>
                 <input type="file" id="modalEditPhotoFile" accept="image/*" style="font-size: 12px; padding: 6px;">
 
-                <label>Tamanhos e Códigos VALE (Formato: Tamanho:Código, ex: 01:16724398, 02:16725077):</label>
+                <label>Tamanhos e Cód. Vale (Formato: Tamanho:Cód.Vale, ex: 01:16724398, 02:16725077):</label>
                 <textarea id="modalEditVars" rows="4" placeholder="01:16724398, 02:16725077"></textarea>
             </div>
             <div style="border-top: 1px solid #eee; padding-top: 12px; display: flex; justify-content: flex-end; gap: 10px;">
@@ -550,11 +547,11 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v24)</p>
+        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v26)</p>
     </footer>
 
     <script>
-        const defaultCatalog_v24 = [
+        const defaultCatalog_v26 = [
             {
                 title: "📂 Linha Administrativa - Masculino",
                 category: "Administrativa",
@@ -645,8 +642,8 @@
             }
         ];
 
-        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v24'));
-        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v24;
+        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v26'));
+        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v26;
 
         let selectedCategoryFilter = "";
         let cart = [];
@@ -661,6 +658,21 @@
             if(cat === "Inverno/Acessórios") document.getElementById('card-inv').classList.add('active');
 
             renderCatalog();
+        }
+
+        function selectModalCategory(cat) {
+            document.getElementById('modalEditCategory').value = cat;
+            document.querySelectorAll('.modal-cat-card').forEach(card => {
+                if(card.getAttribute('data-cat') === cat) {
+                    card.style.background = 'var(--primary-color)';
+                    card.style.color = 'white';
+                    card.style.borderColor = 'var(--primary-dark)';
+                } else {
+                    card.style.background = '#fff';
+                    card.style.color = '#333';
+                    card.style.borderColor = '#ccc';
+                }
+            });
         }
 
         function renderCatalog() {
@@ -721,7 +733,7 @@
                             <thead>
                                 <tr>
                                     <th>Foto</th>
-                                    <th>Cód. VALE</th>
+                                    <th>Cód. Vale</th>
                                     <th>Descrição do Item</th>
                                     <th>Cor</th>
                                     <th>Género</th>
@@ -789,7 +801,7 @@
             }
 
             updateCartUI();
-            alert(`Adicionado: ${qty}x ${foundProd.nome} (Tam: ${tamanhoStr}, Cód: ${selectedCod})`);
+            alert(`Adicionado: ${qty}x ${foundProd.nome} (Tam: ${tamanhoStr}, Cód. Vale: ${selectedCod})`);
         }
 
         function updateCartUI() {
@@ -810,7 +822,7 @@
                     <div class="cart-item">
                         <div>
                             <strong>${c.nome}</strong><br>
-                            <small>Cód: ${c.cod} | Cor: ${c.cor} | Tam: ${c.tamanho} | Qtd: ${c.qty}</small>
+                            <small>Cód. Vale: ${c.cod} | Cor: ${c.cor} | Tam: ${c.tamanho} | Qtd: ${c.qty}</small>
                         </div>
                         <button onclick="removeCart(${index})" style="background:none; border:none; color:red; cursor:pointer; font-weight:bold;">X</button>
                     </div>
@@ -850,7 +862,7 @@
 
             const dataAtual = new Date().toLocaleString();
 
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v24') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v26') || '[]');
             orders.push({
                 nome: nome,
                 matricula: matricula,
@@ -858,7 +870,7 @@
                 dataPedido: dataAtual,
                 itens: [...cart]
             });
-            localStorage.setItem('vale_orders_v24', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v26', JSON.stringify(orders));
 
             alert(`Sucesso! Pedido enviado em nome de ${nome} (Retirada prevista para: ${retirada}). Registado no sistema.`);
             
@@ -920,13 +932,14 @@
             }
         }
 
+        // Exportação otimizada para Excel em Português (Delimitador por ponto e vírgula ';')
         function exportCatalogCSV() {
-            let csvContent = "data:text/csv;charset=utf-8,Categoria,Genero,Nome,Referencia,Cor,TamanhosCodigos\r\n";
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFFCategoria;Genero;Nome;CodVale;Cor;TamanhosCodigos\r\n";
             catalogSections.forEach(sec => {
                 sec.items.forEach(item => {
                     let tamStr = item.tamanhos.map(t => `${t.tamanho}:${t.cod}`).join(';');
                     let row = [sec.category, sec.gender, `"${item.nome}"`, item.ref, `"${item.cor}"`, `"${tamStr}"`];
-                    csvContent += row.join(",") + "\r\n";
+                    csvContent += row.join(";") + "\r\n";
                 });
             });
             var encodedUri = encodeURI(csvContent);
@@ -938,6 +951,7 @@
             document.body.removeChild(link);
         }
 
+        // Importação robusta (suporta ponto e vírgula ';' ou vírgula ',')
         function importCatalogCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -949,13 +963,16 @@
                 for (let i = 1; i < lines.length; i++) {
                     let line = lines[i].trim();
                     if(!line) continue;
+                    
+                    // Detetar se usa ';' ou ','
+                    let separator = line.includes(';') ? ';' : ',';
                     let row = [];
                     let inQuotes = false;
                     let currentVal = '';
                     for (let char of line) {
                         if (char === '"') {
                             inQuotes = !inQuotes;
-                        } else if (char === ',' && !inQuotes) {
+                        } else if (char === separator && !inQuotes) {
                             row.push(currentVal.trim());
                             currentVal = '';
                         } else {
@@ -1003,15 +1020,15 @@
                 let newSections = Object.values(newItemsMap);
                 if(newSections.length > 0) {
                     catalogSections = newSections;
-                    localStorage.setItem('vale_catalog_v24', JSON.stringify(catalogSections));
+                    localStorage.setItem('vale_catalog_v26', JSON.stringify(catalogSections));
                     renderCatalog();
                     loadAdminCatalogTable();
-                    alert('Catálogo importado com sucesso via CSV!');
+                    alert('Catálogo importado com sucesso via Excel/CSV!');
                 } else {
-                    alert('Erro ao processar o ficheiro CSV.');
+                    alert('Erro ao processar o ficheiro. Verifique o formato.');
                 }
             };
-            reader.readAsText(file);
+            reader.readAsText(file, 'UTF-8');
         }
 
         function loadAdminCatalogTable() {
@@ -1023,7 +1040,7 @@
                     <thead>
                         <tr>
                             <th>Foto</th>
-                            <th>Ref</th>
+                            <th>Cód. Vale</th>
                             <th>Nome do Item</th>
                             <th>Cor</th>
                             <th>Género</th>
@@ -1064,7 +1081,7 @@
                 document.getElementById('modalEditRef').value = '';
                 document.getElementById('modalEditColor').value = 'Verde Vale';
                 document.getElementById('modalEditGender').value = 'Masculino';
-                document.getElementById('modalEditCategory').value = 'Administrativa';
+                selectModalCategory('Administrativa');
                 document.getElementById('modalEditVars').value = '';
                 document.getElementById('editModalTitle').innerText = 'Adicionar Novo Item ao Catálogo';
             } else {
@@ -1075,7 +1092,7 @@
                 document.getElementById('modalEditRef').value = item.ref;
                 document.getElementById('modalEditColor').value = item.cor;
                 document.getElementById('modalEditGender').value = catalogSections[secIdx].gender;
-                document.getElementById('modalEditCategory').value = catalogSections[secIdx].category;
+                selectModalCategory(catalogSections[secIdx].category);
 
                 let varsStr = item.tamanhos.map(t => `${t.tamanho}:${t.cod}`).join(', ');
                 document.getElementById('modalEditVars').value = varsStr;
@@ -1153,7 +1170,7 @@
                     }
                 }
 
-                localStorage.setItem('vale_catalog_v24', JSON.stringify(catalogSections));
+                localStorage.setItem('vale_catalog_v26', JSON.stringify(catalogSections));
                 renderCatalog();
                 loadAdminCatalogTable();
                 closeEditModal();
@@ -1180,7 +1197,7 @@
         function deleteAdminItem(secIdx, itemIdx) {
             if(confirm('Tem certeza que deseja excluir este item do catálogo?')) {
                 catalogSections[secIdx].items.splice(itemIdx, 1);
-                localStorage.setItem('vale_catalog_v24', JSON.stringify(catalogSections));
+                localStorage.setItem('vale_catalog_v26', JSON.stringify(catalogSections));
                 renderCatalog();
                 loadAdminCatalogTable();
                 alert('Item excluído com sucesso!');
@@ -1190,7 +1207,7 @@
         function loadAdminOrders() {
             const container = document.getElementById('adminOrdersList');
             if(!container) return;
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v24') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v26') || '[]');
 
             if (orders.length === 0) {
                 container.innerHTML = `<p style="color: #777; text-align: center;">Nenhum pedido registado.</p>`;
@@ -1199,7 +1216,7 @@
 
             container.innerHTML = '';
             orders.forEach((ord, idx) => {
-                let itensStr = ord.itens.map(i => `<li>${i.qty}x ${i.nome} (Cor: ${i.cor}, Cód: ${i.cod}, Tam: ${i.tamanho})</li>`).join('');
+                let itensStr = ord.itens.map(i => `<li>${i.qty}x ${i.nome} (Cor: ${i.cor}, Cód. Vale: ${i.cod}, Tam: ${i.tamanho})</li>`).join('');
                 container.innerHTML += `
                     <div class="admin-order-card">
                         <strong>Pedido #${idx+1} - ${ord.nome} (Mat: ${ord.matricula})</strong><br>
