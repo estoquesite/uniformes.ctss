@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitação de Uniformes - VALE (v20)</title>
+    <title>Solicitação de Uniformes - VALE (v22)</title>
     <style>
         :root {
             --primary-color: #007a5e;
@@ -93,6 +93,35 @@
             margin: 25px auto;
             padding: 0 15px;
         }
+        /* Cards de Filtro por Categoria */
+        .category-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .cat-card {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--secondary-color);
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .cat-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        .cat-card.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+
         .filter-box {
             background: white;
             padding: 15px;
@@ -330,7 +359,7 @@
     <header>
         <div class="logo-container">
             <h1>VALE - Sistema de Uniformes</h1>
-            <span class="version-tag">v20</span>
+            <span class="version-tag">v22</span>
         </div>
         <div class="header-actions">
             <button class="btn-header" onclick="toggleCart()">
@@ -349,15 +378,17 @@
 
     <div class="container">
         
+        <!-- Cards de Filtro Rápido por Categoria -->
+        <div class="category-cards-grid">
+            <div class="cat-card active" id="card-all" onclick="selectCategoryCard('')">📂 Todas as Categorias</div>
+            <div class="cat-card" id="card-adm" onclick="selectCategoryCard('Administrativa')">👔 Linha Administrativa</div>
+            <div class="cat-card" id="card-op" onclick="selectCategoryCard('Operacional')">⚙️ Linha Operacional</div>
+            <div class="cat-card" id="card-inv" onclick="selectCategoryCard('Inverno/Acessórios')">❄️ Inverno e Acessórios</div>
+        </div>
+
         <!-- Filtros -->
         <div class="filter-box">
             <input type="text" id="searchFilter" placeholder="Pesquisar por nome, código ou referência..." onkeyup="renderCatalog()">
-            <select id="categoryFilter" onchange="renderCatalog()">
-                <option value="">Todas as Categorias</option>
-                <option value="Administrativa">Linha Administrativa</option>
-                <option value="Operacional">Linha Operacional</option>
-                <option value="Inverno/Acessórios">Inverno e Acessórios</option>
-            </select>
             <select id="genderFilter" onchange="renderCatalog()">
                 <option value="">Todos os Géneros</option>
                 <option value="Masculino">Masculino</option>
@@ -370,7 +401,7 @@
 
     </div>
 
-    <!-- Carrinho Modal -->
+    <!-- Carrinho Modal com Data de Retirada -->
     <div class="modal" id="cartModal">
         <div class="modal-content">
             <div>
@@ -385,11 +416,13 @@
                         <input type="text" id="userName" placeholder="Insira seu nome">
                         <label for="userMatricula">Matrícula:</label>
                         <input type="text" id="userMatricula" placeholder="Insira sua matrícula">
+                        <label for="userRetirada">Data Prevista de Retirada:</label>
+                        <input type="date" id="userRetirada">
                     </div>
                 </div>
 
                 <h4>Itens Selecionados:</h4>
-                <div class="modal-body" id="cartItemsContainer" style="max-height: 200px;">
+                <div class="modal-body" id="cartItemsContainer" style="max-height: 180px;">
                     <p style="color: #777; text-align: center; margin-top: 15px;">O carrinho está vazio.</p>
                 </div>
             </div>
@@ -399,16 +432,26 @@
         </div>
     </div>
 
-    <!-- Painel Administrador (Acesso Direto) -->
+    <!-- Painel Administrador com Senha -->
     <div class="modal" id="adminModal">
         <div class="modal-content">
             <div>
                 <div class="modal-header">
-                    <h3>Painel do Administrador (v20)</h3>
+                    <h3>Painel do Administrador (v22)</h3>
                     <button class="close-modal" onclick="closeAdminModal()">&times;</button>
                 </div>
 
-                <div id="adminPanelContent" style="margin-top: 15px; height: calc(100% - 40px); display: flex; flex-direction: column;">
+                <div id="adminLoginSection" style="margin-top: 50px; text-align: center;">
+                    <p>Área restrita. Digite a senha de Administrador (admin123):</p>
+                    <div style="position: relative; display: inline-block; width: 50%; margin-bottom: 10px;">
+                        <input type="password" id="adminPassword" placeholder="Senha ADM" style="padding: 10px; width: 100%; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                        <span onclick="togglePasswordVisibility()" style="position: absolute; right: 10px; top: 10px; cursor: pointer; font-size: 18px;" id="eyeIcon" title="Mostrar/Ocultar Senha">👁️</span>
+                    </div>
+                    <br>
+                    <button class="btn-add" onclick="checkAdminPassword()" style="padding: 10px 24px; font-size: 14px;">Entrar</button>
+                </div>
+
+                <div id="adminPanelContent" style="display: none; margin-top: 15px; height: calc(100% - 60px); display: flex; flex-direction: column;">
                     <div class="admin-tabs">
                         <button class="admin-tab-btn active" onclick="switchAdminTab('manage')">Gerir Catálogo (Tabela)</button>
                         <button class="admin-tab-btn" onclick="switchAdminTab('orders')">Pedidos Recebidos</button>
@@ -450,7 +493,7 @@
 
                 <div style="display: flex; gap: 10px;">
                     <div style="flex: 1;">
-                        <label>Referência:</label>
+                        <label>Referência (Código):</label>
                         <input type="text" id="modalEditRef" placeholder="CM-444">
                     </div>
                     <div style="flex: 1;">
@@ -492,11 +535,11 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v20)</p>
+        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v22)</p>
     </footer>
 
     <script>
-        const defaultCatalog_v20 = [
+        const defaultCatalog_v22 = [
             {
                 title: "📂 Linha Administrativa - Masculino",
                 category: "Administrativa",
@@ -587,10 +630,24 @@
             }
         ];
 
-        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v20'));
-        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v20;
+        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v22'));
+        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v22;
 
+        let selectedCategoryFilter = "";
         let cart = [];
+
+        function selectCategoryCard(cat) {
+            selectedCategoryFilter = cat;
+            
+            // Atualizar classes visuais dos cards
+            document.querySelectorAll('.cat-card').forEach(card => card.classList.remove('active'));
+            if(cat === "") document.getElementById('card-all').classList.add('active');
+            if(cat === "Administrativa") document.getElementById('card-adm').classList.add('active');
+            if(cat === "Operacional") document.getElementById('card-op').classList.add('active');
+            if(cat === "Inverno/Acessórios") document.getElementById('card-inv').classList.add('active');
+
+            renderCatalog();
+        }
 
         function renderCatalog() {
             const container = document.getElementById('tablesContainer');
@@ -598,13 +655,12 @@
             container.innerHTML = '';
 
             const query = document.getElementById('searchFilter').value.toLowerCase();
-            const catFilter = document.getElementById('categoryFilter').value;
             const genderFilter = document.getElementById('genderFilter').value;
 
             let hasVisible = false;
 
             catalogSections.forEach((section) => {
-                if (catFilter !== "" && section.category !== catFilter) return;
+                if (selectedCategoryFilter !== "" && section.category !== selectedCategoryFilter) return;
                 if (genderFilter !== "" && section.gender !== genderFilter) return;
 
                 const filteredItems = section.items.filter(prod => {
@@ -761,9 +817,15 @@
         function enviarPedido() {
             const nome = document.getElementById('userName').value.trim();
             const matricula = document.getElementById('userMatricula').value.trim();
+            const retirada = document.getElementById('userRetirada').value;
 
             if (!nome || !matricula) {
                 alert('Por favor, preencha o seu Nome e a Matrícula.');
+                return;
+            }
+
+            if (!retirada) {
+                alert('Por favor, selecione a data prevista de retirada.');
                 return;
             }
 
@@ -774,32 +836,59 @@
 
             const dataAtual = new Date().toLocaleString();
 
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v20') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v22') || '[]');
             orders.push({
                 nome: nome,
                 matricula: matricula,
-                data: dataAtual,
+                dataRetirada: retirada,
+                dataPedido: dataAtual,
                 itens: [...cart]
             });
-            localStorage.setItem('vale_orders_v20', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v22', JSON.stringify(orders));
 
-            alert(`Sucesso! Pedido enviado em nome de ${nome} (Matrícula: ${matricula}) em ${dataAtual}. Registado no sistema.`);
+            alert(`Sucesso! Pedido enviado em nome de ${nome} (Retirada prevista para: ${retirada}). Registado no sistema.`);
             
             cart = [];
             document.getElementById('userName').value = '';
             document.getElementById('userMatricula').value = '';
+            document.getElementById('userRetirada').value = '';
             updateCartUI();
             toggleCart();
         }
 
         function openAdminModal() {
             document.getElementById('adminModal').style.display = 'flex';
-            loadAdminCatalogTable();
-            loadAdminOrders();
+            document.getElementById('adminLoginSection').style.display = 'block';
+            document.getElementById('adminPanelContent').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
         }
 
         function closeAdminModal() {
             document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById('adminPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeIcon.textContent = '🙈';
+            } else {
+                passInput.type = 'password';
+                eyeIcon.textContent = '👁️';
+            }
+        }
+
+        function checkAdminPassword() {
+            const pass = document.getElementById('adminPassword').value.trim();
+            if (pass === 'admin123') {
+                document.getElementById('adminLoginSection').style.display = 'none';
+                document.getElementById('adminPanelContent').style.display = 'flex';
+                loadAdminCatalogTable();
+                loadAdminOrders();
+            } else {
+                alert('Senha incorreta! (Use: admin123)');
+            }
         }
 
         function switchAdminTab(tab) {
@@ -826,7 +915,7 @@
                     <thead>
                         <tr>
                             <th>Foto</th>
-                            <th>Ref</th>
+                            <th>Cód / Ref</th>
                             <th>Nome do Item</th>
                             <th>Cor</th>
                             <th>Género</th>
@@ -956,7 +1045,7 @@
                     }
                 }
 
-                localStorage.setItem('vale_catalog_v20', JSON.stringify(catalogSections));
+                localStorage.setItem('vale_catalog_v22', JSON.stringify(catalogSections));
                 renderCatalog();
                 loadAdminCatalogTable();
                 closeEditModal();
@@ -983,7 +1072,7 @@
         function deleteAdminItem(secIdx, itemIdx) {
             if(confirm('Tem certeza que deseja excluir este item do catálogo?')) {
                 catalogSections[secIdx].items.splice(itemIdx, 1);
-                localStorage.setItem('vale_catalog_v20', JSON.stringify(catalogSections));
+                localStorage.setItem('vale_catalog_v22', JSON.stringify(catalogSections));
                 renderCatalog();
                 loadAdminCatalogTable();
                 alert('Item excluído com sucesso!');
@@ -993,7 +1082,7 @@
         function loadAdminOrders() {
             const container = document.getElementById('adminOrdersList');
             if(!container) return;
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v20') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v22') || '[]');
 
             if (orders.length === 0) {
                 container.innerHTML = `<p style="color: #777; text-align: center;">Nenhum pedido registado.</p>`;
@@ -1006,7 +1095,8 @@
                 container.innerHTML += `
                     <div class="admin-order-card">
                         <strong>Pedido #${idx+1} - ${ord.nome} (Mat: ${ord.matricula})</strong><br>
-                        <small>Data do Pedido: <strong>${ord.data}</strong></small>
+                        <small>Data Prevista de Retirada: <strong>${ord.dataRetirada || 'Não informada'}</strong></small><br>
+                        <small>Registado em: ${ord.dataPedido}</small>
                         <ul style="margin: 3px 0 0 12px; padding: 0;">${itensStr}</ul>
                     </div>
                 `;
