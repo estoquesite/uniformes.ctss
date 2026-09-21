@@ -1,650 +1,193 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VALE - Sistema de Uniformes (v41)</title>
-    <style>
-        :root {
-            --primary: #007a5e;
-            --primary-dark: #005a43;
-            --secondary: #1e293b;
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --accent: #f97316;
-            --border-color: #cbd5e1;
-            --text-main: #0f172a;
-        }
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-        }
-        header {
-            background-color: var(--secondary);
-            color: white;
-            padding: 16px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .brand h1 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-        .version-tag {
-            background: var(--primary);
-            color: white;
-            font-size: 11px;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-weight: 700;
-        }
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-        }
-        .tab-btn {
-            background: rgba(255,255,255,0.08);
-            color: #e2e8f0;
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s;
-        }
-        .tab-btn:hover, .tab-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        
-        .main-wrapper {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 0 24px;
-        }
-        
-        .view-section { display: none; }
-        .view-section.active { display: block; }
+  <meta charset="UTF-8">
+  <title>Cadastro Simplificado</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      color: #333;
+    }
 
-        .toolbar {
-            background: var(--card-bg);
-            padding: 20px 24px;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.02);
-            margin-bottom: 24px;
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            align-items: center;
-            border: 1px solid var(--border-color);
-        }
-        .toolbar input, .toolbar select {
-            flex: 1;
-            min-width: 240px;
-            padding: 11px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 13px;
-            outline: none;
-            background: #fff;
-        }
+    /* Seção de Filtros Tradicionais */
+    .filtros-container {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      padding: 15px;
+      background-color: #f5f5f5;
+      border-radius: 6px;
+    }
+    .filtro-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .filtro-item select {
+      padding: 8px;
+      min-width: 180px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
 
-        .categories-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-        .cat-pill {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            color: var(--secondary);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            transition: all 0.2s ease;
-        }
-        .cat-pill:hover { border-color: var(--primary); color: var(--primary); }
-        .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+    /* Seção de Criação Direta de Categoria */
+    .secao-cadastro {
+      margin-bottom: 25px;
+    }
+    .input-inline {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .input-inline input {
+      padding: 8px 12px;
+      width: 280px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .btn-ok {
+      padding: 8px 18px;
+      background-color: #0b7285;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
 
-        .table-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-            overflow-x: auto;
-            margin-bottom: 30px;
-            border: 1px solid var(--border-color);
-        }
-        .table-title {
-            background: #f8fafc;
-            padding: 16px 24px;
-            font-weight: 700;
-            font-size: 15px;
-            color: var(--secondary);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 13px;
-        }
-        th, td {
-            padding: 14px 18px;
-            border-bottom: 1px solid #f1f5f9;
-            vertical-align: middle;
-        }
-        th {
-            background-color: #f8fafc;
-            color: #64748b;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.5px;
-        }
-        tr:hover { background-color: #f8fafc; }
-        
-        .item-img {
-            width: 45px; height: 45px; object-fit: contain;
-            border: 1px solid var(--border-color); border-radius: 8px; background: #fff; padding: 2px;
-        }
-        .badge {
-            background: #ecfdf5; color: #047857; padding: 5px 12px;
-            border-radius: 20px; font-weight: 700; font-size: 11px; display: inline-block;
-            border: 1px solid #a7f3d0;
-        }
-        .select-size {
-            padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 8px;
-            font-size: 13px; width: 170px; outline: none; background: white; cursor: pointer;
-        }
-        .input-qty {
-            width: 60px; padding: 8px; text-align: center;
-            border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px;
-        }
-        .btn {
-            background: var(--primary); color: white; border: none;
-            padding: 9px 18px; border-radius: 8px; font-weight: 600;
-            cursor: pointer; font-size: 12px; transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0,122,94,0.15);
-        }
-        .btn:hover { background: var(--primary-dark); }
-        .btn-danger { background: #ef4444; }
-        .btn-danger:hover { background: #dc2626; }
-        .btn-accent { background: var(--accent); }
-        .btn-accent:hover { background: #ea580c; }
+    /* Linhas Diretas de Tamanho + Código */
+    .linha-tamanho {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .linha-tamanho input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .input-tamanho {
+      width: 120px;
+    }
+    .input-codigo {
+      width: 180px;
+    }
 
-        .edit-input {
-            width: 100%; padding: 8px 12px; border: 1px solid var(--primary);
-            border-radius: 6px; font-size: 12px; background: #fffdf5; box-sizing: border-box;
-        }
-        .size-edit-row {
-            display: flex; gap: 6px; align-items: center; margin-bottom: 6px;
-        }
-        .btn-move {
-            background: #64748b; color: white; border: none;
-            border-radius: 6px; padding: 6px 10px; cursor: pointer;
-            font-size: 11px; margin-right: 4px;
-        }
-        .btn-move:hover { background: #475569; }
-
-        .cart-layout {
-            display: grid; grid-template-columns: 2fr 1fr; gap: 24px;
-        }
-        @media(max-width: 900px) { .cart-layout { grid-template-columns: 1fr; } }
-        
-        .card-box {
-            background: var(--card-bg); padding: 28px; border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.02); border: 1px solid var(--border-color);
-        }
-        .card-box h3 { margin-top: 0; color: var(--secondary); font-size: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
-        
-        .form-field { margin-bottom: 16px; }
-        .form-field label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--secondary); }
-        .form-field input, .form-field select {
-            width: 100%; padding: 11px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; outline: none;
-        }
-
-        .order-card {
-            background: #fff; border-left: 5px solid var(--primary);
-            padding: 20px; margin-bottom: 16px; border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02); border: 1px solid var(--border-color);
-        }
-
-        footer {
-            background-color: var(--secondary); color: #94a3b8; text-align: center;
-            padding: 24px; margin-top: 60px; font-size: 12px;
-        }
-    </style>
+    /* Botões de Ação */
+    .btn-adicionar {
+      background-color: #2b8a3e;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    .btn-remover {
+      background-color: #e03131;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <div class="brand">
-            <h1>VALE - Sistema de Uniformes</h1>
-            <span class="version-tag">v41</span>
-        </div>
-        <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchView('catalog')">📦 Catálogo</button>
-            <button class="tab-btn" onclick="switchView('cart')">🛒 Carrinho (<span id="cart-counter">0</span>)</button>
-            <button class="tab-btn" id="lockBtn" onclick="openAdminPortal()">🔒 Painel ADM</button>
-        </div>
-    </header>
-
-    <div class="main-wrapper">
-
-        <!-- VISÃO 1: CATÁLOGO -->
-        <div id="view-catalog" class="view-section active">
-            <div class="categories-bar" id="categoriesBar"></div>
-            
-            <div class="toolbar">
-                <input type="text" id="searchFilter" placeholder="Pesquisar por nome, cor ou Cód. Vale..." onkeyup="renderCatalog()">
-                <select id="genderFilter" onchange="renderCatalog()">
-                    <option value="">Todos os Géneros</option>
-                    <option value="Masculino">Masculino</option>
-                    <option value="Feminino">Feminino</option>
-                    <option value="Unissex">Unissex</option>
-                </select>
-                <div id="adminToggleContainer" style="display:none;">
-                    <button class="btn btn-accent" onclick="addNewSection()">➕ Nova Categoria</button>
-                </div>
-            </div>
-
-            <div id="catalogContent"></div>
-        </div>
-
-        <!-- VISÃO 2: CARRINHO -->
-        <div id="view-cart" class="view-section">
-            <div class="cart-layout">
-                <div class="card-box">
-                    <h3>Itens Selecionados no Pedido</h3>
-                    <div id="cartItemsList">
-                        <p style="color: #64748b; text-align: center; padding: 30px;">O seu carrinho está vazio.</p>
-                    </div>
-                </div>
-                <div class="card-box">
-                    <h3>Identificação do Colaborador</h3>
-                    <div class="form-field">
-                        <label>Nome Completo:</label>
-                        <input type="text" id="userName" placeholder="Insira seu nome">
-                    </div>
-                    <div class="form-field">
-                        <label>Matrícula:</label>
-                        <input type="text" id="userMatricula" placeholder="Insira sua matrícula">
-                    </div>
-                    <div class="form-field">
-                        <label>Data Prevista de Retirada:</label>
-                        <input type="date" id="userRetirada">
-                    </div>
-                    <button class="btn btn-accent" style="width: 100%; padding: 12px; margin-top: 10px; font-size: 14px;" onclick="enviarPedido()">Confirmar e Enviar Pedido</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- VISÃO 3: PAINEL ADMINISTRADOR -->
-        <div id="view-admin" class="view-section">
-            <div class="card-box">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 style="margin:0; border:none;">Gestão de Pedidos Recebidos</h3>
-                    <button class="btn" onclick="switchView('catalog')" style="background: var(--secondary);">⬅️ Voltar ao Catálogo</button>
-                </div>
-                <div id="adminOrdersContainer">
-                    <p style="color: #64748b; text-align: center; padding: 30px;">Nenhum pedido registado.</p>
-                </div>
-            </div>
-        </div>
-
+  <!-- 1. Filtros Tradicionais (Sem os cards) -->
+  <section class="filtros-container">
+    <div class="filtro-item">
+      <label for="filtro-categoria">Categoria / Classe:</label>
+      <select id="filtro-categoria">
+        <option value="">Todas as categorias</option>
+        <option value="adm_masc">Administrativo Masculino</option>
+        <option value="op_masc">Operacional Masculino</option>
+      </select>
     </div>
+    <div class="filtro-item">
+      <label for="filtro-tamanho">Tamanho:</label>
+      <select id="filtro-tamanho">
+        <option value="">Todos os tamanhos</option>
+        <option value="P">P</option>
+        <option value="M">M</option>
+        <option value="G">G</option>
+      </select>
+    </div>
+  </section>
 
-    <footer>
-        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v41)</p>
-    </footer>
+  <!-- 2. Cadastro de Categoria (Digitar + Enter/OK) -->
+  <section class="secao-cadastro">
+    <label for="nova-categoria"><strong>Nova Categoria:</strong></label>
+    <div class="input-inline">
+      <input type="text" id="nova-categoria" placeholder="Ex: Administrativo Masculino">
+      <button class="btn-ok" id="btn-salvar-categoria">OK</button>
+    </div>
+  </section>
 
-    <script>
-        const defaultCatalog_v41 = [
-            {
-                category: "Administrativa",
-                gender: "Masculino",
-                items: [
-                    { 
-                        id: 1, 
-                        nome: 'Camisa Administrativa Masculina Manga Longa', 
-                        ref: '16724398', 
-                        cor: 'Verde Vale',
-                        foto: '',
-                        tamanhos: [
-                            { cod: '16724398', tamanho: '01' },
-                            { cod: '16725077', tamanho: '02' },
-                            { cod: '16724307', tamanho: '03' }
-                        ]
-                    },
-                    { 
-                        id: 2, 
-                        nome: 'Camisa Administrativa Masculina Manga Curta', 
-                        ref: '16724400', 
-                        cor: 'Verde Vale',
-                        foto: '',
-                        tamanhos: [
-                            { cod: '16724400', tamanho: '01' },
-                            { cod: '16724412', tamanho: '02' }
-                        ]
-                    }
-                ]
-            }
-        ];
+  <hr>
 
-        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v41'));
-        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v41;
-        
-        let isEditUnlocked = false;
-        let selectedCategoryFilter = "";
-        let cart = [];
+  <!-- 3. Tamanho e Código direto na mesma linha -->
+  <section class="secao-cadastro">
+    <h3>Tamanhos e Códigos</h3>
+    <div id="container-tamanhos">
+      <div class="linha-tamanho">
+        <input type="text" class="input-tamanho" placeholder="Tamanho (ex: M)">
+        <input type="text" class="input-codigo" placeholder="Código">
+        <button class="btn-remover" onclick="removerLinha(this)">×</button>
+      </div>
+    </div>
+    <button class="btn-adicionar" id="btn-adicionar-tamanho">+ Adicionar Tamanho</button>
+  </section>
 
-        function switchView(viewName) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
-            if(viewName === 'catalog') {
-                document.getElementById('view-catalog').classList.add('active');
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-            } else if(viewName === 'cart') {
-                document.getElementById('view-cart').classList.add('active');
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
-                renderCartUI();
-            } else if(viewName === 'admin') {
-                document.getElementById('view-admin').classList.add('active');
-                renderAdminOrders();
-            }
-        }
+  <script>
+    // Adicionar nova categoria ao pressionar Enter ou clicar em OK
+    const inputCategoria = document.getElementById('nova-categoria');
+    const btnSalvarCategoria = document.getElementById('btn-salvar-categoria');
+    const selectCategoria = document.getElementById('filtro-categoria');
 
-        function openAdminPortal() {
-            if (!isEditUnlocked) {
-                let pass = prompt("Digite a senha de Administrador (admin123):");
-                if (pass === "admin123") {
-                    isEditUnlocked = true;
-                    document.getElementById('lockBtn').innerHTML = "🔓 Modo ADM Ativo";
-                    document.getElementById('lockBtn').style.background = "#d4edda";
-                    document.getElementById('lockBtn').style.color = "#155724";
-                    document.getElementById('lockBtn').style.borderColor = "#c3e6cb";
-                    document.getElementById('adminToggleContainer').style.display = "block";
-                    switchView('admin');
-                    renderCatalog();
-                    alert("Acesso concedido! Modo de edição total ativado.");
-                } else if (pass !== null) {
-                    alert("Senha incorreta!");
-                }
-            } else {
-                switchView('admin');
-            }
-        }
+    function salvarCategoria() {
+      const nome = inputCategoria.value.trim();
+      if (!nome) return;
 
-        function renderCategoriesBar() {
-            const bar = document.getElementById('categoriesBar');
-            if(!bar) return;
-            let cats = [...new Set(catalogSections.map(s => s.category))];
-            
-            let html = `<div class="cat-pill ${selectedCategoryFilter === '' ? 'active' : ''}" onclick="selectCat('')">📂 Todas as Categorias</div>`;
-            cats.forEach(c => {
-                html += `<div class="cat-pill ${selectedCategoryFilter === c ? 'active' : ''}" onclick="selectCat('${c}')">📁 ${c}</div>`;
-            });
-            bar.innerHTML = html;
-        }
+      const novaOpcao = document.createElement('option');
+      novaOpcao.value = nome.toLowerCase().replace(/\s+/g, '_');
+      novaOpcao.textContent = nome;
+      selectCategoria.appendChild(novaOpcao);
 
-        function selectCat(cat) {
-            selectedCategoryFilter = cat;
-            renderCatalog();
-        }
+      inputCategoria.value = '';
+    }
 
-        function renderCatalog() {
-            renderCategoriesBar();
-            const container = document.getElementById('catalogContent');
-            if(!container) return;
-            container.innerHTML = '';
+    btnSalvarCategoria.addEventListener('click', salvarCategoria);
+    inputCategoria.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        salvarCategoria();
+      }
+    });
 
-            const query = document.getElementById('searchFilter').value.toLowerCase();
-            const genderFilter = document.getElementById('genderFilter').value;
+    // Adicionar linha direta de Tamanho + Código
+    const containerTamanhos = document.getElementById('container-tamanhos');
+    const btnAdicionarTamanho = document.getElementById('btn-adicionar-tamanho');
 
-            catalogSections.forEach((section, sIdx) => {
-                if (selectedCategoryFilter !== "" && section.category !== selectedCategoryFilter) return;
-                if (genderFilter !== "" && section.gender !== genderFilter) return;
+    btnAdicionarTamanho.addEventListener('click', () => {
+      const divLinha = document.createElement('div');
+      divLinha.className = 'linha-tamanho';
+      divLinha.innerHTML = `
+        <input type="text" class="input-tamanho" placeholder="Tamanho">
+        <input type="text" class="input-codigo" placeholder="Código">
+        <button class="btn-remover" onclick="removerLinha(this)">×</button>
+      `;
+      containerTamanhos.appendChild(divLinha);
+    });
 
-                const filteredItems = section.items.filter(prod => {
-                    return prod.nome.toLowerCase().includes(query) || 
-                           prod.ref.toLowerCase().includes(query) ||
-                           prod.cor.toLowerCase().includes(query) ||
-                           prod.tamanhos.some(t => t.cod.includes(query) || t.tamanho.toLowerCase().includes(query));
-                });
-
-                if (filteredItems.length === 0 && !isEditUnlocked) return;
-
-                let rowsHtml = '';
-                section.items.forEach((prod, iIdx) => {
-                    let thumb = prod.foto || 'https://via.placeholder.com/45?text=Foto';
-                    let firstCod = prod.tamanhos[0] ? prod.tamanhos[0].cod : prod.ref;
-                    let options = prod.tamanhos.map(t => `<option value="${t.cod}">${t.tamanho} (Cód: ${t.cod})</option>`).join('');
-
-                    if (isEditUnlocked) {
-                        let sizesHtml = '';
-                        prod.tamanhos.forEach((t, tIdx) => {
-                            sizesHtml += `
-                                <div class="size-edit-row">
-                                    <input type="text" class="edit-input" value="${t.tamanho}" onchange="updateSize(${sIdx}, ${iIdx}, ${tIdx}, 'tamanho', this.value)" style="width:45px;" placeholder="Tam">
-                                    <input type="text" class="edit-input" value="${t.cod}" onchange="updateSize(${sIdx}, ${iIdx}, ${tIdx}, 'cod', this.value)" style="width:110px;" placeholder="Cód Vale (16...)">
-                                    <button class="btn btn-danger" onclick="removeSize(${sIdx}, ${iIdx}, ${tIdx})" style="padding:4px 8px;">×</button>
-                                </div>
-                            `;
-                        });
-                        sizesHtml += `<button class="btn" onclick="addSize(${sIdx}, ${iIdx})" style="padding:4px 10px; font-size:11px; margin-top:4px;">+ Adicionar Tamanho</button>`;
-
-                        rowsHtml += `
-                            <tr>
-                                <td>
-                                    <img src="${thumb}" class="item-img" style="margin-bottom:4px;"><br>
-                                    <input type="file" accept="image/*" onchange="updateItemPhoto(${sIdx}, ${iIdx}, event)" style="font-size:10px; width:90px;">
-                                </td>
-                                <td><input type="text" class="edit-input" value="${prod.ref}" onchange="updateItem(${sIdx}, ${iIdx}, 'ref', this.value)" style="width:110px;" placeholder="16..."></td>
-                                <td><input type="text" class="edit-input" value="${prod.nome}" onchange="updateItem(${sIdx}, ${iIdx}, 'nome', this.value)"></td>
-                                <td><input type="text" class="edit-input" value="${prod.cor}" onchange="updateItem(${sIdx}, ${iIdx}, 'cor', this.value)" style="width:90px;"></td>
-                                <td><input type="text" class="edit-input" value="${section.gender}" onchange="updateGender(${sIdx}, ${iIdx}, this.value)" style="width:90px;"></td>
-                                <td>${sizesHtml}</td>
-                                <td style="white-space: nowrap;">
-                                    <button class="btn-move" onclick="moveItem(${sIdx}, ${iIdx}, -1)">⬆️</button>
-                                    <button class="btn-move" onclick="moveItem(${sIdx}, ${iIdx}, 1)">⬇️</button>
-                                    <button class="btn btn-danger" onclick="deleteItem(${sIdx}, ${iIdx})" style="padding:7px 12px;">Excluir</button>
-                                </td>
-                            </tr>
-                        `;
-                    } else {
-                        rowsHtml += `
-                            <tr>
-                                <td><img src="${thumb}" class="item-img" onerror="this.src='https://via.placeholder.com/45?text=Foto'"></td>
-                                <td><strong style="color: var(--primary);">${prod.ref || firstCod}</strong></td>
-                                <td>${prod.nome}</td>
-                                <td>${prod.cor}</td>
-                                <td><span class="badge">${section.gender}</span></td>
-                                <td><select class="select-size" id="sel-${prod.id}">${options}</select></td>
-                                <td><input type="number" class="input-qty" id="qty-${prod.id}" value="1" min="1" max="50"></td>
-                                <td><button class="btn" onclick="addToCart(${prod.id})">Adicionar</button></td>
-                            </tr>
-                        `;
-                    }
-                });
-
-                let headers = isEditUnlocked ? 
-                    `<tr><th>Foto</th><th>Cód. Vale (16...)</th><th>Nome do Item</th><th>Cor</th><th>Género</th><th>Tamanhos & Códigos (Separados)</th><th>Ações</th></tr>` :
-                    `<tr><th>Foto</th><th>Cód. Vale</th><th>Descrição do Item</th><th>Cor</th><th>Género</th><th>Tamanho</th><th>Qtd</th><th>Ação</th></tr>`;
-
-                let secHeader = isEditUnlocked ? `
-                    <div style="display:flex; gap:12px; align-items:center; width:100%; flex-wrap:wrap;">
-                        <input type="text" class="edit-input" value="${section.category}" onchange="updateSec(${sIdx}, 'category', this.value)" style="width:150px;" placeholder="Categoria">
-                        <input type="text" class="edit-input" value="${section.gender}" onchange="updateSec(${sIdx}, 'gender', this.value)" style="width:130px;" placeholder="Género">
-                        <button class="btn" onclick="addItem(${sIdx})" style="background:var(--accent);">+ Novo Item</button>
-                        <button class="btn btn-danger" onclick="deleteSec(${sIdx})">🗑️ Apagar Secção</button>
-                    </div>
-                ` : `<span>📂 Linha ${section.category} - ${section.gender}</span>`;
-
-                container.innerHTML += `
-                    <div class="table-card">
-                        <div class="table-title">${secHeader}</div>
-                        <table>
-                            <thead>${headers}</thead>
-                            <tbody>${rowsHtml}</tbody>
-                        </table>
-                    </div>
-                `;
-            });
-        }
-
-        function updateItem(s, i, f, v) { catalogSections[s].items[i][f] = v.trim(); saveAndSync(); }
-        function updateSize(s, i, t, f, v) { catalogSections[s].items[i].tamanhos[t][f] = v.trim(); saveAndSync(); }
-        function addSize(s, i) { catalogSections[s].items[i].tamanhos.push({tamanho: 'Único', cod: '16700000'}); saveAndSync(); }
-        function removeSize(s, i, t) {
-            if(catalogSections[s].items[i].tamanhos.length <= 1) { alert('Mínimo 1 tamanho.'); return; }
-            catalogSections[s].items[i].tamanhos.splice(t, 1); saveAndSync();
-        }
-        function deleteItem(s, i) { if(confirm('Excluir item?')) { catalogSections[s].items.splice(i,1); saveAndSync(); } }
-        function updateItemPhoto(s, i, event) {
-            let file = event.target.files[0];
-            if(!file) return;
-            let reader = new FileReader();
-            reader.onload = function(e) {
-                catalogSections[s].items[i].foto = e.target.result;
-                saveAndSync();
-            };
-            reader.readAsDataURL(file);
-        }
-        function addItem(s) {
-            let nome = prompt('Nome do item:'); if(!nome) return;
-            let ref = prompt('Cód. Vale (começado por 16...):', '16724398');
-            catalogSections[s].items.push({ id: Date.now(), nome: nome, ref: ref || '16700000', cor: 'Verde Vale', foto: '', tamanhos: [{tamanho:'01', cod: ref || '16724398'}] });
-            saveAndSync();
-        }
-        function addNewSection() {
-            let cat = prompt('Nome da Categoria:'); if(!cat) return;
-            let gen = prompt('Género:', 'Unissex'); if(!gen) return;
-            catalogSections.push({ category: cat, gender: gen, items: [{ id: Date.now(), nome: 'Novo Uniforme', ref: '16700000', cor: 'Padrão', foto:'', tamanhos:[{tamanho:'Único', cod:'16700000'}] }] });
-            saveAndSync();
-        }
-        function deleteSec(s) { if(confirm('Apagar secção inteira?')) { catalogSections.splice(s, 1); saveAndSync(); } }
-        function updateSec(s, f, v) { catalogSections[s][f] = v.trim(); saveAndSync(); }
-        function moveItem(s, i, dir) {
-            let target = i + dir; if(target < 0 || target >= catalogSections[s].items.length) return;
-            let tmp = catalogSections[s].items[i]; catalogSections[s].items[i] = catalogSections[s].items[target]; catalogSections[s].items[target] = tmp;
-            saveAndSync();
-        }
-
-        function saveAndSync() {
-            localStorage.setItem('vale_catalog_v41', JSON.stringify(catalogSections));
-            renderCatalog();
-        }
-
-        function addToCart(id) {
-            let prod = null; catalogSections.forEach(s => { let m = s.items.find(x => x.id === id); if(m) prod = m; });
-            if(!prod) return;
-            let sel = document.getElementById(`sel-${id}`);
-            let qty = parseInt(document.getElementById(`qty-${id}`).value);
-            let cod = sel.value;
-            let tamObj = prod.tamanhos.find(t => t.cod === cod);
-
-            let key = `${id}-${cod}`;
-            let ex = cart.find(c => c.key === key);
-            if(ex) { ex.qty += qty; } else {
-                cart.push({ key: key, nome: prod.nome, cor: prod.cor, cod: cod, tamanho: tamObj.tamanho, qty: qty });
-            }
-            document.getElementById('cart-counter').innerText = cart.reduce((a,b)=>a+b.qty,0);
-            alert(`Adicionado ao carrinho: ${qty}x ${prod.nome}`);
-        }
-
-        function renderCartUI() {
-            let box = document.getElementById('cartItemsList');
-            if(cart.length === 0) { box.innerHTML = `<p style="color: #64748b; text-align: center; padding: 30px;">O seu carrinho está vazio.</p>`; return; }
-            let html = '';
-            cart.forEach((c, idx) => {
-                html += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px;">
-                        <div><strong>${c.nome}</strong><br><small style="color:#64748b;">Cód. Vale: ${c.cod} | Cor: ${c.cor} | Tam: ${c.tamanho} | Qtd: ${c.qty}</small></div>
-                        <button class="btn btn-danger" onclick="removeFromCart(${idx})" style="padding:5px 10px;">Remover</button>
-                    </div>
-                `;
-            });
-            box.innerHTML = html;
-        }
-
-        function removeFromCart(idx) { cart.splice(idx,1); renderCartUI(); document.getElementById('cart-counter').innerText = cart.reduce((a,b)=>a+b.qty,0); }
-
-        function enviarPedido() {
-            let nome = document.getElementById('userName').value.trim();
-            let mat = document.getElementById('userMatricula').value.trim();
-            let ret = document.getElementById('userRetirada').value;
-
-            if(!nome || !mat || !ret) { alert('Preencha todos os campos de identificação e data de retirada.'); return; }
-            if(cart.length === 0) { alert('Carrinho vazio!'); return; }
-
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v41') || '[]');
-            orders.push({ nome, matricula: mat, dataRetirada: ret, dataPedido: new Date().toLocaleString(), status: 'Pendente', itens: [...cart] });
-            localStorage.setItem('vale_orders_v41', JSON.stringify(orders));
-
-            alert('Pedido enviado com sucesso!');
-            cart = []; document.getElementById('userName').value=''; document.getElementById('userMatricula').value=''; document.getElementById('userRetirada').value='';
-            document.getElementById('cart-counter').innerText = '0';
-            switchView('catalog');
-        }
-
-        function renderAdminOrders() {
-            let container = document.getElementById('adminOrdersContainer');
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v41') || '[]');
-            if(orders.length === 0) { container.innerHTML = `<p style="color: #64748b; text-align: center; padding: 30px;">Nenhum pedido registado.</p>`; return; }
-
-            let html = '';
-            orders.forEach((o, idx) => {
-                let itensStr = o.itens.map(i => `<li>${i.qty}x ${i.nome} (Cód. Vale: ${i.cod}, Tam: ${i.tamanho})</li>`).join('');
-                let st = o.status === 'Aprovado' ? `<span style="color:#047857; font-weight:bold;">✅ Aprovado por ${o.aprovador}</span>` :
-                         o.status === 'Reprovado' ? `<span style="color:#dc2626; font-weight:bold;">❌ Reprovado por ${o.aprovador}</span>` :
-                         `<button class="btn" onclick="aprovar(${idx}, 'Aprovado')">Aprovar</button> <button class="btn btn-danger" onclick="aprovar(${idx}, 'Reprovado')">Reprovar</button>`;
-
-                html += `
-                    <div class="order-card">
-                        <strong>Pedido #${idx+1} - ${o.nome} (Mat: ${o.matricula})</strong><br>
-                        <small style="color:#64748b;">Retirada: ${o.dataRetirada} | Registado: ${o.dataPedido}</small>
-                        <ul style="margin: 8px 0 12px 15px; padding:0; color:#334155;">${itensStr}</ul>
-                        <div>Status: ${st}</div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function aprovar(idx, status) {
-            let nome = prompt('Seu Nome:'); if(!nome) return;
-            let mat = prompt('Sua Matrícula:'); if(!mat) return;
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v41') || '[]');
-            orders[idx].status = status;
-            orders[idx].aprovador = `${nome} (Mat: ${mat})`;
-            localStorage.setItem('vale_orders_v41', JSON.stringify(orders));
-            renderAdminOrders();
-        }
-
-        window.onload = renderCatalog;
-    </script>
+    function removerLinha(botao) {
+      botao.parentElement.remove();
+    }
+  </script>
 </body>
 </html>
