@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitação de Uniformes - VALE (v14)</title>
+    <title>Solicitação de Uniformes - VALE (v15)</title>
     <style>
         :root {
             --primary-color: #007a5e;
@@ -193,7 +193,7 @@
             background-color: var(--primary-dark);
         }
         
-        /* Modais */
+        /* Modais gerais */
         .modal {
             display: none;
             position: fixed;
@@ -202,20 +202,29 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.5);
-            justify-content: flex-end;
+            justify-content: center;
+            align-items: center;
             z-index: 2000;
         }
         .modal-content {
             background: white;
-            width: 540px;
-            height: 100%;
+            width: 500px;
+            max-width: 95vw;
+            max-height: 90vh;
             padding: 25px;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             box-sizing: border-box;
             overflow-y: auto;
+        }
+        /* Painel ADM Grande e Largo */
+        #adminModal .modal-content {
+            width: 850px;
+            max-width: 95vw;
+            height: 85vh;
         }
         .modal-header {
             display: flex;
@@ -227,8 +236,10 @@
         .close-modal {
             background: none;
             border: none;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
+            font-weight: bold;
+            color: #666;
         }
         .modal-body {
             flex-grow: 1;
@@ -237,24 +248,25 @@
         }
         .form-user {
             background: #f9f9f9;
-            padding: 12px;
+            padding: 15px;
             border-radius: 6px;
             margin-bottom: 12px;
+            border: 1px solid #e0e0e0;
         }
         .form-user label {
             display: block;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
-            margin-bottom: 2px;
-            margin-top: 6px;
+            margin-bottom: 3px;
+            margin-top: 8px;
         }
         .form-user input, .form-user select, .form-user textarea {
             width: 100%;
-            padding: 8px;
+            padding: 9px;
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
-            font-size: 12px;
+            font-size: 13px;
         }
         .cart-item {
             display: flex;
@@ -281,25 +293,25 @@
         .admin-order-card {
             background: #f8f9fa;
             border-left: 4px solid var(--primary-color);
-            padding: 8px;
-            margin-bottom: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 13px;
         }
         .admin-tabs {
             display: flex;
-            gap: 4px;
-            margin-bottom: 12px;
+            gap: 6px;
+            margin-bottom: 15px;
         }
         .admin-tab-btn {
             flex: 1;
-            padding: 7px;
+            padding: 10px;
             background: #e0e0e0;
             border: none;
             font-weight: bold;
             cursor: pointer;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 13px;
         }
         .admin-tab-btn.active {
             background: var(--primary-color);
@@ -320,7 +332,7 @@
     <header>
         <div class="logo-container">
             <h1>VALE - Sistema de Uniformes</h1>
-            <span class="version-tag">v14</span>
+            <span class="version-tag">v15</span>
         </div>
         <div class="header-actions">
             <button class="btn-header" onclick="toggleCart()">
@@ -334,7 +346,7 @@
 
     <div class="hero">
         <h2>Catálogo Estilo Excel</h2>
-        <p>Selecione o tamanho na caixinha de seleção e adicione ao carrinho[span_2](start_span)[span_2](end_span).</p>
+        <p>Selecione o tamanho na caixinha de seleção e adicione ao carrinho[span_0](start_span)[span_0](end_span).</p>
     </div>
 
     <div class="container">
@@ -389,38 +401,39 @@
         </div>
     </div>
 
-    <!-- Painel Administrador (Senha: admin123) -->
+    <!-- Painel Administrador Largo (Senha: admin123) -->
     <div class="modal" id="adminModal">
-        <div class="modal-content" style="width: 560px;">
+        <div class="modal-content">
             <div>
                 <div class="modal-header">
-                    <h3>Painel do Administrador (v14)</h3>
+                    <h3>Painel do Administrador (v15)</h3>
                     <button class="close-modal" onclick="closeAdminModal()">&times;</button>
                 </div>
 
-                <div id="adminLoginSection" style="margin-top: 25px; text-align: center;">
+                <div id="adminLoginSection" style="margin-top: 40px; text-align: center;">
                     <p>Área restrita. Digite a senha de Administrador (admin123):</p>
-                    <div style="position: relative; display: inline-block; width: 70%; margin-bottom: 10px;">
-                        <input type="password" id="adminPassword" placeholder="Senha ADM" style="padding: 9px; width: 100%; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-                        <span onclick="togglePasswordVisibility()" style="position: absolute; right: 8px; top: 8px; cursor: pointer; font-size: 16px;" id="eyeIcon" title="Mostrar/Ocultar Senha">👁️</span>
+                    <div style="position: relative; display: inline-block; width: 50%; margin-bottom: 10px;">
+                        <input type="password" id="adminPassword" placeholder="Senha ADM" style="padding: 10px; width: 100%; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                        <span onclick="togglePasswordVisibility()" style="position: absolute; right: 10px; top: 10px; cursor: pointer; font-size: 18px;" id="eyeIcon" title="Mostrar/Ocultar Senha">👁️</span>
                     </div>
                     <br>
-                    <button class="btn-add" onclick="checkAdminPassword()" style="padding: 8px 16px; font-size: 13px;">Entrar</button>
+                    <button class="btn-add" onclick="checkAdminPassword()" style="padding: 10px 24px; font-size: 14px;">Entrar</button>
                 </div>
 
-                <div id="adminPanelContent" style="display: none; margin-top: 12px;">
+                <div id="adminPanelContent" style="display: none; margin-top: 15px; height: calc(100% - 60px); display: flex; flex-direction: column;">
                     <div class="admin-tabs">
                         <button class="admin-tab-btn active" onclick="switchAdminTab('manage')">Gerir / Editar Itens</button>
                         <button class="admin-tab-btn" onclick="switchAdminTab('orders')">Pedidos Recebidos</button>
                     </div>
 
                     <!-- Aba Gerir / Editar Itens -->
-                    <div id="tabManageContent" class="form-user" style="max-height: 330px; overflow-y: auto;">
+                    <div id="tabManageContent" class="form-user" style="flex-grow: 1; overflow-y: auto;">
                         <input type="hidden" id="editCatalogId" value="">
                         
-                        <div style="background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 12px;">
-                            <strong id="formTitleMode" style="color: var(--primary-color); font-size: 12px;">Editar Item Selecionado:</strong>
-                            <div style="display: flex; gap: 8px; margin-top: 6px;">
+                        <div style="background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px;">
+                            <strong id="formTitleMode" style="color: var(--primary-color); font-size: 14px;">Selecione um item abaixo para editar:</strong>
+                            
+                            <div style="display: flex; gap: 12px; margin-top: 10px;">
                                 <div style="flex: 2;">
                                     <label>Nome do Item:</label>
                                     <input type="text" id="editItemName" placeholder="Ex: Camisa Administrativa...">
@@ -431,7 +444,7 @@
                                 </div>
                             </div>
 
-                            <div style="display: flex; gap: 8px;">
+                            <div style="display: flex; gap: 12px;">
                                 <div style="flex: 1;">
                                     <label>Categoria:</label>
                                     <select id="editItemCat">
@@ -450,22 +463,22 @@
                                 </div>
                             </div>
 
-                            <label>Foto do Aparelho:</label>
-                            <input type="file" id="editItemPhotoFile" accept="image/*" style="font-size: 11px; padding: 4px;">
+                            <label>Foto do Aparelho (Deixe em branco para manter a atual):</label>
+                            <input type="file" id="editItemPhotoFile" accept="image/*" style="font-size: 12px; padding: 6px;">
 
-                            <label>Tamanhos, Cores e Códigos (Formato: Tamanho:Código (Cor)):</label>
+                            <label>Tamanhos, Cores e Códigos VALE (Formato: Tamanho:Código (Cor)):</label>
                             <textarea id="editItemVars" rows="3" placeholder="01:16724398 (Verde Vale), 02:16725077 (Verde Vale)"></textarea>
 
-                            <button class="btn-add" onclick="saveAdminItem()" style="width: 100%; margin-top: 10px; padding: 8px;">Guardar Alterações do Item</button>
+                            <button class="btn-add" onclick="saveAdminItem()" style="width: 100%; margin-top: 12px; padding: 10px; font-size: 14px;">Guardar Alterações do Item</button>
                         </div>
 
-                        <h4 style="margin: 10px 0 5px 0; font-size: 12px; color: var(--secondary-color);">Lista de Produtos para Editar:</h4>
+                        <h4 style="margin: 15px 0 8px 0; font-size: 13px; color: var(--secondary-color);">Lista de Produtos do Catálogo:</h4>
                         <div id="adminItemsList"></div>
                     </div>
 
                     <!-- Aba Pedidos -->
-                    <div id="tabOrdersContent" style="display: none;" class="modal-body">
-                        <div id="adminOrdersList" style="max-height: 310px;">
+                    <div id="tabOrdersContent" style="display: none; flex-grow: 1; overflow-y: auto;" class="modal-body">
+                        <div id="adminOrdersList">
                             <p style="color: #777; text-align: center;">Nenhum pedido registado.</p>
                         </div>
                     </div>
@@ -475,11 +488,11 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v14)</p>
+        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v15)</p>
     </footer>
 
     <script>
-        const defaultCatalog_v14 = [
+        const defaultCatalog_v15 = [
             {
                 title: "📂 Linha Administrativa - Masculino",
                 category: "Administrativa",
@@ -569,8 +582,8 @@
             }
         ];
 
-        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v14'));
-        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v14;
+        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v15'));
+        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v15;
 
         let cart = [];
 
@@ -749,14 +762,14 @@
                 return;
             }
 
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v14') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v15') || '[]');
             orders.push({
                 nome: nome,
                 matricula: matricula,
                 data: new Date().toLocaleString(),
                 itens: [...cart]
             });
-            localStorage.setItem('vale_orders_v14', JSON.stringify(orders));
+            localStorage.setItem('vale_orders_v15', JSON.stringify(orders));
 
             alert(`Sucesso! Pedido enviado em nome de ${nome} (Matrícula: ${matricula}). Registado no sistema.`);
             
@@ -813,16 +826,16 @@
             container.innerHTML = '';
 
             catalogSections.forEach((sec, sIdx) => {
-                container.innerHTML += `<div style="font-weight:bold; color:var(--primary-color); margin-top:8px; font-size:11px;">${sec.title}</div>`;
+                container.innerHTML += `<div style="font-weight:bold; color:var(--primary-color); margin-top:10px; font-size:12px; border-bottom:1px solid #ddd; padding-bottom:3px;">${sec.title}</div>`;
                 sec.items.forEach((item, iIdx) => {
                     let thumb = item.foto ? item.foto : 'https://via.placeholder.com/25?text=Foto';
                     container.innerHTML += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding:4px 6px; margin-top:3px; border-radius:4px; border:1px solid #ddd; font-size:11px;">
-                            <div style="display:flex; align-items:center; gap:5px;">
-                                <img src="${thumb}" style="width:22px; height:22px; object-fit:contain; border:1px solid #ccc;">
-                                <span>${item.nome} (${item.ref})</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding:6px 8px; margin-top:4px; border-radius:4px; border:1px solid #ddd; font-size:12px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <img src="${thumb}" style="width:28px; height:28px; object-fit:contain; border:1px solid #ccc;">
+                                <span><strong>${item.ref}</strong> - ${item.nome}</span>
                             </div>
-                            <button class="btn-add" onclick="editAdminItem(${sIdx}, ${iIdx})" style="padding:3px 6px; font-size:10px;">Editar</button>
+                            <button class="btn-add" onclick="editAdminItem(${sIdx}, ${iIdx})" style="padding:4px 10px; font-size:11px;">Editar</button>
                         </div>
                     `;
                 });
@@ -841,13 +854,13 @@
 
             let varsStr = item.variacoes.map(v => `${v.tamanho}:${v.cod} (${v.cor})`).join(', ');
             document.getElementById('editItemVars').value = varsStr;
-            document.getElementById('formTitleMode').innerText = `A editar: ${item.nome}`;
+            document.getElementById('formTitleMode').innerText = `A editar: ${item.nome} (${item.ref})`;
         }
 
         function saveAdminItem() {
             const targetId = document.getElementById('editCatalogId').value;
             if(!targetId) {
-                alert('Selecione um item da lista abaixo para editar primeiro.');
+                alert('Selecione um item da lista abaixo clicando em "Editar" primeiro.');
                 return;
             }
 
@@ -882,7 +895,6 @@
             });
 
             const processUpdate = (fotoUrl) => {
-                // Atualizar dados do item
                 catalogSections[sIdx].items[iIdx].nome = nome;
                 catalogSections[sIdx].items[iIdx].ref = ref;
                 catalogSections[sIdx].items[iIdx].variacoes = variacoes;
@@ -890,11 +902,10 @@
                     catalogSections[sIdx].items[iIdx].foto = fotoUrl;
                 }
 
-                // Se mudou de categoria ou género, realocar se necessário (simplificado: atualiza a secção correspondente)
-                localStorage.setItem('vale_catalog_v14', JSON.stringify(catalogSections));
+                localStorage.setItem('vale_catalog_v15', JSON.stringify(catalogSections));
                 renderCatalog();
                 loadAdminItemsList();
-                alert('Item atualizado com sucesso!');
+                alert('Item atualizado com sucesso no catálogo!');
             };
 
             if (fileInput.files && fileInput.files[0]) {
@@ -911,7 +922,7 @@
         function loadAdminOrders() {
             const container = document.getElementById('adminOrdersList');
             if(!container) return;
-            let orders = JSON.parse(localStorage.getItem('vale_orders_v14') || '[]');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v15') || '[]');
 
             if (orders.length === 0) {
                 container.innerHTML = `<p style="color: #777; text-align: center;">Nenhum pedido registado.</p>`;
