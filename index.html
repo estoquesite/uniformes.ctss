@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v3.1)</title>
+    <title>Gestão de Uniformes - Vale (v3.2)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -75,6 +75,30 @@
         </div>
     </div>
 
+    <!-- MODAL DE GESTÃO DE UTILIZADORES (DIRETO NO RODAPÉ COM OS BONEQUINHOS) -->
+    <div id="modalUtilizadoresAdmin" class="fixed inset-0 z-[160] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-lg w-full space-y-4 text-xs relative">
+            <button onclick="fecharModalUtilizadoresAdmin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
+            <div class="flex items-center gap-2 border-b pb-3">
+                <span class="text-xl">👥</span>
+                <div>
+                    <h3 class="font-black uppercase text-slate-900 text-sm">Painel de Utilizadores Cadastrados</h3>
+                    <p class="text-[11px] text-slate-500">Adicione novas contas de colaboradores ou remova acessos.</p>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="adicionarUtilizadorAdmin()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl font-bold text-xs transition shadow-sm">➕ Cadastrar Novo Utilizador</button>
+            </div>
+
+            <div id="listaUtilizadoresAdmin" class="max-h-60 overflow-y-auto space-y-2"></div>
+
+            <div class="flex justify-end pt-2 border-t">
+                <button onclick="fecharModalUtilizadoresAdmin()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl font-bold">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- CABEÇALHO SUPERIOR -->
     <header class="bg-emerald-900 text-white px-4 py-3 shadow-md border-b border-emerald-800 text-xs flex justify-between items-center z-50 relative">
         <div class="flex items-center gap-2">
@@ -97,7 +121,6 @@
         <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl shadow-inner overflow-x-auto no-scrollbar">
             <button onclick="mudarTab('catalogo')" id="tab-btn-catalogo" class="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5"><span>👕</span> Catálogo</button>
             <button onclick="mudarTab('carrinho')" id="tab-btn-carrinho" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50"><span>🛒</span> Carrinho <span id="contadorCarrinho" class="bg-emerald-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
-            <button onclick="mudarTab('usuarios')" id="tab-btn-usuarios" class="py-3 px-4 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden" title="Utilizadores"><span>👥</span></button>
             <button onclick="mudarTab('admin')" id="tab-btn-admin" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>📊</span> Pedidos <span id="contadorPedidos" class="bg-amber-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
             <button onclick="mudarTab('gerir')" id="tab-btn-gerir" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>✏️</span> Catálogo</button>
         </div>
@@ -140,21 +163,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: GESTÃO DE UTILIZADORES / RESTRITOS (ADMIN) -->
-        <div id="tab-usuarios" class="space-y-4 hidden">
-            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
-                    <div>
-                        <h2 class="text-sm font-black uppercase text-slate-800">👥 Gestão de Utilizadores Restritos</h2>
-                        <p class="text-[11px] text-slate-500">Visualize todas as contas cadastradas e remova acessos indevidos se necessário.</p>
-                    </div>
-                    <button onclick="adicionarUtilizadorAdmin()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">➕ Adicionar Utilizador</button>
-                </div>
-                <div id="listaUtilizadoresAdmin" class="space-y-2"></div>
-            </div>
-        </div>
-
-        <!-- TAB 4: PAINEL DE APROVAÇÃO (ADMIN) -->
+        <!-- TAB 3: PAINEL DE APROVAÇÃO (ADMIN) -->
         <div id="tab-admin" class="space-y-4 hidden">
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
@@ -169,7 +178,7 @@
             </div>
         </div>
 
-        <!-- TAB 5: GERIR CATÁLOGO (ADMIN) -->
+        <!-- TAB 4: GERIR CATÁLOGO (ADMIN) -->
         <div id="tab-gerir" class="space-y-4 hidden">
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
@@ -186,10 +195,10 @@
 
     </div>
 
-    <!-- RODAPÉ COM FAIXA VERDE E BOTÃO DOS BONEQUINHOS (👥) PARA O ADMIN -->
+    <!-- RODAPÉ COM FAIXA VERDE, VERSÃO E BOTÃO DOS BONEQUINHOS (👥) -->
     <footer class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-emerald-900 text-white px-4 py-2.5 flex justify-between items-center max-w-5xl mx-auto rounded-t-2xl shadow-2xl border-t border-emerald-800 text-xs">
-        <span class="font-bold tracking-wider">Uniformes Vale • Versão v3.1</span>
-        <button onclick="mudarTab('usuarios')" id="btnBonequinhosFooter" class="hidden bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition">
+        <span class="font-bold tracking-wider">Uniformes Vale • Versão v3.2</span>
+        <button onclick="abrirModalUtilizadoresAdmin()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition" title="Gerir Utilizadores">
             <span>👥</span> Utilizadores
         </button>
     </footer>
@@ -392,6 +401,16 @@
             if(modoAdmin) toggleModoAdmin();
         }
 
+        // GESTÃO DE UTILIZADORES NO MODAL DO RODAPÉ
+        function abrirModalUtilizadoresAdmin() {
+            renderizarUtilizadoresAdmin();
+            document.getElementById('modalUtilizadoresAdmin').classList.remove('hidden');
+        }
+
+        function fecharModalUtilizadoresAdmin() {
+            document.getElementById('modalUtilizadoresAdmin').classList.add('hidden');
+        }
+
         function renderizarUtilizadoresAdmin() {
             const container = document.getElementById('listaUtilizadoresAdmin');
             if(!container) return;
@@ -438,7 +457,7 @@
         }
 
         function mudarTab(tab) {
-            ['catalogo', 'carrinho', 'usuarios', 'admin', 'gerir'].forEach(t => {
+            ['catalogo', 'carrinho', 'admin', 'gerir'].forEach(t => {
                 let el = document.getElementById('tab-' + t);
                 if(el) el.classList.add('hidden');
                 let btn = document.getElementById('tab-btn-' + t);
@@ -461,8 +480,6 @@
                 modoAdmin = false;
                 document.getElementById('badgeModo').innerText = "Modo: Utilizador";
                 document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
-                document.getElementById('btnBonequinhosFooter').classList.add('hidden');
-                document.getElementById('tab-btn-usuarios').classList.add('hidden');
                 document.getElementById('tab-btn-admin').classList.add('hidden');
                 document.getElementById('tab-btn-gerir').classList.add('hidden');
                 mudarTab('catalogo');
@@ -485,14 +502,13 @@
                 fecharModalAdminLogin();
                 document.getElementById('badgeModo').innerText = "Modo: Administrador";
                 document.getElementById('btnModoAdmin').innerText = "👤 Sair Admin";
-                document.getElementById('btnBonequinhosFooter').classList.remove('hidden');
-                document.getElementById('tab-btn-usuarios').classList.remove('hidden');
                 document.getElementById('tab-btn-admin').classList.remove('hidden');
                 document.getElementById('tab-btn-gerir').classList.remove('hidden');
                 mudarTab('admin');
                 atualizarTudo();
             } else {
-                document.getElementById('erroAdminPin').classList.remove('hidden');
+                document.getElementById('erroAdminPin').classList.add('hidden');
+                document.getElementById('erroAdminPin').classList.remove('hidden'); // Corrigido
             }
         }
 
