@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale</title>
+    <title>Gestão de Uniformes - Vale (v2.1)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -119,18 +119,18 @@
             </div>
         </div>
 
-        <!-- TAB 4: GERIR CATÁLOGO (ADMIN) -->
+        <!-- TAB 4: GERIR CATÁLOGO (ADMIN COM QUADRADOS SEPARADOS PARA TAMANHO E CÓDIGO) -->
         <div id="tab-gerir" class="space-y-4 hidden">
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
                     <div>
                         <h2 class="text-sm font-black uppercase text-slate-800">✏️ Gestão e Edição do Catálogo</h2>
-                        <p class="text-[11px] text-slate-500">Adicione novos uniformes, edite códigos VALE, tamanhos, cores ou referências.</p>
+                        <p class="text-[11px] text-slate-500">Adicione novos uniformes, carregue fotos, defina tamanhos e códigos VALE em caixas separadas.</p>
                     </div>
                     <button onclick="adicionarNovoUniforme()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">➕ Adicionar Novo Uniforme</button>
                 </div>
 
-                <div id="listaGerirUniformes" class="space-y-3"></div>
+                <div id="listaGerirUniformes" class="space-y-4"></div>
             </div>
         </div>
 
@@ -138,11 +138,10 @@
 
     <!-- SCRIPT DA APLICAÇÃO -->
     <script>
-        const CHAVE_APP = "mariana_uniformes_vale_fixos_definitiva";
+        const CHAVE_APP = "mariana_uniformes_vale_dados_fixos_v2";
         let modoAdmin = false;
         let carrinho = [];
 
-        // DADOS INICIAIS BASEADOS NO CATÁLOGO OFICIAL DA VALE (PDF)[span_1](start_span)[span_1](end_span)
         let dadosUniformes = [
             {
                 id: 1,
@@ -161,42 +160,6 @@
                 imagem: "https://cdn-icons-png.flaticon.com/512/3163/3163179.png",
                 tamanhos: ["36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60"],
                 codigos: {"36": "16724419", "38": "16724632", "40": "15500269", "42": "16724557", "44": "16724179", "46": "16724435", "48": "16724631", "50": "16724654", "52": "15500271", "54": "16724434", "56": "13307872", "58": "13307871", "60": "13307870"}
-            },
-            {
-                id: 3,
-                nome: "Camisa administrativa masculina manga longa",
-                cor: "Verde Vale / Cinza",
-                referencia: "CM-444",
-                imagem: "https://cdn-icons-png.flaticon.com/512/2585/2585152.png",
-                tamanhos: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13"],
-                codigos: {"01": "16724398", "02": "16725077", "03": "16724307", "04": "16724431", "05": "16724426", "06": "16724304", "07": "16724678", "08": "16724648", "09": "15473749", "10": "16724524", "11": "13300304", "12": "13308469", "13": "13329457"}
-            },
-            {
-                id: 4,
-                nome: "Polo masculina (administrativa)",
-                cor: "Cinza / Branco",
-                referencia: "CM-540",
-                imagem: "https://cdn-icons-png.flaticon.com/512/892/892458.png",
-                tamanhos: ["XP", "P", "M", "G", "GG", "3G", "4G", "5G", "6G"],
-                codigos: {"XP": "13306603", "P": "13306602", "M": "13306601", "G": "13306600", "GG": "13306549", "3G": "13306548", "4G": "13306547", "5G": "13306546", "6G": "13306545"}
-            },
-            {
-                id: 5,
-                nome: "Calça jeans administrativo feminina",
-                cor: "Azul Marinho",
-                referencia: "CL-285",
-                imagem: "https://cdn-icons-png.flaticon.com/512/2613/2613204.png",
-                tamanhos: ["34", "36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60"],
-                codigos: {"34": "13315330", "36": "13315329", "38": "13315328", "40": "13315327", "42": "13315326", "44": "13315351", "46": "13315350", "48": "13315349", "50": "13315348", "52": "13315347", "54": "13315346", "56": "13315345", "58": "13315300", "60": "13314839"}
-            },
-            {
-                id: 6,
-                nome: "Jaqueta padrão unissex com capuz",
-                cor: "Cinza / Verde Vale",
-                referencia: "JQ-102",
-                imagem: "https://cdn-icons-png.flaticon.com/512/892/892458.png",
-                tamanhos: ["XP", "P", "M", "G", "GG", "3G", "4G", "5G", "6G"],
-                codigos: {"XP": "13329504", "P": "13192371", "M": "13192334", "G": "13192336", "GG": "13331161", "3G": "13329873", "4G": "13329816", "5G": "13329872", "6G": "13329871"}
             }
         ];
 
@@ -207,6 +170,14 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             let salvo = localStorage.getItem(CHAVE_APP);
+            if (!salvo) {
+                let oldVal = localStorage.getItem("mariana_uniformes_vale_dados_fixos_v1");
+                if (oldVal) {
+                    salvo = oldVal;
+                    localStorage.setItem(CHAVE_APP, salvo);
+                }
+            }
+
             if (salvo) {
                 try {
                     let parsed = JSON.parse(salvo);
@@ -233,7 +204,7 @@
                 let el = document.getElementById('tab-' + t);
                 if(el) el.classList.add('hidden');
                 let btn = document.getElementById('tab-btn-' + t);
-                if(btn) {
+                if(btn && !btn.classList.contains('hidden')) {
                     btn.className = "flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50";
                 }
             });
@@ -247,7 +218,6 @@
             }
         }
 
-        // CONTROLO DE MODO ADMIN
         function toggleModoAdmin() {
             if (modoAdmin) {
                 modoAdmin = false;
@@ -284,7 +254,6 @@
             }
         }
 
-        // RENDERIZAR CATÁLOGO
         function renderizarCatalogo() {
             const container = document.getElementById('grelhaCatalogo');
             const filtro = (document.getElementById('filtroCatalogo').value || "").toLowerCase();
@@ -300,15 +269,19 @@
 
             lista.forEach(item => {
                 let tamanhosHtml = '';
-                item.tamanhos.forEach(tam => {
-                    let cod = item.codigos[tam] || '---';
-                    tamanhosHtml += `<option value="${tam}">Tam: ${tam} (Cód: ${cod})</option>`;
-                });
+                if(item.tamanhos && item.tamanhos.length > 0) {
+                    item.tamanhos.forEach(tam => {
+                        let cod = (item.codigos && item.codigos[tam]) ? item.codigos[tam] : '---';
+                        tamanhosHtml += `<option value="${tam}">Tam: ${tam} (Cód: ${cod})</option>`;
+                    });
+                } else {
+                    tamanhosHtml = `<option value="">Sem tamanhos definidos</option>`;
+                }
 
                 container.innerHTML += `
                     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between">
                         <div class="flex gap-3 items-center">
-                            <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center p-2 border shrink-0">
+                            <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center p-2 border shrink-0 overflow-hidden">
                                 <img src="${item.imagem}" alt="Uniforme" class="max-h-full max-w-full object-contain">
                             </div>
                             <div class="min-w-0 flex-1">
@@ -334,12 +307,15 @@
             });
         }
 
-        // GESTÃO DO CARRINHO
         function adicionarAoCarrinho(id) {
             let item = dadosApp.uniformes.find(u => u.id === id);
             let selTam = document.getElementById(`sel-tam-${id}`).value;
+            if(!selTam) {
+                alert("Por favor, selecione um tamanho válido.");
+                return;
+            }
             let qtd = parseInt(document.getElementById(`qtd-${id}`).value) || 1;
-            let cod = item.codigos[selTam] || '---';
+            let cod = (item.codigos && item.codigos[selTam]) ? item.codigos[selTam] : '---';
 
             carrinho.push({
                 cartId: Date.now() + Math.random(),
@@ -352,7 +328,7 @@
                 quantidade: qtd
             });
 
-            document.getElementById('contadorCarrinho').innerText = carrinho.length;
+            renderizarCarrinho();
             alert(`✅ ${item.nome} (Tam: ${selTam}) adicionado ao carrinho!`);
         }
 
@@ -424,7 +400,6 @@
             mudarTab('catalogo');
         }
 
-        // RENDERIZAR PAINEL ADMIN (APROVAÇÕES)
         function renderizarAdminPedidos() {
             const container = document.getElementById('listaPedidosAdmin');
             if(!container) return;
@@ -490,24 +465,65 @@
             }
         }
 
-        // RENDERIZAR GERIR CATÁLOGO (ADMIN)
+        // GESTÃO DO CATÁLOGO (COM QUADRADOS SEPARADOS PARA TAMANHO E CÓDIGO VALE)
         function renderizarGerirUniformes() {
             const container = document.getElementById('listaGerirUniformes');
             if(!container) return;
 
             let html = '';
-            dadosApp.uniformes.forEach((u, idx) => {
+            dadosApp.uniformes.forEach((u) => {
+                let tamanhosListHtml = '';
+                if(u.tamanhos) {
+                    u.tamanhos.forEach(tam => {
+                        let cod = (u.codigos && u.codigos[tam]) ? u.codigos[tam] : '';
+                        tamanhosListHtml += `
+                            <div class="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs shadow-sm">
+                                <!-- Quadrado do Tamanho -->
+                                <div class="flex flex-col w-24">
+                                    <label class="text-[9px] font-extrabold text-slate-500 uppercase">Tamanho</label>
+                                    <input type="text" value="${tam}" onchange="atualizarNomeTamanho(${u.id}, '${tam}', this.value)" class="bg-white p-2 border border-slate-300 rounded-lg font-bold text-xs text-center" placeholder="Tam...">
+                                </div>
+                                <!-- Quadrado do Código VALE -->
+                                <div class="flex flex-col flex-1 min-w-0">
+                                    <label class="text-[9px] font-extrabold text-slate-500 uppercase">Código VALE</label>
+                                    <input type="text" value="${cod}" oninput="atualizarCodigoTamanho(${u.id}, '${tam}', this.value)" class="bg-white p-2 border border-slate-300 rounded-lg font-mono font-bold text-xs" placeholder="Cód VALE...">
+                                </div>
+                                <!-- Botão Excluir -->
+                                <button onclick="removerTamanhoUniforme(${u.id}, '${tam}')" class="text-red-500 font-bold p-2 bg-red-50 hover:bg-red-100 rounded-lg mt-4" title="Remover">✕</button>
+                            </div>
+                        `;
+                    });
+                }
+
                 html += `
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
-                        <div class="flex justify-between items-center gap-2 flex-wrap border-b pb-2">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-300 space-y-3 text-xs shadow-sm">
+                        <div class="flex justify-between items-center gap-2 flex-wrap border-b pb-3">
                             <input type="text" value="${u.nome}" oninput="atualizarUniformeProp(${u.id}, 'nome', this.value)" class="flex-1 bg-white p-2 border border-slate-300 rounded-xl font-bold text-slate-900 outline-none" placeholder="Nome do Uniforme...">
                             <input type="text" value="${u.referencia}" oninput="atualizarUniformeProp(${u.id}, 'referencia', this.value)" class="w-24 bg-white p-2 border border-slate-300 rounded-xl font-bold text-center outline-none" placeholder="Ref...">
                             <input type="text" value="${u.cor}" oninput="atualizarUniformeProp(${u.id}, 'cor', this.value)" class="w-28 bg-white p-2 border border-slate-300 rounded-xl font-bold text-center outline-none" placeholder="Cor...">
                             <button onclick="apagarUniforme(${u.id})" class="text-red-600 font-bold bg-red-100 hover:bg-red-200 px-3 py-2 rounded-xl transition">Excluir ✕</button>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-slate-600">Link Foto:</span>
-                            <input type="text" value="${u.imagem}" oninput="atualizarUniformeProp(${u.id}, 'imagem', this.value)" class="flex-1 bg-white p-2 border border-slate-300 rounded-xl text-xs outline-none" placeholder="URL da imagem...">
+
+                        <!-- FOTO E UPLOAD -->
+                        <div class="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-200">
+                            <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center p-1 border shrink-0 overflow-hidden">
+                                <img src="${u.imagem}" alt="Foto" class="max-h-full max-w-full object-contain">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <label class="block font-bold text-slate-600 mb-1">Carregar Nova Imagem do Dispositivo:</label>
+                                <input type="file" accept="image/*" onchange="carregarImagemUniforme(${u.id}, event)" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                            </div>
+                        </div>
+
+                        <!-- TAMANHOS E CÓDIGOS VALE EM QUADRADOS SEPARADOS -->
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-slate-700 uppercase">📏 Tamanhos e Códigos VALE (Caixas Independentes):</span>
+                                <button onclick="adicionarTamanhoUniforme(${u.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]">➕ Adicionar Caixa</button>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                                ${tamanhosListHtml || '<p class="text-xs text-slate-400 italic col-span-full">Nenhum tamanho configurado.</p>'}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -522,8 +538,8 @@
                 cor: "Verde Vale",
                 referencia: "REF-000",
                 imagem: "https://cdn-icons-png.flaticon.com/512/3163/3163179.png",
-                tamanhos: ["P", "M", "G", "GG"],
-                codigos: {"P": "000000", "M": "000001", "G": "000002", "GG": "000003"}
+                tamanhos: ["P", "M", "G"],
+                codigos: {"P": "000000", "M": "000001", "G": "000002"}
             };
             dadosApp.uniformes.unshift(novo);
             salvarStorage();
@@ -536,6 +552,82 @@
             if(u) {
                 u[campo] = val;
                 salvarStorage();
+                renderizarCatalogo();
+            }
+        }
+
+        function carregarImagemUniforme(id, event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    let u = dadosApp.uniformes.find(item => item.id === id);
+                    if(u) {
+                        u.imagem = evt.target.result;
+                        salvarStorage();
+                        renderizarGerirUniformes();
+                        renderizarCatalogo();
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function adicionarTamanhoUniforme(id) {
+            let tam = prompt("Digite o novo tamanho (ex: 42, GG, 14):");
+            if(tam && tam.trim() !== "") {
+                let cod = prompt(`Digite o Código VALE para o tamanho ${tam.trim().toUpperCase()}:`, "");
+                let u = dadosApp.uniformes.find(item => item.id === id);
+                if(u) {
+                    if(!u.tamanhos) u.tamanhos = [];
+                    if(!u.codigos) u.codigos = {};
+                    let tLimpo = tam.trim().toUpperCase();
+                    if(!u.tamanhos.includes(tLimpo)) {
+                        u.tamanhos.push(tLimpo);
+                    }
+                    u.codigos[tLimpo] = cod ? cod.trim() : "";
+                    salvarStorage();
+                    renderizarGerirUniformes();
+                    renderizarCatalogo();
+                }
+            }
+        }
+
+        function atualizarNomeTamanho(id, oldTam, newTam) {
+            let u = dadosApp.uniformes.find(item => item.id === id);
+            if(u && newTam && newTam.trim() !== "") {
+                let nTam = newTam.trim().toUpperCase();
+                let idx = u.tamanhos.indexOf(oldTam);
+                if(idx !== -1) {
+                    u.tamanhos[idx] = nTam;
+                    if(u.codigos && u.codigos[oldTam] !== undefined) {
+                        u.codigos[nTam] = u.codigos[oldTam];
+                        delete u.codigos[oldTam];
+                    }
+                    salvarStorage();
+                    renderizarGerirUniformes();
+                    renderizarCatalogo();
+                }
+            }
+        }
+
+        function atualizarCodigoTamanho(id, tam, val) {
+            let u = dadosApp.uniformes.find(item => item.id === id);
+            if(u) {
+                if(!u.codigos) u.codigos = {};
+                u.codigos[tam] = val.trim();
+                salvarStorage();
+                renderizarCatalogo();
+            }
+        }
+
+        function removerTamanhoUniforme(id, tam) {
+            let u = dadosApp.uniformes.find(item => item.id === id);
+            if(u) {
+                u.tamanhos = u.tamanhos.filter(t => t !== tam);
+                if(u.codigos) delete u.codigos[tam];
+                salvarStorage();
+                renderizarGerirUniformes();
                 renderizarCatalogo();
             }
         }
