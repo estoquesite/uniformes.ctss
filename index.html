@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v2.5)</title>
+    <title>Gestão de Uniformes - Vale (v2.7)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -97,7 +97,7 @@
         <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl shadow-inner overflow-x-auto no-scrollbar">
             <button onclick="mudarTab('catalogo')" id="tab-btn-catalogo" class="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5"><span>👕</span> Catálogo</button>
             <button onclick="mudarTab('carrinho')" id="tab-btn-carrinho" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50"><span>🛒</span> Carrinho <span id="contadorCarrinho" class="bg-emerald-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
-            <button onclick="mudarTab('usuarios')" id="tab-btn-usuarios" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>👥</span> Utilizadores</button>
+            <button onclick="mudarTab('usuarios')" id="tab-btn-usuarios" class="py-3 px-4 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden" title="Utilizadores"><span>👥</span></button>
             <button onclick="mudarTab('admin')" id="tab-btn-admin" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>📊</span> Pedidos <span id="contadorPedidos" class="bg-amber-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
             <button onclick="mudarTab('gerir')" id="tab-btn-gerir" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>✏️</span> Catálogo</button>
         </div>
@@ -185,6 +185,11 @@
 
     </div>
 
+    <!-- RODAPÉ COM A VERSÃO -->
+    <footer class="text-center py-6 text-xs text-slate-400 font-bold tracking-wider">
+        Uniformes Vale • Versão v2.7
+    </footer>
+
     <!-- SCRIPT DA APLICAÇÃO -->
     <script>
         const CHAVE_APP = "mariana_uniformes_vale_dados_fixos_v3";
@@ -217,7 +222,7 @@
         let dadosApp = {
             uniformes: dadosUniformes,
             pedidos: [],
-            utilizadores: [] // Contas criadas livremente pelos utilizadores
+            utilizadores: []
         };
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -353,7 +358,6 @@
             if(modoAdmin) toggleModoAdmin();
         }
 
-        // PAINEL DE GESTÃO DE UTILIZADORES RESTRITOS (ADMIN)
         function renderizarUtilizadoresAdmin() {
             const container = document.getElementById('listaUtilizadoresAdmin');
             if(!container) return;
