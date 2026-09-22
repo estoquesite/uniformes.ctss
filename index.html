@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v2.4)</title>
+    <title>Gestão de Uniformes - Vale (v2.5)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,22 +12,21 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen pb-32 select-none transition-colors duration-200 font-sans">
 
-    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR (COM BOTÃO X PARA FECHAR) -->
+    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR -->
     <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
-            <!-- Botão X para fechar a tela -->
             <button onclick="fecharModalUserAuth()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
 
             <div class="w-14 h-14 bg-indigo-100 text-indigo-700 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">👕</div>
             <div>
                 <h2 class="text-sm font-black text-slate-900">Uniformes Vale - Acesso</h2>
-                <p class="text-slate-500 mt-0.5 text-[11px]" id="authSubtitulo">Insira a sua matrícula para entrar ou criar conta.</p>
+                <p class="text-slate-500 mt-0.5 text-[11px]" id="authSubtitulo">Insira a sua matrícula e senha para entrar.</p>
             </div>
 
             <!-- Formulário de Login/Registo -->
             <div class="space-y-3 text-left">
                 <div>
-                    <label class="block font-semibold text-slate-600 mb-1">Matrícula</label>
+                    <label class="block font-semibold text-slate-600 mb-1">Matrícula ou Nome</label>
                     <input type="text" id="authMatricula" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: 81025364">
                 </div>
                 <div id="divNomeRegistro" class="hidden">
@@ -48,7 +47,7 @@
 
             <div class="pt-2 border-t text-center">
                 <button onclick="alternarModoAuth()" id="linkTrocaAuth" class="text-indigo-600 font-bold text-[11px] hover:underline">
-                    Primeiro acesso? Crie a sua senha aqui.
+                    Primeiro acesso? Crie a sua conta aqui.
                 </button>
             </div>
         </div>
@@ -61,7 +60,7 @@
             <div class="w-14 h-14 bg-emerald-100 text-emerald-700 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">🔒</div>
             <div>
                 <h2 class="text-sm font-black text-slate-900">Acesso Administrador</h2>
-                <p class="text-slate-500 mt-0.5 text-[11px]">Insira a senha PIN para aceder ao painel de gestão e aprovações.</p>
+                <p class="text-slate-500 mt-0.5 text-[11px]">Insira a senha PIN para aceder ao painel de gestão.</p>
             </div>
             <div class="space-y-2.5">
                 <input type="password" id="inputAdminPin" maxlength="6" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-center text-base font-black tracking-widest outline-none text-slate-900 focus:border-emerald-600" placeholder="••••">
@@ -83,7 +82,7 @@
             <span class="font-black tracking-wide text-sm" id="headerSaudacao">Uniformes Vale - Gestão & Pedidos</span>
         </div>
         <div class="flex items-center gap-2">
-            <button onclick="abrirModalAuth()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]" title="Entrar / Mudar Conta">Conta</button>
+            <button onclick="abrirModalAuth()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]" title="Mudar Conta">Conta</button>
             <span id="badgeModo" class="bg-emerald-800 px-2.5 py-1 rounded-lg font-bold text-[10px] uppercase">Modo: Utilizador</span>
             <button onclick="toggleModoAdmin()" id="btnModoAdmin" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">
                 ⚙️ Admin
@@ -97,10 +96,10 @@
         <!-- ABAS DE NAVEGAÇÃO -->
         <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl shadow-inner overflow-x-auto no-scrollbar">
             <button onclick="mudarTab('catalogo')" id="tab-btn-catalogo" class="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5"><span>👕</span> Catálogo</button>
-            <button onclick="mudarTab('carrinho')" id="tab-btn-carrinho" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50"><span>🛒</span> Carrinho / Pedido <span id="contadorCarrinho" class="bg-emerald-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
-            <button onclick="mudarTab('autorizados')" id="tab-btn-autorizados" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>👥</span> Utilizadores Autorizados</button>
-            <button onclick="mudarTab('admin')" id="tab-btn-admin" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>📊</span> Aprovar Pedidos <span id="contadorPedidos" class="bg-amber-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
-            <button onclick="mudarTab('gerir')" id="tab-btn-gerir" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>✏️</span> Gerir Uniformes</button>
+            <button onclick="mudarTab('carrinho')" id="tab-btn-carrinho" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50"><span>🛒</span> Carrinho <span id="contadorCarrinho" class="bg-emerald-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
+            <button onclick="mudarTab('usuarios')" id="tab-btn-usuarios" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>👥</span> Utilizadores</button>
+            <button onclick="mudarTab('admin')" id="tab-btn-admin" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>📊</span> Pedidos <span id="contadorPedidos" class="bg-amber-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
+            <button onclick="mudarTab('gerir')" id="tab-btn-gerir" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>✏️</span> Catálogo</button>
         </div>
 
         <!-- TAB 1: CATÁLOGO DE UNIFORMES -->
@@ -141,18 +140,16 @@
             </div>
         </div>
 
-        <!-- TAB 3: UTILIZADORES AUTORIZADOS (ADMIN) -->
-        <div id="tab-autorizados" class="space-y-4 hidden">
+        <!-- TAB 3: GESTÃO DE UTILIZADORES / RESTRITOS (ADMIN) -->
+        <div id="tab-usuarios" class="space-y-4 hidden">
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
                     <div>
-                        <h2 class="text-sm font-black uppercase text-slate-800">👥 Lista de Utilizadores Autorizados</h2>
-                        <p class="text-[11px] text-slate-500">Apenas as matrículas cadastradas aqui podem criar conta e aceder ao sistema.</p>
+                        <h2 class="text-sm font-black uppercase text-slate-800">👥 Gestão de Utilizadores Restritos</h2>
+                        <p class="text-[11px] text-slate-500">Visualize todas as contas cadastradas e remova acessos indevidos se necessário.</p>
                     </div>
-                    <button onclick="adicionarAutorizado()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">➕ Adicionar Matrícula Autorizada</button>
                 </div>
-
-                <div id="listaAutorizados" class="space-y-2"></div>
+                <div id="listaUtilizadoresAdmin" class="space-y-2"></div>
             </div>
         </div>
 
@@ -220,10 +217,7 @@
         let dadosApp = {
             uniformes: dadosUniformes,
             pedidos: [],
-            utilizadores: [],
-            autorizados: [
-                { matricula: "81025364", nome: "Mariana Pereira Cruz" }
-            ]
+            utilizadores: [] // Contas criadas livremente pelos utilizadores
         };
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -263,7 +257,7 @@
             renderizarCarrinho();
             renderizarAdminPedidos();
             renderizarGerirUniformes();
-            renderizarListaAutorizados();
+            renderizarUtilizadoresAdmin();
         }
 
         function abrirModalAuth() {
@@ -284,14 +278,14 @@
             erro.classList.add('hidden');
 
             if(modoRegisto) {
-                sub.innerText = "Crie a sua senha informando a sua matrícula e nome autorizado.";
+                sub.innerText = "Crie a sua conta informando a sua matrícula, nome e senha.";
                 btn.innerText = "Registar Conta";
                 link.innerText = "Já tem conta? Faça login aqui.";
                 divNome.classList.remove('hidden');
             } else {
                 sub.innerText = "Insira a sua matrícula e senha para entrar.";
                 btn.innerText = "Entrar no Sistema";
-                link.innerText = "Primeiro acesso? Crie a sua senha aqui.";
+                link.innerText = "Primeiro acesso? Crie a sua conta aqui.";
                 divNome.classList.add('hidden');
             }
         }
@@ -316,13 +310,6 @@
                     return;
                 }
 
-                let permitido = dadosApp.autorizados.some(a => a.matricula === mat);
-                if(!permitido) {
-                    erro.innerText = "Matrícula não autorizada pelo administrador. Contacte o suporte.";
-                    erro.classList.remove('hidden');
-                    return;
-                }
-
                 let existente = dadosApp.utilizadores.find(u => u.matricula === mat);
                 if(existente) {
                     erro.innerText = "Esta matrícula já tem conta criada. Faça login.";
@@ -338,14 +325,14 @@
                 alternarModoAuth();
                 document.getElementById('authSenha').value = '';
             } else {
-                let user = dadosApp.utilizadores.find(u => u.matricula === mat && u.senha === senha);
+                let user = dadosApp.utilizadores.find(u => (u.matricula === mat || u.nome.toLowerCase() === mat.toLowerCase()) && u.senha === senha);
                 if(user) {
                     usuarioAtual = user;
                     sessionStorage.setItem('usuario_logado_vale', JSON.stringify(user));
                     document.getElementById('modalUserAuth').classList.add('hidden');
                     atualizarCabecalhoUtilizador();
                 } else {
-                    erro.innerText = "Matrícula ou senha incorretas (ou conta não criada).";
+                    erro.innerText = "Matrícula/Nome ou senha incorretas (ou conta não criada).";
                     erro.classList.remove('hidden');
                 }
             }
@@ -366,52 +353,41 @@
             if(modoAdmin) toggleModoAdmin();
         }
 
-        function renderizarListaAutorizados() {
-            const container = document.getElementById('listaAutorizados');
+        // PAINEL DE GESTÃO DE UTILIZADORES RESTRITOS (ADMIN)
+        function renderizarUtilizadoresAdmin() {
+            const container = document.getElementById('listaUtilizadoresAdmin');
             if(!container) return;
 
-            if(!dadosApp.autorizados || dadosApp.autorizados.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-4">Nenhuma matrícula autorizada.</p>';
+            if(!dadosApp.utilizadores || dadosApp.utilizadores.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-4">Nenhum utilizador registado no sistema.</p>';
                 return;
             }
 
             let html = '';
-            dadosApp.autorizados.forEach((a, idx) => {
+            dadosApp.utilizadores.forEach((u, idx) => {
                 html += `
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
                         <div>
-                            <span class="font-black text-slate-900">${a.nome}</span>
-                            <span class="text-slate-500 font-semibold ml-2">Matrícula: <b>${a.matricula}</b></span>
+                            <span class="font-black text-slate-900">${u.nome}</span>
+                            <span class="text-slate-500 font-semibold ml-2">Matrícula: <b>${u.matricula}</b></span>
                         </div>
-                        <button onclick="removerAutorizado(${idx})" class="text-red-500 font-bold bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-xl">✕ Remover</button>
+                        <button onclick="removerUtilizador(${idx})" class="text-red-500 font-bold bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-xl">✕ Remover Acesso</button>
                     </div>
                 `;
             });
             container.innerHTML = html;
         }
 
-        function adicionarAutorizado() {
-            let mat = prompt("Digite a matrícula do colaborador:");
-            let nome = prompt("Digite o nome do colaborador:");
-            if(mat && mat.trim() !== "" && nome && nome.trim() !== "") {
-                if(!dadosApp.autorizados) dadosApp.autorizados = [];
-                dadosApp.autorizados.push({ matricula: mat.trim(), nome: nome.trim() });
+        function removerUtilizador(idx) {
+            if(confirm("Deseja realmente remover o acesso deste utilizador?")) {
+                dadosApp.utilizadores.splice(idx, 1);
                 salvarStorage();
-                renderizarListaAutorizados();
-                alert("✅ Colaborador autorizado com sucesso!");
-            }
-        }
-
-        function removerAutorizado(idx) {
-            if(confirm("Deseja revogar a autorização desta matrícula?")) {
-                dadosApp.autorizados.splice(idx, 1);
-                salvarStorage();
-                renderizarListaAutorizados();
+                renderizarUtilizadoresAdmin();
             }
         }
 
         function mudarTab(tab) {
-            ['catalogo', 'carrinho', 'autorizados', 'admin', 'gerir'].forEach(t => {
+            ['catalogo', 'carrinho', 'usuarios', 'admin', 'gerir'].forEach(t => {
                 let el = document.getElementById('tab-' + t);
                 if(el) el.classList.add('hidden');
                 let btn = document.getElementById('tab-btn-' + t);
@@ -434,7 +410,7 @@
                 modoAdmin = false;
                 document.getElementById('badgeModo').innerText = "Modo: Utilizador";
                 document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
-                document.getElementById('tab-btn-autorizados').classList.add('hidden');
+                document.getElementById('tab-btn-usuarios').classList.add('hidden');
                 document.getElementById('tab-btn-admin').classList.add('hidden');
                 document.getElementById('tab-btn-gerir').classList.add('hidden');
                 mudarTab('catalogo');
@@ -457,7 +433,7 @@
                 fecharModalAdminLogin();
                 document.getElementById('badgeModo').innerText = "Modo: Administrador";
                 document.getElementById('btnModoAdmin').innerText = "👤 Sair Admin";
-                document.getElementById('tab-btn-autorizados').classList.remove('hidden');
+                document.getElementById('tab-btn-usuarios').classList.remove('hidden');
                 document.getElementById('tab-btn-admin').classList.remove('hidden');
                 document.getElementById('tab-btn-gerir').classList.remove('hidden');
                 mudarTab('admin');
