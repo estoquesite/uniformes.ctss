@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v2.3)</title>
+    <title>Gestão de Uniformes - Vale (v2.4)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,9 +12,12 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen pb-32 select-none transition-colors duration-200 font-sans">
 
-    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR -->
+    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR (COM BOTÃO X PARA FECHAR) -->
     <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
+            <!-- Botão X para fechar a tela -->
+            <button onclick="fecharModalUserAuth()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
+
             <div class="w-14 h-14 bg-indigo-100 text-indigo-700 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">👕</div>
             <div>
                 <h2 class="text-sm font-black text-slate-900">Uniformes Vale - Acesso</h2>
@@ -53,7 +56,8 @@
 
     <!-- MODAL DE AUTENTICAÇÃO ADMIN (PIN 1510) -->
     <div id="modalAdminLogin" class="fixed inset-0 z-[150] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs">
+        <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
+            <button onclick="fecharModalAdminLogin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
             <div class="w-14 h-14 bg-emerald-100 text-emerald-700 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">🔒</div>
             <div>
                 <h2 class="text-sm font-black text-slate-900">Acesso Administrador</h2>
@@ -79,7 +83,7 @@
             <span class="font-black tracking-wide text-sm" id="headerSaudacao">Uniformes Vale - Gestão & Pedidos</span>
         </div>
         <div class="flex items-center gap-2">
-            <button onclick="sairDaConta()" class="bg-red-800 hover:bg-red-900 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]" title="Terminar Sessão">Sair</button>
+            <button onclick="abrirModalAuth()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]" title="Entrar / Mudar Conta">Conta</button>
             <span id="badgeModo" class="bg-emerald-800 px-2.5 py-1 rounded-lg font-bold text-[10px] uppercase">Modo: Utilizador</span>
             <button onclick="toggleModoAdmin()" id="btnModoAdmin" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">
                 ⚙️ Admin
@@ -216,9 +220,9 @@
         let dadosApp = {
             uniformes: dadosUniformes,
             pedidos: [],
-            utilizadores: [], // {matricula, nome, senha}
+            utilizadores: [],
             autorizados: [
-                { matricula: "81025364", nome: "Mariana Pereira Cruz" } // Predefinido autorizado
+                { matricula: "81025364", nome: "Mariana Pereira Cruz" }
             ]
         };
 
@@ -239,7 +243,6 @@
                 } catch(e) {}
             }
 
-            // Verificar se já tem sessão ativa no navegador
             let sessaoSalva = sessionStorage.getItem('usuario_logado_vale');
             if (sessaoSalva) {
                 usuarioAtual = JSON.parse(sessaoSalva);
@@ -263,7 +266,14 @@
             renderizarListaAutorizados();
         }
 
-        // CONTROLOS DE LOGIN / REGISTO
+        function abrirModalAuth() {
+            document.getElementById('modalUserAuth').classList.remove('hidden');
+        }
+
+        function fecharModalUserAuth() {
+            document.getElementById('modalUserAuth').classList.add('hidden');
+        }
+
         function alternarModoAuth() {
             modoRegisto = !modoRegisto;
             const sub = document.getElementById('authSubtitulo');
@@ -306,7 +316,6 @@
                     return;
                 }
 
-                // Verificar se a matrícula está na lista de autorizados pelo Admin
                 let permitido = dadosApp.autorizados.some(a => a.matricula === mat);
                 if(!permitido) {
                     erro.innerText = "Matrícula não autorizada pelo administrador. Contacte o suporte.";
@@ -314,7 +323,6 @@
                     return;
                 }
 
-                // Verificar se já existe conta
                 let existente = dadosApp.utilizadores.find(u => u.matricula === mat);
                 if(existente) {
                     erro.innerText = "Esta matrícula já tem conta criada. Faça login.";
@@ -330,7 +338,6 @@
                 alternarModoAuth();
                 document.getElementById('authSenha').value = '';
             } else {
-                // Fazer Login
                 let user = dadosApp.utilizadores.find(u => u.matricula === mat && u.senha === senha);
                 if(user) {
                     usuarioAtual = user;
@@ -359,7 +366,6 @@
             if(modoAdmin) toggleModoAdmin();
         }
 
-        // GESTÃO DE UTILIZADORES AUTORIZADOS (ADMIN)
         function renderizarListaAutorizados() {
             const container = document.getElementById('listaAutorizados');
             if(!container) return;
