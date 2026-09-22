@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v4.7)</title>
+    <title>Gestão de Uniformes - Vale (v4.8)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -52,7 +52,7 @@
         </div>
     </div>
 
-    <!-- TELA DE LOGIN DE ADMINISTRADOR (COM MATRÍCULA E SENHA BONITA) -->
+    <!-- TELA DE LOGIN DE ADMINISTRADOR -->
     <div id="modalAdminLogin" class="fixed inset-0 z-[150] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
             <button onclick="fecharModalAdminLogin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
@@ -241,7 +241,7 @@
 
     <!-- RODAPÉ COM FAIXA VERDE E BOTÃO DOS BONEQUINHOS (👥) PARA ABRIR UTILIZADORES -->
     <footer class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-emerald-900 text-white px-4 py-2.5 flex justify-between items-center max-w-5xl mx-auto rounded-t-2xl shadow-2xl border-t border-emerald-800 text-xs">
-        <span class="font-bold tracking-wider">Uniformes Vale • Versão v4.7</span>
+        <span class="font-bold tracking-wider">Uniformes Vale • Versão v4.8</span>
         <button onclick="clicarBotaoBonequinhos()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition" title="Utilizadores Cadastrados">
             <span>👥</span> Utilizadores
         </button>
@@ -435,6 +435,15 @@
 
                     if(user.matricula === "81025364" && user.senha === "1510") {
                         ativarModoAdminVisual();
+                    } else {
+                        modoAdmin = false;
+                        document.getElementById('badgeModo').innerText = "Modo: Utilizador";
+                        document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
+                        document.getElementById('tab-btn-catalogo').classList.remove('hidden');
+                        document.getElementById('tab-btn-carrinho').classList.remove('hidden');
+                        document.getElementById('tab-btn-admin').classList.add('hidden');
+                        document.getElementById('tab-btn-gerir').classList.add('hidden');
+                        mudarTab('catalogo');
                     }
                 } else {
                     erro.innerText = "Matrícula ou senha incorretas.";
@@ -454,6 +463,9 @@
             usuarioAtual = null;
             modoAdmin = false;
             document.getElementById('badgeModo').innerText = "Modo: Utilizador";
+            document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
+            document.getElementById('tab-btn-catalogo').classList.remove('hidden');
+            document.getElementById('tab-btn-carrinho').classList.remove('hidden');
             document.getElementById('tab-btn-admin').classList.add('hidden');
             document.getElementById('tab-btn-gerir').classList.add('hidden');
             mudarTab('catalogo');
@@ -463,8 +475,18 @@
         function ativarModoAdminVisual() {
             modoAdmin = true;
             document.getElementById('badgeModo').innerText = "Modo: Administrador";
+            document.getElementById('btnModoAdmin').innerText = "👤 Sair Admin";
+            
+            // Ocultar abas de cliente para o admin
+            document.getElementById('tab-btn-catalogo').classList.add('hidden');
+            document.getElementById('tab-btn-carrinho').classList.add('hidden');
+            
+            // Mostrar abas de gestão de pedidos e catálogo do admin
             document.getElementById('tab-btn-admin').classList.remove('hidden');
             document.getElementById('tab-btn-gerir').classList.remove('hidden');
+            
+            mudarTab('admin');
+            atualizarTudo();
         }
 
         function toggleModoAdmin() {
@@ -472,6 +494,8 @@
                 modoAdmin = false;
                 document.getElementById('badgeModo').innerText = "Modo: Utilizador";
                 document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
+                document.getElementById('tab-btn-catalogo').classList.remove('hidden');
+                document.getElementById('tab-btn-carrinho').classList.remove('hidden');
                 document.getElementById('tab-btn-admin').classList.add('hidden');
                 document.getElementById('tab-btn-gerir').classList.add('hidden');
                 mudarTab('catalogo');
@@ -494,21 +518,15 @@
             erro.classList.add('hidden');
 
             if(mat === "81025364" && senha === "1510") {
-                modoAdmin = true;
                 fecharModalAdminLogin();
-                document.getElementById('badgeModo').innerText = "Modo: Administrador";
-                document.getElementById('btnModoAdmin').innerText = "👤 Sair Admin";
-                document.getElementById('tab-btn-admin').classList.remove('hidden');
-                document.getElementById('tab-btn-gerir').classList.remove('hidden');
-                mudarTab('admin');
-                atualizarTudo();
+                ativarModoAdminVisual();
             } else {
                 erro.classList.remove('hidden');
             }
         }
 
         function clicarBotaoBonequinhos() {
-            if(modoAdmin || (usuarioAtual && usuarioAtual.matricula === "81025364")) {
+            if(modoAdmin || (usuarioAtual && usuarioAtual.matricula === "81025364" && usuarioAtual.senha === "1510")) {
                 ativarModoAdminVisual();
                 abrirModalUtilizadoresAdmin();
             } else {
