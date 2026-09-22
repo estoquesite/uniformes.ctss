@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v2.1)</title>
+    <title>Gestão de Uniformes - Vale (v2.3)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,6 +11,45 @@
     </script>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen pb-32 select-none transition-colors duration-200 font-sans">
+
+    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR -->
+    <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs">
+            <div class="w-14 h-14 bg-indigo-100 text-indigo-700 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">👕</div>
+            <div>
+                <h2 class="text-sm font-black text-slate-900">Uniformes Vale - Acesso</h2>
+                <p class="text-slate-500 mt-0.5 text-[11px]" id="authSubtitulo">Insira a sua matrícula para entrar ou criar conta.</p>
+            </div>
+
+            <!-- Formulário de Login/Registo -->
+            <div class="space-y-3 text-left">
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-1">Matrícula</label>
+                    <input type="text" id="authMatricula" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: 81025364">
+                </div>
+                <div id="divNomeRegistro" class="hidden">
+                    <label class="block font-semibold text-slate-600 mb-1">Nome Completo</label>
+                    <input type="text" id="authNome" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: Mariana Cruz">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-1">Senha</label>
+                    <input type="password" id="authSenha" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="••••">
+                </div>
+
+                <div id="erroAuth" class="text-red-500 font-bold text-[11px] hidden text-center"></div>
+
+                <button onclick="processarAutenticacao()" id="btnAuthAcao" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition text-xs shadow-sm">
+                    Entrar no Sistema
+                </button>
+            </div>
+
+            <div class="pt-2 border-t text-center">
+                <button onclick="alternarModoAuth()" id="linkTrocaAuth" class="text-indigo-600 font-bold text-[11px] hover:underline">
+                    Primeiro acesso? Crie a sua senha aqui.
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL DE AUTENTICAÇÃO ADMIN (PIN 1510) -->
     <div id="modalAdminLogin" class="fixed inset-0 z-[150] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
@@ -37,9 +76,10 @@
     <header class="bg-emerald-900 text-white px-4 py-3 shadow-md border-b border-emerald-800 text-xs flex justify-between items-center z-50 relative">
         <div class="flex items-center gap-2">
             <span class="text-base">👔</span>
-            <span class="font-black tracking-wide text-sm">Uniformes Vale - Gestão & Pedidos</span>
+            <span class="font-black tracking-wide text-sm" id="headerSaudacao">Uniformes Vale - Gestão & Pedidos</span>
         </div>
         <div class="flex items-center gap-2">
+            <button onclick="sairDaConta()" class="bg-red-800 hover:bg-red-900 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]" title="Terminar Sessão">Sair</button>
             <span id="badgeModo" class="bg-emerald-800 px-2.5 py-1 rounded-lg font-bold text-[10px] uppercase">Modo: Utilizador</span>
             <button onclick="toggleModoAdmin()" id="btnModoAdmin" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">
                 ⚙️ Admin
@@ -54,6 +94,7 @@
         <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl shadow-inner overflow-x-auto no-scrollbar">
             <button onclick="mudarTab('catalogo')" id="tab-btn-catalogo" class="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5"><span>👕</span> Catálogo</button>
             <button onclick="mudarTab('carrinho')" id="tab-btn-carrinho" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50"><span>🛒</span> Carrinho / Pedido <span id="contadorCarrinho" class="bg-emerald-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
+            <button onclick="mudarTab('autorizados')" id="tab-btn-autorizados" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>👥</span> Utilizadores Autorizados</button>
             <button onclick="mudarTab('admin')" id="tab-btn-admin" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>📊</span> Aprovar Pedidos <span id="contadorPedidos" class="bg-amber-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
             <button onclick="mudarTab('gerir')" id="tab-btn-gerir" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>✏️</span> Gerir Uniformes</button>
         </div>
@@ -76,22 +117,14 @@
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="border-b pb-3">
                     <h2 class="text-sm font-black uppercase text-slate-800">🛒 O seu Carrinho de Uniformes</h2>
-                    <p class="text-[11px] text-slate-500">Confirme os itens selecionados e preencha os seus dados para envio.</p>
+                    <p class="text-[11px] text-slate-500">Confirme os itens selecionados e defina a data de retirada.</p>
                 </div>
 
                 <div id="listaItensCarrinho" class="space-y-3"></div>
 
                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
                     <h3 class="font-bold text-xs text-slate-700 uppercase">📝 Dados para Retirada</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                        <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Matrícula</label>
-                            <input type="text" id="pedidoMatricula" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold outline-none" placeholder="Ex: 123456">
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Nome Completo</label>
-                            <input type="text" id="pedidoNome" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold outline-none" placeholder="Ex: Mariana Cruz">
-                        </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                         <div>
                             <label class="block font-semibold text-slate-600 mb-1">Data da Retirada</label>
                             <input type="date" id="pedidoData" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold outline-none">
@@ -104,7 +137,22 @@
             </div>
         </div>
 
-        <!-- TAB 3: PAINEL DE APROVAÇÃO (ADMIN) -->
+        <!-- TAB 3: UTILIZADORES AUTORIZADOS (ADMIN) -->
+        <div id="tab-autorizados" class="space-y-4 hidden">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <h2 class="text-sm font-black uppercase text-slate-800">👥 Lista de Utilizadores Autorizados</h2>
+                        <p class="text-[11px] text-slate-500">Apenas as matrículas cadastradas aqui podem criar conta e aceder ao sistema.</p>
+                    </div>
+                    <button onclick="adicionarAutorizado()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">➕ Adicionar Matrícula Autorizada</button>
+                </div>
+
+                <div id="listaAutorizados" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- TAB 4: PAINEL DE APROVAÇÃO (ADMIN) -->
         <div id="tab-admin" class="space-y-4 hidden">
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
@@ -119,13 +167,13 @@
             </div>
         </div>
 
-        <!-- TAB 4: GERIR CATÁLOGO (ADMIN COM QUADRADOS SEPARADOS PARA TAMANHO E CÓDIGO) -->
+        <!-- TAB 5: GERIR CATÁLOGO (ADMIN) -->
         <div id="tab-gerir" class="space-y-4 hidden">
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
                     <div>
                         <h2 class="text-sm font-black uppercase text-slate-800">✏️ Gestão e Edição do Catálogo</h2>
-                        <p class="text-[11px] text-slate-500">Adicione novos uniformes, carregue fotos, defina tamanhos e códigos VALE em caixas separadas.</p>
+                        <p class="text-[11px] text-slate-500">Adicione novos uniformes, carregue fotos, crie caixas de tamanhos e códigos VALE livremente.</p>
                     </div>
                     <button onclick="adicionarNovoUniforme()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">➕ Adicionar Novo Uniforme</button>
                 </div>
@@ -138,9 +186,11 @@
 
     <!-- SCRIPT DA APLICAÇÃO -->
     <script>
-        const CHAVE_APP = "mariana_uniformes_vale_dados_fixos_v2";
+        const CHAVE_APP = "mariana_uniformes_vale_dados_fixos_v3";
         let modoAdmin = false;
         let carrinho = [];
+        let usuarioAtual = null;
+        let modoRegisto = false;
 
         let dadosUniformes = [
             {
@@ -165,13 +215,17 @@
 
         let dadosApp = {
             uniformes: dadosUniformes,
-            pedidos: []
+            pedidos: [],
+            utilizadores: [], // {matricula, nome, senha}
+            autorizados: [
+                { matricula: "81025364", nome: "Mariana Pereira Cruz" } // Predefinido autorizado
+            ]
         };
 
         window.addEventListener('DOMContentLoaded', () => {
             let salvo = localStorage.getItem(CHAVE_APP);
             if (!salvo) {
-                let oldVal = localStorage.getItem("mariana_uniformes_vale_dados_fixos_v1");
+                let oldVal = localStorage.getItem("mariana_uniformes_vale_dados_fixos_v2");
                 if (oldVal) {
                     salvo = oldVal;
                     localStorage.setItem(CHAVE_APP, salvo);
@@ -184,6 +238,15 @@
                     if (parsed && parsed.uniformes) dadosApp = parsed;
                 } catch(e) {}
             }
+
+            // Verificar se já tem sessão ativa no navegador
+            let sessaoSalva = sessionStorage.getItem('usuario_logado_vale');
+            if (sessaoSalva) {
+                usuarioAtual = JSON.parse(sessaoSalva);
+                document.getElementById('modalUserAuth').classList.add('hidden');
+                atualizarCabecalhoUtilizador();
+            }
+
             atualizarTudo();
             document.getElementById('pedidoData').valueAsDate = new Date();
         });
@@ -197,10 +260,152 @@
             renderizarCarrinho();
             renderizarAdminPedidos();
             renderizarGerirUniformes();
+            renderizarListaAutorizados();
+        }
+
+        // CONTROLOS DE LOGIN / REGISTO
+        function alternarModoAuth() {
+            modoRegisto = !modoRegisto;
+            const sub = document.getElementById('authSubtitulo');
+            const btn = document.getElementById('btnAuthAcao');
+            const link = document.getElementById('linkTrocaAuth');
+            const divNome = document.getElementById('divNomeRegistro');
+            const erro = document.getElementById('erroAuth');
+            erro.classList.add('hidden');
+
+            if(modoRegisto) {
+                sub.innerText = "Crie a sua senha informando a sua matrícula e nome autorizado.";
+                btn.innerText = "Registar Conta";
+                link.innerText = "Já tem conta? Faça login aqui.";
+                divNome.classList.remove('hidden');
+            } else {
+                sub.innerText = "Insira a sua matrícula e senha para entrar.";
+                btn.innerText = "Entrar no Sistema";
+                link.innerText = "Primeiro acesso? Crie a sua senha aqui.";
+                divNome.classList.add('hidden');
+            }
+        }
+
+        function processarAutenticacao() {
+            let mat = document.getElementById('authMatricula').value.trim();
+            let senha = document.getElementById('authSenha').value.trim();
+            let erro = document.getElementById('erroAuth');
+            erro.classList.add('hidden');
+
+            if(!mat || !senha) {
+                erro.innerText = "Preencha todos os campos obrigatórios.";
+                erro.classList.remove('hidden');
+                return;
+            }
+
+            if(modoRegisto) {
+                let nome = document.getElementById('authNome').value.trim();
+                if(!nome) {
+                    erro.innerText = "Digite o seu nome completo.";
+                    erro.classList.remove('hidden');
+                    return;
+                }
+
+                // Verificar se a matrícula está na lista de autorizados pelo Admin
+                let permitido = dadosApp.autorizados.some(a => a.matricula === mat);
+                if(!permitido) {
+                    erro.innerText = "Matrícula não autorizada pelo administrador. Contacte o suporte.";
+                    erro.classList.remove('hidden');
+                    return;
+                }
+
+                // Verificar se já existe conta
+                let existente = dadosApp.utilizadores.find(u => u.matricula === mat);
+                if(existente) {
+                    erro.innerText = "Esta matrícula já tem conta criada. Faça login.";
+                    erro.classList.remove('hidden');
+                    return;
+                }
+
+                let novoUser = { matricula: mat, nome: nome, senha: senha };
+                dadosApp.utilizadores.push(novoUser);
+                salvarStorage();
+
+                alert("✅ Conta criada com sucesso! Faça login agora.");
+                alternarModoAuth();
+                document.getElementById('authSenha').value = '';
+            } else {
+                // Fazer Login
+                let user = dadosApp.utilizadores.find(u => u.matricula === mat && u.senha === senha);
+                if(user) {
+                    usuarioAtual = user;
+                    sessionStorage.setItem('usuario_logado_vale', JSON.stringify(user));
+                    document.getElementById('modalUserAuth').classList.add('hidden');
+                    atualizarCabecalhoUtilizador();
+                } else {
+                    erro.innerText = "Matrícula ou senha incorretas (ou conta não criada).";
+                    erro.classList.remove('hidden');
+                }
+            }
+        }
+
+        function atualizarCabecalhoUtilizador() {
+            if(usuarioAtual) {
+                document.getElementById('headerSaudacao').innerText = `Olá, ${usuarioAtual.nome} (Mat: ${usuarioAtual.matricula})`;
+            }
+        }
+
+        function sairDaConta() {
+            sessionStorage.removeItem('usuario_logado_vale');
+            usuarioAtual = null;
+            document.getElementById('authMatricula').value = '';
+            document.getElementById('authSenha').value = '';
+            document.getElementById('modalUserAuth').classList.remove('hidden');
+            if(modoAdmin) toggleModoAdmin();
+        }
+
+        // GESTÃO DE UTILIZADORES AUTORIZADOS (ADMIN)
+        function renderizarListaAutorizados() {
+            const container = document.getElementById('listaAutorizados');
+            if(!container) return;
+
+            if(!dadosApp.autorizados || dadosApp.autorizados.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-4">Nenhuma matrícula autorizada.</p>';
+                return;
+            }
+
+            let html = '';
+            dadosApp.autorizados.forEach((a, idx) => {
+                html += `
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
+                        <div>
+                            <span class="font-black text-slate-900">${a.nome}</span>
+                            <span class="text-slate-500 font-semibold ml-2">Matrícula: <b>${a.matricula}</b></span>
+                        </div>
+                        <button onclick="removerAutorizado(${idx})" class="text-red-500 font-bold bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-xl">✕ Remover</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function adicionarAutorizado() {
+            let mat = prompt("Digite a matrícula do colaborador:");
+            let nome = prompt("Digite o nome do colaborador:");
+            if(mat && mat.trim() !== "" && nome && nome.trim() !== "") {
+                if(!dadosApp.autorizados) dadosApp.autorizados = [];
+                dadosApp.autorizados.push({ matricula: mat.trim(), nome: nome.trim() });
+                salvarStorage();
+                renderizarListaAutorizados();
+                alert("✅ Colaborador autorizado com sucesso!");
+            }
+        }
+
+        function removerAutorizado(idx) {
+            if(confirm("Deseja revogar a autorização desta matrícula?")) {
+                dadosApp.autorizados.splice(idx, 1);
+                salvarStorage();
+                renderizarListaAutorizados();
+            }
         }
 
         function mudarTab(tab) {
-            ['catalogo', 'carrinho', 'admin', 'gerir'].forEach(t => {
+            ['catalogo', 'carrinho', 'autorizados', 'admin', 'gerir'].forEach(t => {
                 let el = document.getElementById('tab-' + t);
                 if(el) el.classList.add('hidden');
                 let btn = document.getElementById('tab-btn-' + t);
@@ -223,6 +428,7 @@
                 modoAdmin = false;
                 document.getElementById('badgeModo').innerText = "Modo: Utilizador";
                 document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
+                document.getElementById('tab-btn-autorizados').classList.add('hidden');
                 document.getElementById('tab-btn-admin').classList.add('hidden');
                 document.getElementById('tab-btn-gerir').classList.add('hidden');
                 mudarTab('catalogo');
@@ -245,6 +451,7 @@
                 fecharModalAdminLogin();
                 document.getElementById('badgeModo').innerText = "Modo: Administrador";
                 document.getElementById('btnModoAdmin').innerText = "👤 Sair Admin";
+                document.getElementById('tab-btn-autorizados').classList.remove('hidden');
                 document.getElementById('tab-btn-admin').classList.remove('hidden');
                 document.getElementById('tab-btn-gerir').classList.remove('hidden');
                 mudarTab('admin');
@@ -363,12 +570,10 @@
         }
 
         function finalizarPedido() {
-            let mat = document.getElementById('pedidoMatricula').value.trim();
-            let nome = document.getElementById('pedidoNome').value.trim();
             let dataRet = document.getElementById('pedidoData').value;
 
-            if(!mat || !nome || !dataRet) {
-                alert("Por favor, preencha a Matrícula, o Nome e a Data da Retirada.");
+            if(!dataRet) {
+                alert("Por favor, selecione a Data da Retirada.");
                 return;
             }
 
@@ -379,8 +584,8 @@
 
             let novoPedido = {
                 id: Date.now(),
-                matricula: mat,
-                nome: nome,
+                matricula: usuarioAtual ? usuarioAtual.matricula : "000000",
+                nome: usuarioAtual ? usuarioAtual.nome : "Colaborador",
                 dataRetirada: dataRet,
                 dataPedido: new Date().toLocaleDateString('pt-PT'),
                 status: 'Pendente',
@@ -391,8 +596,6 @@
             salvarStorage();
 
             carrinho = [];
-            document.getElementById('pedidoMatricula').value = '';
-            document.getElementById('pedidoNome').value = '';
             renderizarCarrinho();
             renderizarAdminPedidos();
 
@@ -465,7 +668,6 @@
             }
         }
 
-        // GESTÃO DO CATÁLOGO (COM QUADRADOS SEPARADOS PARA TAMANHO E CÓDIGO VALE)
         function renderizarGerirUniformes() {
             const container = document.getElementById('listaGerirUniformes');
             if(!container) return;
@@ -478,18 +680,15 @@
                         let cod = (u.codigos && u.codigos[tam]) ? u.codigos[tam] : '';
                         tamanhosListHtml += `
                             <div class="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs shadow-sm">
-                                <!-- Quadrado do Tamanho -->
                                 <div class="flex flex-col w-24">
                                     <label class="text-[9px] font-extrabold text-slate-500 uppercase">Tamanho</label>
                                     <input type="text" value="${tam}" onchange="atualizarNomeTamanho(${u.id}, '${tam}', this.value)" class="bg-white p-2 border border-slate-300 rounded-lg font-bold text-xs text-center" placeholder="Tam...">
                                 </div>
-                                <!-- Quadrado do Código VALE -->
                                 <div class="flex flex-col flex-1 min-w-0">
                                     <label class="text-[9px] font-extrabold text-slate-500 uppercase">Código VALE</label>
                                     <input type="text" value="${cod}" oninput="atualizarCodigoTamanho(${u.id}, '${tam}', this.value)" class="bg-white p-2 border border-slate-300 rounded-lg font-mono font-bold text-xs" placeholder="Cód VALE...">
                                 </div>
-                                <!-- Botão Excluir -->
-                                <button onclick="removerTamanhoUniforme(${u.id}, '${tam}')" class="text-red-500 font-bold p-2 bg-red-50 hover:bg-red-100 rounded-lg mt-4" title="Remover">✕</button>
+                                <button onclick="removerTamanhoUniforme(${u.id}, '${tam}')" class="text-red-500 font-bold p-2 bg-red-50 hover:bg-red-100 rounded-lg mt-4" title="Remover Caixa">✕</button>
                             </div>
                         `;
                     });
@@ -504,7 +703,6 @@
                             <button onclick="apagarUniforme(${u.id})" class="text-red-600 font-bold bg-red-100 hover:bg-red-200 px-3 py-2 rounded-xl transition">Excluir ✕</button>
                         </div>
 
-                        <!-- FOTO E UPLOAD -->
                         <div class="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-200">
                             <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center p-1 border shrink-0 overflow-hidden">
                                 <img src="${u.imagem}" alt="Foto" class="max-h-full max-w-full object-contain">
@@ -515,11 +713,10 @@
                             </div>
                         </div>
 
-                        <!-- TAMANHOS E CÓDIGOS VALE EM QUADRADOS SEPARADOS -->
                         <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
                             <div class="flex justify-between items-center">
-                                <span class="font-bold text-slate-700 uppercase">📏 Tamanhos e Códigos VALE (Caixas Independentes):</span>
-                                <button onclick="adicionarTamanhoUniforme(${u.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]">➕ Adicionar Caixa</button>
+                                <span class="font-bold text-slate-700 uppercase">📏 Tamanhos e Códigos VALE:</span>
+                                <button onclick="adicionarCaixaTamanho(${u.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-[11px] shadow-sm flex items-center gap-1">➕ Adicionar Caixa</button>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                                 ${tamanhosListHtml || '<p class="text-xs text-slate-400 italic col-span-full">Nenhum tamanho configurado.</p>'}
@@ -538,8 +735,8 @@
                 cor: "Verde Vale",
                 referencia: "REF-000",
                 imagem: "https://cdn-icons-png.flaticon.com/512/3163/3163179.png",
-                tamanhos: ["P", "M", "G"],
-                codigos: {"P": "000000", "M": "000001", "G": "000002"}
+                tamanhos: ["P", "M"],
+                codigos: {"P": "000000", "M": "000001"}
             };
             dadosApp.uniformes.unshift(novo);
             salvarStorage();
@@ -573,23 +770,17 @@
             }
         }
 
-        function adicionarTamanhoUniforme(id) {
-            let tam = prompt("Digite o novo tamanho (ex: 42, GG, 14):");
-            if(tam && tam.trim() !== "") {
-                let cod = prompt(`Digite o Código VALE para o tamanho ${tam.trim().toUpperCase()}:`, "");
-                let u = dadosApp.uniformes.find(item => item.id === id);
-                if(u) {
-                    if(!u.tamanhos) u.tamanhos = [];
-                    if(!u.codigos) u.codigos = {};
-                    let tLimpo = tam.trim().toUpperCase();
-                    if(!u.tamanhos.includes(tLimpo)) {
-                        u.tamanhos.push(tLimpo);
-                    }
-                    u.codigos[tLimpo] = cod ? cod.trim() : "";
-                    salvarStorage();
-                    renderizarGerirUniformes();
-                    renderizarCatalogo();
-                }
+        function adicionarCaixaTamanho(id) {
+            let u = dadosApp.uniformes.find(item => item.id === id);
+            if(u) {
+                if(!u.tamanhos) u.tamanhos = [];
+                if(!u.codigos) u.codigos = {};
+                let novoTam = "TAM_" + (u.tamanhos.length + 1);
+                u.tamanhos.push(novoTam);
+                u.codigos[novoTam] = "";
+                salvarStorage();
+                renderizarGerirUniformes();
+                renderizarCatalogo();
             }
         }
 
