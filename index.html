@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v5.1)</title>
+    <title>Gestão de Uniformes - Vale (v5.2)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -190,14 +190,22 @@
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="border-b pb-3">
                     <h2 class="text-sm font-black uppercase text-slate-800">🛒 O seu Carrinho de Uniformes</h2>
-                    <p class="text-[11px] text-slate-500">Confirme os itens selecionados e defina a data de retirada.</p>
+                    <p class="text-[11px] text-slate-500">Confirme os itens selecionados e defina os dados para retirada.</p>
                 </div>
 
                 <div id="listaItensCarrinho" class="space-y-3"></div>
 
                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-xs text-slate-700 uppercase">📝 Dados para Retirada</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <h3 class="font-bold text-xs text-slate-700 uppercase">📝 Dados para Retirada e Identificação</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Matrícula</label>
+                            <input type="text" id="pedidoMatricula" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: 81025364">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Nome Completo</label>
+                            <input type="text" id="pedidoNome" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: Mariana Cruz">
+                        </div>
                         <div>
                             <label class="block font-semibold text-slate-600 mb-1">Data da Retirada</label>
                             <input type="date" id="pedidoData" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold outline-none">
@@ -244,7 +252,7 @@
 
     <!-- RODAPÉ COM FAIXA VERDE E BOTÃO DOS BONEQUINHOS (👥) PARA ABRIR UTILIZADORES -->
     <footer class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-emerald-900 text-white px-4 py-2.5 flex justify-between items-center max-w-5xl mx-auto rounded-t-2xl shadow-2xl border-t border-emerald-800 text-xs">
-        <span class="font-bold tracking-wider">Uniformes Vale • Versão v5.1</span>
+        <span class="font-bold tracking-wider">Uniformes Vale • Versão v5.2</span>
         <button onclick="clicarBotaoBonequinhos()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition" title="Utilizadores Cadastrados">
             <span>👥</span> Utilizadores
         </button>
@@ -463,6 +471,8 @@
             if(usuarioAtual) {
                 document.getElementById('headerSaudacao').innerText = `Olá, ${usuarioAtual.nome} (Mat: ${usuarioAtual.matricula})`;
                 document.getElementById('btnSair').classList.remove('hidden');
+                document.getElementById('pedidoMatricula').value = usuarioAtual.matricula;
+                document.getElementById('pedidoNome').value = usuarioAtual.nome;
             }
         }
 
@@ -478,8 +488,9 @@
             document.getElementById('tab-btn-carrinho').classList.remove('hidden');
             document.getElementById('tab-btn-admin').classList.add('hidden');
             document.getElementById('tab-btn-gerir').classList.add('hidden');
+            document.getElementById('pedidoMatricula').value = '';
+            document.getElementById('pedidoNome').value = '';
             mudarTab('catalogo');
-            // Removido o abrirModalAuth() para não abrir a tela de login ao sair.
         }
 
         function ativarModoAdminVisual() {
@@ -753,10 +764,12 @@
         }
 
         function finalizarPedido() {
+            let mat = document.getElementById('pedidoMatricula').value.trim();
+            let nome = document.getElementById('pedidoNome').value.trim();
             let dataRet = document.getElementById('pedidoData').value;
 
-            if(!dataRet) {
-                alert("Por favor, selecione a Data da Retirada.");
+            if(!mat || !nome || !dataRet) {
+                alert("Por favor, preencha a Matrícula, o Nome e a Data da Retirada.");
                 return;
             }
 
@@ -767,8 +780,8 @@
 
             let novoPedido = {
                 id: Date.now(),
-                matricula: usuarioAtual ? usuarioAtual.matricula : "81025364",
-                nome: usuarioAtual ? usuarioAtual.nome : "Mariana Pereira Cruz",
+                matricula: mat,
+                nome: nome,
                 dataRetirada: dataRet,
                 dataPedido: new Date().toLocaleDateString('pt-PT'),
                 status: 'Pendente',
