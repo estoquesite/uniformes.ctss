@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v4.8)</title>
+    <title>Gestão de Uniformes - Vale (v4.9)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -241,7 +241,7 @@
 
     <!-- RODAPÉ COM FAIXA VERDE E BOTÃO DOS BONEQUINHOS (👥) PARA ABRIR UTILIZADORES -->
     <footer class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-emerald-900 text-white px-4 py-2.5 flex justify-between items-center max-w-5xl mx-auto rounded-t-2xl shadow-2xl border-t border-emerald-800 text-xs">
-        <span class="font-bold tracking-wider">Uniformes Vale • Versão v4.8</span>
+        <span class="font-bold tracking-wider">Uniformes Vale • Versão v4.9</span>
         <button onclick="clicarBotaoBonequinhos()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition" title="Utilizadores Cadastrados">
             <span>👥</span> Utilizadores
         </button>
@@ -477,7 +477,7 @@
             document.getElementById('badgeModo').innerText = "Modo: Administrador";
             document.getElementById('btnModoAdmin').innerText = "👤 Sair Admin";
             
-            // Ocultar abas de cliente para o admin
+            // Ocultar abas de cliente para o admin ver apenas gestão
             document.getElementById('tab-btn-catalogo').classList.add('hidden');
             document.getElementById('tab-btn-carrinho').classList.add('hidden');
             
