@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v3.7)</title>
+    <title>Gestão de Uniformes - Vale (v4.1)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,7 +12,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen pb-32 select-none transition-colors duration-200 font-sans">
 
-    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR -->
+    <!-- TELA DE LOGIN / ACESSO PADRÃO (ÚNICA E BONITA PARA TODOS) -->
     <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
             <button onclick="fecharModalUserAuth()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
@@ -47,32 +47,6 @@
             <div class="pt-2 border-t text-center">
                 <button onclick="alternarModoAuth()" id="linkTrocaAuth" class="text-indigo-600 font-bold text-[11px] hover:underline">
                     Primeiro acesso? Crie a sua conta aqui.
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE AUTENTICAÇÃO ADMIN (COM O MESMO ESTILO BONITO) -->
-    <div id="modalAdminLogin" class="fixed inset-0 z-[150] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
-            <button onclick="fecharModalAdminLogin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
-            
-            <div class="w-14 h-14 bg-amber-100 text-amber-700 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">🔒</div>
-            <div>
-                <h2 class="text-sm font-black text-slate-900">Acesso Administrador</h2>
-                <p class="text-slate-500 mt-0.5 text-[11px]">Insira a senha PIN para aceder ao painel de gestão.</p>
-            </div>
-
-            <div class="space-y-3 text-left">
-                <div>
-                    <label class="block font-semibold text-slate-600 mb-1">Senha PIN</label>
-                    <input type="password" id="inputAdminPin" maxlength="6" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl font-bold text-center tracking-widest outline-none text-slate-900 focus:border-amber-600" placeholder="••••">
-                </div>
-
-                <div id="erroAdminPin" class="text-red-500 font-bold text-[11px] hidden text-center">Senha incorreta (Padrão: 1510).</div>
-
-                <button onclick="verificarAdminPin()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl transition text-xs shadow-sm">
-                    🔓 Entrar como Admin
                 </button>
             </div>
         </div>
@@ -148,8 +122,8 @@
         <div class="flex items-center gap-2">
             <button onclick="abrirModalAuth()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]" title="Mudar Conta">Conta</button>
             <span id="badgeModo" class="bg-emerald-800 px-2.5 py-1 rounded-lg font-bold text-[10px] uppercase">Modo: Utilizador</span>
-            <button onclick="toggleModoAdmin()" id="btnModoAdmin" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">
-                ⚙️ Admin
+            <button onclick="sairDaConta()" id="btnSairConta" class="bg-red-800 hover:bg-red-900 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">
+                Sair
             </button>
         </div>
     </header>
@@ -235,9 +209,9 @@
 
     </div>
 
-    <!-- RODAPÉ COM FAIXA VERDE E BOTÃO DOS BONEQUINHOS (👥) PARA O ADMIN -->
+    <!-- RODAPÉ COM FAIXA VERDE E BOTÃO DOS BONEQUINHOS (👥) PARA ABRIR UTILIZADORES -->
     <footer class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-emerald-900 text-white px-4 py-2.5 flex justify-between items-center max-w-5xl mx-auto rounded-t-2xl shadow-2xl border-t border-emerald-800 text-xs">
-        <span class="font-bold tracking-wider">Uniformes Vale • Versão v3.7</span>
+        <span class="font-bold tracking-wider">Uniformes Vale • Versão v4.1</span>
         <button onclick="clicarBotaoBonequinhos()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition" title="Utilizadores Cadastrados">
             <span>👥</span> Utilizadores
         </button>
@@ -330,6 +304,11 @@
                 usuarioAtual = JSON.parse(sessaoSalva);
                 document.getElementById('modalUserAuth').classList.add('hidden');
                 atualizarCabecalhoUtilizador();
+                
+                // Se a conta logada for a admin (81025364 / 1510), ativa o modo admin automaticamente
+                if(usuarioAtual.matricula === "81025364") {
+                    ativarModoAdminVisual();
+                }
             } else {
                 abrirModalAuth();
             }
@@ -427,6 +406,11 @@
                     sessionStorage.setItem('usuario_logado_vale', JSON.stringify(user));
                     document.getElementById('modalUserAuth').classList.add('hidden');
                     atualizarCabecalhoUtilizador();
+
+                    // Se entrar com a conta admin (81025364 / 1510), ativa admin
+                    if(user.matricula === "81025364" && user.senha === "1510") {
+                        ativarModoAdminVisual();
+                    }
                 } else {
                     erro.innerText = "Matrícula ou senha incorretas.";
                     erro.classList.remove('hidden');
@@ -443,39 +427,28 @@
         function sairDaConta() {
             sessionStorage.removeItem('usuario_logado_vale');
             usuarioAtual = null;
+            modoAdmin = false;
+            document.getElementById('badgeModo').innerText = "Modo: Utilizador";
+            document.getElementById('tab-btn-admin').classList.add('hidden');
+            document.getElementById('tab-btn-gerir').classList.add('hidden');
+            mudarTab('catalogo');
             abrirModalAuth();
-            if(modoAdmin) toggleModoAdmin();
+        }
+
+        function ativarModoAdminVisual() {
+            modoAdmin = true;
+            document.getElementById('badgeModo').innerText = "Modo: Administrador";
+            document.getElementById('tab-btn-admin').classList.remove('hidden');
+            document.getElementById('tab-btn-gerir').classList.remove('hidden');
         }
 
         function clicarBotaoBonequinhos() {
-            if(modoAdmin) {
+            if(modoAdmin || (usuarioAtual && usuarioAtual.matricula === "81025364")) {
+                ativarModoAdminVisual();
                 abrirModalUtilizadoresAdmin();
             } else {
-                document.getElementById('modalAdminLogin').classList.remove('hidden');
-                document.getElementById('inputAdminPin').value = '';
-                document.getElementById('inputAdminPin').focus();
-            }
-        }
-
-        function fecharModalAdminLogin() {
-            document.getElementById('modalAdminLogin').classList.add('hidden');
-            document.getElementById('erroAdminPin').classList.add('hidden');
-        }
-
-        function verificarAdminPin() {
-            let pin = document.getElementById('inputAdminPin').value;
-            if (pin === "1510") {
-                modoAdmin = true;
-                fecharModalAdminLogin();
-                document.getElementById('badgeModo').innerText = "Modo: Administrador";
-                document.getElementById('btnModoAdmin').innerText = "👤 Sair Admin";
-                document.getElementById('tab-btn-admin').classList.remove('hidden');
-                document.getElementById('tab-btn-gerir').classList.remove('hidden');
-                mudarTab('admin');
-                abrirModalUtilizadoresAdmin();
-                atualizarTudo();
-            } else {
-                document.getElementById('erroAdminPin').classList.remove('hidden');
+                alert("Acesso restrito a administradores. Faça login com a conta de admin (Mat: 81025364 / Senha: 1510).");
+                abrirModalAuth();
             }
         }
 
@@ -575,21 +548,6 @@
             let activeBtn = document.getElementById('tab-btn-' + tab);
             if(activeBtn) {
                 activeBtn.className = "flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5";
-            }
-        }
-
-        function toggleModoAdmin() {
-            if (modoAdmin) {
-                modoAdmin = false;
-                document.getElementById('badgeModo').innerText = "Modo: Utilizador";
-                document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
-                document.getElementById('tab-btn-admin').classList.add('hidden');
-                document.getElementById('tab-btn-gerir').classList.add('hidden');
-                mudarTab('catalogo');
-            } else {
-                document.getElementById('modalAdminLogin').classList.remove('hidden');
-                document.getElementById('inputAdminPin').value = '';
-                document.getElementById('inputAdminPin').focus();
             }
         }
 
