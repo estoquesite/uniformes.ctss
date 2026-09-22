@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v5.0)</title>
+    <title>Gestão de Uniformes - Vale (v5.1)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -244,7 +244,7 @@
 
     <!-- RODAPÉ COM FAIXA VERDE E BOTÃO DOS BONEQUINHOS (👥) PARA ABRIR UTILIZADORES -->
     <footer class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-emerald-900 text-white px-4 py-2.5 flex justify-between items-center max-w-5xl mx-auto rounded-t-2xl shadow-2xl border-t border-emerald-800 text-xs">
-        <span class="font-bold tracking-wider">Uniformes Vale • Versão v5.0</span>
+        <span class="font-bold tracking-wider">Uniformes Vale • Versão v5.1</span>
         <button onclick="clicarBotaoBonequinhos()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition" title="Utilizadores Cadastrados">
             <span>👥</span> Utilizadores
         </button>
@@ -479,7 +479,7 @@
             document.getElementById('tab-btn-admin').classList.add('hidden');
             document.getElementById('tab-btn-gerir').classList.add('hidden');
             mudarTab('catalogo');
-            abrirModalAuth();
+            // Removido o abrirModalAuth() para não abrir a tela de login ao sair.
         }
 
         function ativarModoAdminVisual() {
