@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v2.8)</title>
+    <title>Gestão de Uniformes - Vale (v2.9)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,8 +12,8 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen pb-32 select-none transition-colors duration-200 font-sans">
 
-    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR (OCULTA POR DEFEITO PARA NÃO PRENDER O ECRÃ) -->
-    <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR -->
+    <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
             <button onclick="fecharModalUserAuth()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
 
@@ -75,6 +75,30 @@
         </div>
     </div>
 
+    <!-- MODAL DE GESTÃO DE UTILIZADORES (ADMIN) -->
+    <div id="modalUtilizadoresAdmin" class="fixed inset-0 z-[160] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-lg w-full space-y-4 text-xs relative">
+            <button onclick="fecharModalUtilizadoresAdmin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
+            <div class="flex items-center gap-2 border-b pb-3">
+                <span class="text-xl">👥</span>
+                <div>
+                    <h3 class="font-black uppercase text-slate-900 text-sm">Painel de Utilizadores Cadastrados</h3>
+                    <p class="text-[11px] text-slate-500">Adicione novas contas manualmente ou remova acessos.</p>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="adicionarUtilizadorAdmin()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl font-bold text-xs transition shadow-sm">➕ Cadastrar Novo Utilizador</button>
+            </div>
+
+            <div id="listaUtilizadoresAdmin" class="max-h-60 overflow-y-auto space-y-2"></div>
+
+            <div class="flex justify-end pt-2 border-t">
+                <button onclick="fecharModalUtilizadoresAdmin()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl font-bold">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- CABEÇALHO SUPERIOR -->
     <header class="bg-emerald-900 text-white px-4 py-3 shadow-md border-b border-emerald-800 text-xs flex justify-between items-center z-50 relative">
         <div class="flex items-center gap-2">
@@ -93,11 +117,10 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <div class="max-w-5xl mx-auto p-3 sm:p-6 space-y-4 pt-4">
 
-        <!-- ABAS DE NAVEGAÇÃO (COM OS BONEQUINHOS 👥 ALINHADOS NO ADMIN) -->
+        <!-- ABAS DE NAVEGAÇÃO -->
         <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl shadow-inner overflow-x-auto no-scrollbar">
             <button onclick="mudarTab('catalogo')" id="tab-btn-catalogo" class="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5"><span>👕</span> Catálogo</button>
             <button onclick="mudarTab('carrinho')" id="tab-btn-carrinho" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50"><span>🛒</span> Carrinho <span id="contadorCarrinho" class="bg-emerald-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
-            <button onclick="mudarTab('usuarios')" id="tab-btn-usuarios" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden" title="Utilizadores"><span>👥</span></button>
             <button onclick="mudarTab('admin')" id="tab-btn-admin" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>📊</span> Pedidos <span id="contadorPedidos" class="bg-amber-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
             <button onclick="mudarTab('gerir')" id="tab-btn-gerir" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>✏️</span> Catálogo</button>
         </div>
@@ -140,20 +163,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: GESTÃO DE UTILIZADORES / RESTRITOS (ADMIN) -->
-        <div id="tab-usuarios" class="space-y-4 hidden">
-            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
-                    <div>
-                        <h2 class="text-sm font-black uppercase text-slate-800">👥 Gestão de Utilizadores Restritos</h2>
-                        <p class="text-[11px] text-slate-500">Visualize todas as contas cadastradas e remova acessos indevidos se necessário.</p>
-                    </div>
-                </div>
-                <div id="listaUtilizadoresAdmin" class="space-y-2"></div>
-            </div>
-        </div>
-
-        <!-- TAB 4: PAINEL DE APROVAÇÃO (ADMIN) -->
+        <!-- TAB 3: PAINEL DE APROVAÇÃO (ADMIN) -->
         <div id="tab-admin" class="space-y-4 hidden">
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
@@ -168,7 +178,7 @@
             </div>
         </div>
 
-        <!-- TAB 5: GERIR CATÁLOGO (ADMIN) -->
+        <!-- TAB 4: GERIR CATÁLOGO (ADMIN) -->
         <div id="tab-gerir" class="space-y-4 hidden">
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
@@ -185,9 +195,12 @@
 
     </div>
 
-    <!-- RODAPÉ COM A VERSÃO -->
-    <footer class="text-center py-6 text-xs text-slate-400 font-bold tracking-wider">
-        Uniformes Vale • Versão v2.8
+    <!-- RODAPÉ COM FAIXA VERDE E BOTÃO DOS BONEQUINHOS (👥) PARA O ADMIN -->
+    <footer class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-emerald-900 text-white px-4 py-2.5 flex justify-between items-center max-w-5xl mx-auto rounded-t-2xl shadow-2xl border-t border-emerald-800 text-xs">
+        <span class="font-bold tracking-wider">Uniformes Vale • Versão v2.9</span>
+        <button onclick="abrirModalUtilizadoresAdmin()" id="btnBonequinhosFooter" class="hidden bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition">
+            <span>👥</span> Utilizadores
+        </button>
     </footer>
 
     <!-- SCRIPT DA APLICAÇÃO -->
@@ -222,7 +235,9 @@
         let dadosApp = {
             uniformes: dadosUniformes,
             pedidos: [],
-            utilizadores: []
+            utilizadores: [
+                { matricula: "81025364", nome: "Mariana Pereira Cruz", senha: "1510" } // Conta predefinida da Mariana
+            ]
         };
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -242,10 +257,17 @@
                 } catch(e) {}
             }
 
+            // Garante que a conta da Mariana está sempre presente
+            if(!dadosApp.utilizadores.some(u => u.matricula === "81025364")) {
+                dadosApp.utilizadores.push({ matricula: "81025364", nome: "Mariana Pereira Cruz", senha: "1510" });
+            }
+
             let sessaoSalva = sessionStorage.getItem('usuario_logado_vale');
             if (sessaoSalva) {
                 usuarioAtual = JSON.parse(sessaoSalva);
                 atualizarCabecalhoUtilizador();
+            } else {
+                abrirModalAuth(); // Abre a tela de login ao entrar se não estiver logado
             }
 
             atualizarTudo();
@@ -310,6 +332,7 @@
                 let nome = document.getElementById('authNome').value.trim();
                 if(!nome) {
                     erro.innerText = "Digite o seu nome completo.";
+                    erro.classList.add('hidden'); // Corrigido
                     erro.classList.remove('hidden');
                     return;
                 }
@@ -357,12 +380,22 @@
             if(modoAdmin) toggleModoAdmin();
         }
 
+        // GESTÃO DE UTILIZADORES NO ADMIN
+        function abrirModalUtilizadoresAdmin() {
+            renderizarUtilizadoresAdmin();
+            document.getElementById('modalUtilizadoresAdmin').classList.remove('hidden');
+        }
+
+        function fecharModalUtilizadoresAdmin() {
+            document.getElementById('modalUtilizadoresAdmin').classList.add('hidden');
+        }
+
         function renderizarUtilizadoresAdmin() {
             const container = document.getElementById('listaUtilizadoresAdmin');
             if(!container) return;
 
             if(!dadosApp.utilizadores || dadosApp.utilizadores.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-4">Nenhum utilizador registado no sistema.</p>';
+                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-4">Nenhum utilizador registado.</p>';
                 return;
             }
 
@@ -372,17 +405,30 @@
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
                         <div>
                             <span class="font-black text-slate-900">${u.nome}</span>
-                            <span class="text-slate-500 font-semibold ml-2">Matrícula: <b>${u.matricula}</b></span>
+                            <span class="text-slate-500 font-semibold ml-2">Matrícula: <b>${u.matricula}</b> | Senha: <b>${u.senha}</b></span>
                         </div>
-                        <button onclick="removerUtilizador(${idx})" class="text-red-500 font-bold bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-xl">✕ Remover Acesso</button>
+                        <button onclick="removerUtilizador(${idx})" class="text-red-500 font-bold bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-xl">✕ Apagar</button>
                     </div>
                 `;
             });
             container.innerHTML = html;
         }
 
+        function adicionarUtilizadorAdmin() {
+            let mat = prompt("Digite a matrícula do novo colaborador:");
+            let nome = prompt("Digite o nome completo:");
+            let senha = prompt("Crie uma senha de acesso:", "1234");
+            if(mat && mat.trim() !== "" && nome && nome.trim() !== "" && senha && senha.trim() !== "") {
+                if(!dadosApp.utilizadores) dadosApp.utilizadores = [];
+                dadosApp.utilizadores.push({ matricula: mat.trim(), nome: nome.trim(), senha: senha.trim() });
+                salvarStorage();
+                renderizarUtilizadoresAdmin();
+                alert("✅ Utilizador cadastrado com sucesso!");
+            }
+        }
+
         function removerUtilizador(idx) {
-            if(confirm("Deseja realmente remover o acesso deste utilizador?")) {
+            if(confirm("Deseja realmente apagar esta conta de utilizador?")) {
                 dadosApp.utilizadores.splice(idx, 1);
                 salvarStorage();
                 renderizarUtilizadoresAdmin();
@@ -390,7 +436,7 @@
         }
 
         function mudarTab(tab) {
-            ['catalogo', 'carrinho', 'usuarios', 'admin', 'gerir'].forEach(t => {
+            ['catalogo', 'carrinho', 'admin', 'gerir'].forEach(t => {
                 let el = document.getElementById('tab-' + t);
                 if(el) el.classList.add('hidden');
                 let btn = document.getElementById('tab-btn-' + t);
@@ -413,7 +459,7 @@
                 modoAdmin = false;
                 document.getElementById('badgeModo').innerText = "Modo: Utilizador";
                 document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
-                document.getElementById('tab-btn-usuarios').classList.add('hidden');
+                document.getElementById('btnBonequinhosFooter').classList.add('hidden');
                 document.getElementById('tab-btn-admin').classList.add('hidden');
                 document.getElementById('tab-btn-gerir').classList.add('hidden');
                 mudarTab('catalogo');
@@ -436,7 +482,7 @@
                 fecharModalAdminLogin();
                 document.getElementById('badgeModo').innerText = "Modo: Administrador";
                 document.getElementById('btnModoAdmin').innerText = "👤 Sair Admin";
-                document.getElementById('tab-btn-usuarios').classList.remove('hidden');
+                document.getElementById('btnBonequinhosFooter').classList.remove('hidden');
                 document.getElementById('tab-btn-admin').classList.remove('hidden');
                 document.getElementById('tab-btn-gerir').classList.remove('hidden');
                 mudarTab('admin');
@@ -569,8 +615,8 @@
 
             let novoPedido = {
                 id: Date.now(),
-                matricula: usuarioAtual ? usuarioAtual.matricula : "000000",
-                nome: usuarioAtual ? usuarioAtual.nome : "Colaborador",
+                matricula: usuarioAtual ? usuarioAtual.matricula : "81025364",
+                nome: usuarioAtual ? usuarioAtual.nome : "Mariana Pereira Cruz",
                 dataRetirada: dataRet,
                 dataPedido: new Date().toLocaleDateString('pt-PT'),
                 status: 'Pendente',
