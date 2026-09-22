@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v4.4)</title>
+    <title>Gestão de Uniformes - Vale (v4.5)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,7 +12,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen pb-32 select-none transition-colors duration-200 font-sans">
 
-    <!-- TELA DE LOGIN / ACESSO DE UTILIZADOR -->
+    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR (A TELINHA BONITA) -->
     <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
             <button onclick="fecharModalUserAuth()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
@@ -60,7 +60,7 @@
                 <span class="text-xl">👥</span>
                 <div>
                     <h3 class="font-black uppercase text-slate-900 text-sm">Painel de Utilizadores Cadastrados</h3>
-                    <p class="text-[11px] text-slate-500">Adicione novas contas de colaboradores ou remova acessos.</p>
+                    <p class="text-[11px] text-slate-500">Visualize as contas de colaboradores cadastradas.</p>
                 </div>
             </div>
 
@@ -211,7 +211,7 @@
 
     <!-- RODAPÉ COM FAIXA VERDE E BOTÃO DOS BONEQUINHOS (👥) PARA ABRIR UTILIZADORES -->
     <footer class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-emerald-900 text-white px-4 py-2.5 flex justify-between items-center max-w-5xl mx-auto rounded-t-2xl shadow-2xl border-t border-emerald-800 text-xs">
-        <span class="font-bold tracking-wider">Uniformes Vale • Versão v4.4</span>
+        <span class="font-bold tracking-wider">Uniformes Vale • Versão v4.5</span>
         <button onclick="clicarBotaoBonequinhos()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition" title="Utilizadores Cadastrados">
             <span>👥</span> Utilizadores
         </button>
@@ -445,8 +445,7 @@
                 ativarModoAdminVisual();
                 abrirModalUtilizadoresAdmin();
             } else {
-                alert("Acesso restrito. Faça login com a conta de Administrador (Mat: 81025364 / Senha: 1510).");
-                abrirModalAuth();
+                abrirModalAuth(); // Se não estiver logado como admin, abre diretamente a telinha bonita de login
             }
         }
 
