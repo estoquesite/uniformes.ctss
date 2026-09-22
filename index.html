@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v3.2)</title>
+    <title>Gestão de Uniformes - Vale (v3.3)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,8 +12,8 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen pb-32 select-none transition-colors duration-200 font-sans">
 
-    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR -->
-    <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR (ABRE AUTOMÁTICA COM CAMPOS VAZIOS) -->
+    <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
             <button onclick="fecharModalUserAuth()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
 
@@ -23,7 +23,7 @@
                 <p class="text-slate-500 mt-0.5 text-[11px]" id="authSubtitulo">Insira a sua matrícula e senha para entrar.</p>
             </div>
 
-            <!-- Formulário de Login/Registo -->
+            <!-- Formulário de Login/Registo com campos limpos -->
             <div class="space-y-3 text-left">
                 <div>
                     <label class="block font-semibold text-slate-600 mb-1">Matrícula ou Nome</label>
@@ -75,7 +75,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE GESTÃO DE UTILIZADORES (DIRETO NO RODAPÉ COM OS BONEQUINHOS) -->
+    <!-- MODAL DE GESTÃO DE UTILIZADORES (ADMIN) -->
     <div id="modalUtilizadoresAdmin" class="fixed inset-0 z-[160] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-lg w-full space-y-4 text-xs relative">
             <button onclick="fecharModalUtilizadoresAdmin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
@@ -195,10 +195,10 @@
 
     </div>
 
-    <!-- RODAPÉ COM FAIXA VERDE, VERSÃO E BOTÃO DOS BONEQUINHOS (👥) -->
+    <!-- RODAPÉ COM FAIXA VERDE E BOTÃO DOS BONEQUINHOS (👥) PARA O ADMIN -->
     <footer class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-emerald-900 text-white px-4 py-2.5 flex justify-between items-center max-w-5xl mx-auto rounded-t-2xl shadow-2xl border-t border-emerald-800 text-xs">
-        <span class="font-bold tracking-wider">Uniformes Vale • Versão v3.2</span>
-        <button onclick="abrirModalUtilizadoresAdmin()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition" title="Gerir Utilizadores">
+        <span class="font-bold tracking-wider">Uniformes Vale • Versão v3.3</span>
+        <button onclick="abrirModalUtilizadoresAdmin()" id="btnBonequinhosFooter" class="hidden bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition">
             <span>👥</span> Utilizadores
         </button>
     </footer>
@@ -289,7 +289,10 @@
             let sessaoSalva = sessionStorage.getItem('usuario_logado_vale');
             if (sessaoSalva) {
                 usuarioAtual = JSON.parse(sessaoSalva);
+                document.getElementById('modalUserAuth').classList.add('hidden');
                 atualizarCabecalhoUtilizador();
+            } else {
+                document.getElementById('modalUserAuth').classList.remove('hidden'); // Exibe login no início se não estiver logado
             }
 
             atualizarTudo();
@@ -401,7 +404,6 @@
             if(modoAdmin) toggleModoAdmin();
         }
 
-        // GESTÃO DE UTILIZADORES NO MODAL DO RODAPÉ
         function abrirModalUtilizadoresAdmin() {
             renderizarUtilizadoresAdmin();
             document.getElementById('modalUtilizadoresAdmin').classList.remove('hidden');
@@ -480,6 +482,7 @@
                 modoAdmin = false;
                 document.getElementById('badgeModo').innerText = "Modo: Utilizador";
                 document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
+                document.getElementById('btnBonequinhosFooter').classList.add('hidden');
                 document.getElementById('tab-btn-admin').classList.add('hidden');
                 document.getElementById('tab-btn-gerir').classList.add('hidden');
                 mudarTab('catalogo');
@@ -502,13 +505,13 @@
                 fecharModalAdminLogin();
                 document.getElementById('badgeModo').innerText = "Modo: Administrador";
                 document.getElementById('btnModoAdmin').innerText = "👤 Sair Admin";
+                document.getElementById('btnBonequinhosFooter').classList.remove('hidden');
                 document.getElementById('tab-btn-admin').classList.remove('hidden');
                 document.getElementById('tab-btn-gerir').classList.remove('hidden');
                 mudarTab('admin');
                 atualizarTudo();
             } else {
-                document.getElementById('erroAdminPin').classList.add('hidden');
-                document.getElementById('erroAdminPin').classList.remove('hidden'); // Corrigido
+                document.getElementById('erroAdminPin').classList.remove('hidden');
             }
         }
 
