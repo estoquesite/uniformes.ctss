@@ -1,2071 +1,650 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roteiro Europa - Mariana (v213.0)</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Manifest Dinâmico via JavaScript -->
-    <link id="pwa-manifest" rel="manifest" href="">
+    <title>VALE - Sistema de Uniformes (v41)</title>
+    <style>
+        :root {
+            --primary: #007a5e;
+            --primary-dark: #005a43;
+            --secondary: #1e293b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --accent: #f97316;
+            --border-color: #cbd5e1;
+            --text-main: #0f172a;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+        header {
+            background-color: var(--secondary);
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .brand h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .version-tag {
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+        }
+        .tab-btn {
+            background: rgba(255,255,255,0.08);
+            color: #e2e8f0;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover, .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .main-wrapper {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 24px;
+        }
+        
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        .toolbar {
+            background: var(--card-bg);
+            padding: 20px 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.02);
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+        .toolbar input, .toolbar select {
+            flex: 1;
+            min-width: 240px;
+            padding: 11px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            background: #fff;
+        }
+
+        .categories-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .cat-pill {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+        .cat-pill:hover { border-color: var(--primary); color: var(--primary); }
+        .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .table-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            overflow-x: auto;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+        .table-title {
+            background: #f8fafc;
+            padding: 16px 24px;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 14px 18px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+        tr:hover { background-color: #f8fafc; }
+        
+        .item-img {
+            width: 45px; height: 45px; object-fit: contain;
+            border: 1px solid var(--border-color); border-radius: 8px; background: #fff; padding: 2px;
+        }
+        .badge {
+            background: #ecfdf5; color: #047857; padding: 5px 12px;
+            border-radius: 20px; font-weight: 700; font-size: 11px; display: inline-block;
+            border: 1px solid #a7f3d0;
+        }
+        .select-size {
+            padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 8px;
+            font-size: 13px; width: 170px; outline: none; background: white; cursor: pointer;
+        }
+        .input-qty {
+            width: 60px; padding: 8px; text-align: center;
+            border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px;
+        }
+        .btn {
+            background: var(--primary); color: white; border: none;
+            padding: 9px 18px; border-radius: 8px; font-weight: 600;
+            cursor: pointer; font-size: 12px; transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,122,94,0.15);
+        }
+        .btn:hover { background: var(--primary-dark); }
+        .btn-danger { background: #ef4444; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-accent { background: var(--accent); }
+        .btn-accent:hover { background: #ea580c; }
+
+        .edit-input {
+            width: 100%; padding: 8px 12px; border: 1px solid var(--primary);
+            border-radius: 6px; font-size: 12px; background: #fffdf5; box-sizing: border-box;
+        }
+        .size-edit-row {
+            display: flex; gap: 6px; align-items: center; margin-bottom: 6px;
+        }
+        .btn-move {
+            background: #64748b; color: white; border: none;
+            border-radius: 6px; padding: 6px 10px; cursor: pointer;
+            font-size: 11px; margin-right: 4px;
+        }
+        .btn-move:hover { background: #475569; }
+
+        .cart-layout {
+            display: grid; grid-template-columns: 2fr 1fr; gap: 24px;
+        }
+        @media(max-width: 900px) { .cart-layout { grid-template-columns: 1fr; } }
+        
+        .card-box {
+            background: var(--card-bg); padding: 28px; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02); border: 1px solid var(--border-color);
+        }
+        .card-box h3 { margin-top: 0; color: var(--secondary); font-size: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+        
+        .form-field { margin-bottom: 16px; }
+        .form-field label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--secondary); }
+        .form-field input, .form-field select {
+            width: 100%; padding: 11px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; outline: none;
+        }
+
+        .order-card {
+            background: #fff; border-left: 5px solid var(--primary);
+            padding: 20px; margin-bottom: 16px; border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02); border: 1px solid var(--border-color);
+        }
+
+        footer {
+            background-color: var(--secondary); color: #94a3b8; text-align: center;
+            padding: 24px; margin-top: 60px; font-size: 12px;
+        }
+    </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen pb-32 select-none transition-colors duration-200">
+<body>
 
-    <!-- TELA DE BLOQUEIO / SEGURANÇA (SENHA 1510 & DIGITAL) -->
-    <div id="tela-bloqueio" class="fixed inset-0 z-[100] bg-slate-900 flex items-center justify-center p-4 backdrop-blur-md hidden">
-        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs">
-            <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">🔒</div>
-            <div>
-                <h2 class="text-sm font-black text-slate-900">Área Protegida</h2>
-                <p class="text-slate-500 mt-0.5 text-[11px]">Insira a sua senha PIN ou utilize a digital para desbloquear.</p>
-            </div>
-            <div class="space-y-2.5">
-                <input type="password" id="input-pin" maxlength="6" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-center text-base font-black tracking-widest outline-none text-slate-900 focus:border-indigo-600" placeholder="••••">
-                <button onclick="desbloquearComPin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-sm text-xs">
-                    🔓 Desbloquear com Senha
-                </button>
-                <button onclick="desbloquearComBiometria()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 rounded-xl transition border border-slate-300 text-xs flex items-center justify-center gap-1.5">
-                    <span>👆</span> Entrar com Digital
-                </button>
-            </div>
-            <div id="erro-pin" class="text-red-500 font-bold text-[11px] hidden">Senha incorreta (Padrão: 1510).</div>
+    <header>
+        <div class="brand">
+            <h1>VALE - Sistema de Uniformes</h1>
+            <span class="version-tag">v41</span>
         </div>
-    </div>
-
-    <!-- CABEÇALHO SUPERIOR COMPACTO COM TRADUTOR E ATUALIZAR -->
-    <header class="bg-slate-900 text-white px-3 py-2 shadow-md border-b border-slate-800 text-xs flex justify-between items-center z-50 relative gap-1 flex-wrap">
-        <span class="font-bold tracking-wide">🚄 Roteiro Europa - Mariana</span>
-        <div class="flex items-center gap-1.5 flex-wrap">
-            <a href="https://translate.google.com/?hl=pt&sl=auto&tl=pt&op=images" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg font-bold text-[10px] transition shadow-sm flex items-center gap-1" title="Google Tradutor & Câmara">🌐 Tradutor</a>
-            <button onclick="window.location.reload()" class="bg-slate-800 hover:bg-slate-700 text-white px-2 py-1 rounded-lg font-bold text-[10px] transition shadow-sm border border-slate-700" title="Atualizar Página">🔄</button>
-            <button onclick="exportarPdfPrint()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg font-bold text-[10px] transition shadow-sm" title="Imprimir Tudo">🖨️</button>
-            <span class="bg-indigo-950 px-1.5 py-0.5 rounded font-mono font-bold text-[9px]">v213.0</span>
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchView('catalog')">📦 Catálogo</button>
+            <button class="tab-btn" onclick="switchView('cart')">🛒 Carrinho (<span id="cart-counter">0</span>)</button>
+            <button class="tab-btn" id="lockBtn" onclick="openAdminPortal()">🔒 Painel ADM</button>
         </div>
     </header>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <div class="max-w-4xl mx-auto p-3 sm:p-6 space-y-4 pt-4">
+    <div class="main-wrapper">
 
-        <!-- SEPARADORES (TABS) - OS 5 CARTÕES PRINCIPAIS ALINHADOS -->
-        <div class="grid grid-cols-5 gap-1 bg-slate-200 p-1 rounded-2xl shadow-inner text-center">
-            <button onclick="mudarTab('leitura')" id="tab-btn-leitura" class="py-2.5 px-1 rounded-xl bg-indigo-600 text-white font-extrabold shadow-sm transition text-[11px] flex flex-col items-center gap-0.5"><span>✈️</span><span class="text-[8px] uppercase">Roteiro</span></button>
-            <button onclick="mudarTab('itinerario')" id="tab-btn-itinerario" class="py-2.5 px-1 rounded-xl bg-white text-slate-700 font-extrabold shadow-sm transition text-[11px] flex flex-col items-center gap-0.5 hover:bg-slate-50"><span>📅</span><span class="text-[8px] uppercase">Editar</span></button>
-            <button onclick="mudarTab('utilidades')" id="tab-btn-utilidades" class="py-2.5 px-1 rounded-xl bg-white text-slate-700 font-extrabold shadow-sm transition text-[11px] flex flex-col items-center gap-0.5 hover:bg-slate-50"><span>📋</span><span class="text-[8px] uppercase">Hub</span></button>
-            <button onclick="mudarTab('orcamento')" id="tab-btn-orcamento" class="py-2.5 px-1 rounded-xl bg-white text-slate-700 font-extrabold shadow-sm transition text-[11px] flex flex-col items-center gap-0.5 hover:bg-slate-50"><span>💰</span><span class="text-[8px] uppercase">Orç.</span></button>
-            <button onclick="mudarTab('compras')" id="tab-btn-compras" class="py-2.5 px-1 rounded-xl bg-white text-slate-700 font-extrabold shadow-sm transition text-[11px] flex flex-col items-center gap-0.5 hover:bg-slate-50"><span>🛍️</span><span class="text-[8px] uppercase">Compras</span></button>
-        </div>
-
-        <!-- TAB 1: ROTEIRO -->
-        <div id="tab-leitura" class="space-y-3">
-            <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white p-3.5 rounded-2xl shadow-md flex justify-between items-center">
-                <div>
-                    <h2 class="text-xs font-black uppercase tracking-wider text-indigo-200">✈️ Roteiro Oficial (Aprovados)</h2>
-                    <p class="text-[10px] text-slate-300">Tranque blocos no Editar para aparecerem aqui.</p>
-                </div>
-                <div id="progresso-viagem" class="bg-indigo-600 px-3 py-1.5 rounded-xl text-xs font-black shadow-inner">0 / 0 Aprovados</div>
-            </div>
-
-            <!-- Filtros por Destino -->
-            <div id="filtros-leitura-container" class="bg-slate-200 p-2 rounded-xl overflow-x-auto flex gap-1.5 text-xs items-center no-scrollbar shadow-inner"></div>
-
-            <!-- GRELHA DE ROTEIRO -->
-            <div id="lista-leitura-html" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
-        </div>
-
-        <!-- TAB 2: ITINERÁRIO EDITÁVEL -->
-        <div id="tab-itinerario" class="space-y-3 hidden">
-            <div id="filtros-container" class="bg-slate-200 p-2 rounded-xl overflow-x-auto flex gap-1.5 text-xs items-center no-scrollbar shadow-inner"></div>
-
-            <div class="flex justify-between items-center px-2 py-2.5 bg-white rounded-2xl border border-slate-200 shadow-sm">
-                <h2 class="text-xs font-extrabold uppercase text-slate-700 tracking-wider">📦 Blocos de Destino</h2>
-                <div class="flex gap-1.5">
-                    <button onclick="desfazerUltimaAcao()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">↩️ Voltar</button>
-                    <button onclick="adicionarBloco()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">➕ Novo Bloco</button>
-                </div>
-            </div>
+        <!-- VISÃO 1: CATÁLOGO -->
+        <div id="view-catalog" class="view-section active">
+            <div class="categories-bar" id="categoriesBar"></div>
             
-            <div id="lista-blocos" class="space-y-3"></div>
-        </div>
-
-        <!-- TAB 3: UTILIDADES & VOUCHERS -->
-        <div id="tab-utilidades" class="space-y-3 hidden">
-            <div class="bg-indigo-900 text-white p-3.5 rounded-2xl shadow-md space-y-2.5">
-                <div class="flex justify-between items-center flex-wrap gap-2">
-                    <div>
-                        <h2 class="text-xs font-black uppercase tracking-wider text-indigo-200">📋 Hub de Listas & Vouchers</h2>
-                        <p id="stat-utilidades" class="text-[11px] font-bold text-slate-200">Tudo centralizado com impressão individual</p>
-                    </div>
-                    <button onclick="desfazerUltimaAcao()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm">↩️ Voltar</button>
-                </div>
-
-                <!-- Filtros Hub -->
-                <div class="flex gap-1.5 overflow-x-auto no-scrollbar pt-1">
-                    <button onclick="filtrarUtilidade('todos')" id="filt-util-todos" class="px-3 py-1.5 rounded-xl bg-white text-indigo-950 font-bold text-xs shrink-0 transition shadow-sm">🔍 Todos</button>
-                    <button onclick="filtrarUtilidade('voos')" id="filt-util-voos" class="px-3 py-1.5 rounded-xl bg-indigo-800 text-white font-bold text-xs shrink-0 transition">✈️ Voos</button>
-                    <button onclick="filtrarUtilidade('contatos')" id="filt-util-contatos" class="px-3 py-1.5 rounded-xl bg-indigo-800 text-white font-bold text-xs shrink-0 transition">📞 Contatos</button>
-                    <button onclick="filtrarUtilidade('tarefas')" id="filt-util-tarefas" class="px-3 py-1.5 rounded-xl bg-indigo-800 text-white font-bold text-xs shrink-0 transition">📋 Tarefas</button>
-                    <button onclick="filtrarUtilidade('checklist')" id="filt-util-checklist" class="px-3 py-1.5 rounded-xl bg-indigo-800 text-white font-bold text-xs shrink-0 transition">🎒 Checklist</button>
-                    <button onclick="filtrarUtilidade('vouchers')" id="filt-util-vouchers" class="px-3 py-1.5 rounded-xl bg-indigo-800 text-white font-bold text-xs shrink-0 transition">🎟️ Vouchers</button>
-                    <button onclick="filtrarUtilidade('chat')" id="filt-util-chat" class="px-3 py-1.5 rounded-xl bg-indigo-800 text-white font-bold text-xs shrink-0 transition">💬 Chat</button>
+            <div class="toolbar">
+                <input type="text" id="searchFilter" placeholder="Pesquisar por nome, cor ou Cód. Vale..." onkeyup="renderCatalog()">
+                <select id="genderFilter" onchange="renderCatalog()">
+                    <option value="">Todos os Géneros</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Feminino">Feminino</option>
+                    <option value="Unissex">Unissex</option>
+                </select>
+                <div id="adminToggleContainer" style="display:none;">
+                    <button class="btn btn-accent" onclick="addNewSection()">➕ Nova Categoria</button>
                 </div>
             </div>
 
-            <div id="hub-utilidades-grid" class="grid grid-cols-1 gap-3"></div>
+            <div id="catalogContent"></div>
         </div>
 
-        <!-- TAB 4: ORÇAMENTO -->
-        <div id="tab-orcamento" class="space-y-3 hidden">
-            <div class="bg-white p-3.5 sm:p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4 text-xs">
-                <div class="flex justify-between items-center border-b pb-3 flex-wrap gap-2">
-                    <div>
-                        <h2 class="text-xs font-extrabold uppercase text-slate-800 tracking-wider">💰 Orçamento & Câmbio</h2>
-                        <p class="text-[11px] text-slate-500 font-semibold">Resumo global no topo e gestão detalhada nas abas abaixo</p>
-                    </div>
-                    <button onclick="imprimirSeccaoCustom('Orçamento & Câmbio', document.getElementById('tab-orcamento').innerHTML)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">🖨️ PDF Orçamento</button>
-                </div>
-
-                <!-- CARD DE DESTAQUE: TOTAL GASTO GERAL EM REAIS NO TOPO -->
-                <div class="bg-emerald-50/80 p-4 rounded-2xl border-2 border-emerald-300 shadow-md text-center space-y-1">
-                    <span class="font-black text-xs text-emerald-900 uppercase tracking-wide block">📊 Total Gasto Geral em Reais (R$)</span>
-                    <div id="resumo-total-gasto-brl" class="text-2xl font-black text-emerald-700">R$ 0.00</div>
-                    <p class="text-[10px] text-slate-600">Soma acumulada de todas as despesas, trechos e compras (Euros + Francos + Reais).</p>
-                </div>
-
-                <!-- COTAÇÃO GERAL -->
-                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
-                    <span class="font-bold text-xs text-slate-700 block">💱 Cotação Atual em Reais (R$)</span>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div class="flex items-center gap-1.5 bg-white p-2 border border-slate-200 rounded-xl shadow-sm">
-                            <span class="font-bold text-xs text-amber-800">1€=R$</span>
-                            <input type="text" id="input-cotacao-eur" class="w-full font-black text-xs outline-none text-slate-900" placeholder="6.20">
-                            <button onclick="salvarCotacao('EUR', this.previousElementSibling.value)" class="bg-emerald-600 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]">OK</button>
-                        </div>
-                        <div class="flex items-center gap-1.5 bg-white p-2 border border-slate-200 rounded-xl shadow-sm">
-                            <span class="font-bold text-xs text-blue-800">1CHF=R$</span>
-                            <input type="text" id="input-cotacao-chf" class="w-full font-black text-xs outline-none text-slate-900" placeholder="6.50">
-                            <button onclick="salvarCotacao('CHF', this.previousElementSibling.value)" class="bg-emerald-600 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]">OK</button>
-                        </div>
+        <!-- VISÃO 2: CARRINHO -->
+        <div id="view-cart" class="view-section">
+            <div class="cart-layout">
+                <div class="card-box">
+                    <h3>Itens Selecionados no Pedido</h3>
+                    <div id="cartItemsList">
+                        <p style="color: #64748b; text-align: center; padding: 30px;">O seu carrinho está vazio.</p>
                     </div>
                 </div>
-
-                <!-- SUB-MENU DE ORÇAMENTO -->
-                <div class="flex gap-1.5 bg-slate-100 p-1.5 rounded-2xl text-xs font-bold border border-slate-200 shadow-inner overflow-x-auto no-scrollbar">
-                    <button onclick="mudarOrcamentoSubTab('eur')" id="subtab-eur" class="flex-1 py-2.5 px-3 rounded-xl bg-amber-600 text-white shadow-sm transition text-center font-bold shrink-0">💶 Euros (€)</button>
-                    <button onclick="mudarOrcamentoSubTab('chf')" id="subtab-chf" class="flex-1 py-2.5 px-3 rounded-xl bg-white text-slate-700 border border-slate-200 shadow-sm transition text-center font-bold hover:bg-slate-50 shrink-0">🇨🇭 Francos (CHF)</button>
-                    <button onclick="mudarOrcamentoSubTab('conversor')" id="subtab-conversor" class="flex-1 py-2.5 px-3 rounded-xl bg-white text-slate-700 border border-slate-200 shadow-sm transition text-center font-bold hover:bg-slate-50 shrink-0">🧮 Conversor</button>
+                <div class="card-box">
+                    <h3>Identificação do Colaborador</h3>
+                    <div class="form-field">
+                        <label>Nome Completo:</label>
+                        <input type="text" id="userName" placeholder="Insira seu nome">
+                    </div>
+                    <div class="form-field">
+                        <label>Matrícula:</label>
+                        <input type="text" id="userMatricula" placeholder="Insira sua matrícula">
+                    </div>
+                    <div class="form-field">
+                        <label>Data Prevista de Retirada:</label>
+                        <input type="date" id="userRetirada">
+                    </div>
+                    <button class="btn btn-accent" style="width: 100%; padding: 12px; margin-top: 10px; font-size: 14px;" onclick="enviarPedido()">Confirmar e Enviar Pedido</button>
                 </div>
-
-                <!-- CONTEÚDO DAS SUB-ABAS DE ORÇAMENTO -->
-                <div id="orcamento-conteudo" class="space-y-3 pt-1"></div>
             </div>
         </div>
 
-        <!-- TAB 5: COMPRAS (LISTA ÚNICA DIRETA COM CARINHAS E RISCADO) -->
-        <div id="tab-compras" class="space-y-3 hidden">
-            <div class="bg-white p-3.5 sm:p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4 text-xs" id="compras-conteudo-main">
-                <div class="flex justify-between items-center border-b pb-3 flex-wrap gap-2">
-                    <div>
-                        <h2 class="text-xs font-extrabold uppercase text-slate-800 tracking-wider">🛍️ Lista de Compras</h2>
-                        <p class="text-[11px] text-slate-500 font-semibold">Adicione os seus itens de compras para adultos e crianças</p>
-                    </div>
-                    <div class="flex gap-1.5">
-                        <button onclick="adicionarItemCompraDireto()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">➕ Adicionar Item</button>
-                        <button onclick="imprimirSeccaoCustom('Lista de Compras', document.getElementById('tab-compras').innerHTML)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">🖨️ PDF</button>
-                    </div>
+        <!-- VISÃO 3: PAINEL ADMINISTRADOR -->
+        <div id="view-admin" class="view-section">
+            <div class="card-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin:0; border:none;">Gestão de Pedidos Recebidos</h3>
+                    <button class="btn" onclick="switchView('catalog')" style="background: var(--secondary);">⬅️ Voltar ao Catálogo</button>
                 </div>
-
-                <!-- RESUMO GERAL DAS COMPRAS NO TOPO -->
-                <div id="compras-resumo-topo" class="grid grid-cols-2 gap-2"></div>
-
-                <!-- LISTA DIRETA DE ITENS DE COMPRAS -->
-                <div id="compras-lista-itens" class="space-y-2.5 pt-1"></div>
+                <div id="adminOrdersContainer">
+                    <p style="color: #64748b; text-align: center; padding: 30px;">Nenhum pedido registado.</p>
+                </div>
             </div>
         </div>
 
     </div>
 
-    <!-- MODAL DO LEITOR DE PDF -->
-    <div id="modal-leitor-pdf" class="fixed inset-0 z-[200] bg-slate-900/80 backdrop-blur-sm hidden flex flex-col p-3 sm:p-6">
-        <div class="bg-white rounded-3xl shadow-2xl flex-1 flex flex-col overflow-hidden border border-slate-300 max-w-4xl mx-auto w-full">
-            <div class="bg-slate-900 text-white px-4 py-3 flex justify-between items-center text-xs">
-                <span id="pdf-titulo-modal" class="font-bold truncate">📄 Leitor de PDF</span>
-                <div class="flex items-center gap-2">
-                    <a id="pdf-btn-download" href="#" download="documento.pdf" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs">📥 Baixar</a>
-                    <button onclick="fecharLeitorPdf()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs">✕ Fechar</button>
-                </div>
-            </div>
-            <div class="flex-1 bg-slate-100 p-2 flex items-center justify-center">
-                <iframe id="pdf-iframe-view" class="w-full h-full rounded-2xl border bg-white shadow-inner" src=""></iframe>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE EDITAR TAREFA -->
-    <div id="modal-tarefa" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white p-5 rounded-3xl shadow-2xl max-w-sm w-full space-y-3 text-xs border border-slate-300">
-            <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-xs text-slate-900">✏️ Editar Tarefa</h3>
-                <button onclick="fecharModalTarefa()" class="text-slate-400 font-bold text-sm">✕</button>
-            </div>
-            <input type="hidden" id="tarefa-edit-id">
-            <div>
-                <label class="block font-semibold text-slate-600 mb-1 text-xs">Descrição da Tarefa</label>
-                <textarea id="tarefa-edit-texto" rows="3" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl outline-none text-slate-800 font-bold text-xs" placeholder="Descreva a tarefa..."></textarea>
-            </div>
-            <div class="flex gap-2 pt-1">
-                <button onclick="salvarTarefaModal()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl font-bold text-xs">Guardar</button>
-                <button onclick="fecharModalTarefa()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- BARRA DE FERRAMENTAS FIXA -->
-    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-md text-white px-3 py-2.5 shadow-2xl border-t border-slate-800 text-xs flex items-center justify-around gap-1 overflow-x-auto no-scrollbar max-w-4xl mx-auto rounded-t-2xl">
-        <span class="bg-indigo-600 px-2 py-1 rounded font-mono font-bold text-[9px] shrink-0">v213.0</span>
-        <button onclick="abrirGeminiModal()" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-1 text-xs shadow-sm">
-            <span>✨</span> Gemini
-        </button>
-        <button onclick="ativarMicrofone()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-1 text-xs shadow-sm">
-            <span>🎤</span> Ditar
-        </button>
-        <button onclick="alternarTema()" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-xl font-bold transition border border-slate-700 shrink-0 flex items-center gap-1 text-xs">
-            <span>🌓</span> Tema
-        </button>
-        <button onclick="alterarSenhaPin()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-1 text-xs shadow-sm">
-            <span>🔑</span> Senha
-        </button>
-        <button onclick="exportarPdfPrint()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-1 text-xs shadow-sm">
-            <span>🖨️</span> PDF
-        </button>
-        <button onclick="instalarApp()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-1 text-xs shadow-sm">
-            <span>📱</span> App
-        </button>
-    </nav>
-
-    <!-- MODAL DA GEMINI IA -->
-    <div id="modal-gemini" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white p-4 rounded-3xl shadow-2xl max-w-sm w-full space-y-3 text-xs flex flex-col h-[400px] border border-slate-300">
-            <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-xs text-slate-900 flex items-center gap-1"><span>✨</span> Assistente Gemini IA</h3>
-                <button onclick="fecharGeminiModal()" class="text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
-            </div>
-            <div id="gemini-chat-log" class="flex-1 overflow-y-auto space-y-2 p-2.5 bg-slate-50 rounded-2xl border text-xs">
-                <div class="bg-indigo-50 text-indigo-900 p-2.5 rounded-xl font-medium">Olá, Mariana! Podes pedir-me para anotar algo escrevendo "anotar [texto]" ou consultar o saldo.</div>
-            </div>
-            <div class="flex gap-2 pt-1">
-                <input type="text" id="gemini-input" class="flex-1 p-2.5 bg-slate-100 border border-slate-300 rounded-xl outline-none text-slate-800 font-medium text-xs" placeholder="Ex: anotar comprar bilhete ou saldo..." onkeypress="if(event.key==='Enter')enviarMensagemGemini()">
-                <button onclick="enviarMensagemGemini()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs">Enviar</button>
-            </div>
-        </div>
-    </div>
+    <footer>
+        <p>&copy; 2026 VALE - Sistema Integrado de Uniformes Corporativos (v41)</p>
+    </footer>
 
     <script>
-        // CHAVE PERMANENTE FIXA: Os teus dados nunca mais se vão perder ao atualizar as versões!
-        const CHAVE_APP = "mariana_viagem_europa_dados_fixos_definitiva";
-        let destinoFiltro = 'todos';
-        let tarefaFiltro = 'todas';
-        let utilidadeFiltro = 'todos';
-        let orcamentoSubTab = 'eur'; 
-        let campoFocoAtual = null;
-        let deferredPrompt = null;
-        let historicoAcoes = [];
-
-        let dadosApp = {
-            destinosCadastrados: ["Zurique", "Freiburg", "França", "Interlaken", "Disney"],
-            coresDestinos: {
-                "Zurique": "#3b82f6",
-                "Freiburg": "#f59e0b",
-                "França": "#ec4899",
-                "Interlaken": "#10b981",
-                "Disney": "#8b5cf6"
-            },
-            locaisCadastrados: [
-                "Zurich HB", "Zurich Bus Station (Sihlquai)", "ibis budget Zurich City West",
-                "Freiburg Hbf (Estação Central)", "Premier Inn Freiburg City Süd", "Europa-Park Rust",
-                "Disney Hotel Santa Fe", "Marne-la-Vallée Chessy (Disney)", "Val d'Europe (Outlet)",
-                "CAMPOSANILE PARIS 12 - Bercy Village", "Gare de Lyon (Paris)", "Interlaken Ost",
-                "Hotel Weisses Kreuz", "Grindelwald", "Jungfraujoch"
-            ],
-            diasConcluidos: {},
-            statusPersonalizados: { "Concluído": "#22c55e", "Aguardando": "#f59e0b" },
-            saldoEur: "",
-            saldoChf: "",
-            cotacaoEur: 6.20,
-            cotacaoChf: 6.50,
-            itinerario: [],
-            voos: [],
-            tarefas: [],
-            vouchers: [],
-            orcamento: [],
-            checklist: [],
-            contatos: [],
-            outros: [],
-            chat: [],
-            compras: []
-        };
-
-        document.addEventListener('focusin', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
-                campoFocoAtual = e.target;
-            }
-        });
-
-        function registarEstadoAnterior() {
-            historicoAcoes.push(JSON.stringify(dadosApp));
-            if(historicoAcoes.length > 10) historicoAcoes.shift();
-        }
-
-        function desfazerUltimaAcao() {
-            if(historicoAcoes.length > 0) {
-                let estadoAnterior = historicoAcoes.pop();
-                dadosApp = JSON.parse(estadoAnterior);
-                salvarStorage();
-                atualizarTudo();
-                alert("↩️ Ação desfeita com sucesso!");
-            } else {
-                alert("Nenhuma ação recente para desfazer.");
-            }
-        }
-
-        function calcularDias(inicio, fim) {
-            if(!inicio || !fim) return 1;
-            let d1 = new Date(inicio);
-            let d2 = new Date(fim);
-            let diffTime = Math.abs(d2 - d1);
-            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-            return diffDays > 0 ? diffDays : 1;
-        }
-
-        function limparNumero(val) {
-            if (val === undefined || val === null || val === "") return 0;
-            if (typeof val === 'number') return isNaN(val) ? 0 : val;
-            let str = String(val).trim();
-            if (str.includes('.') && str.includes(',')) {
-                str = str.replace(/\./g, '').replace(',', '.');
-            } else if (str.includes(',')) {
-                str = str.replace(',', '.');
-            }
-            let num = parseFloat(str);
-            return isNaN(num) ? 0 : num;
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            let salvo = localStorage.getItem(CHAVE_APP);
-            if (!salvo) {
-                for (let k of [
-                    "mariana_viagem_europa_dados_fixos",
-                    "mariana_viagem_europa_dados_fixos_v197",
-                    "mariana_viagem_europa_dados_fixos_v198",
-                    "mariana_viagem_europa_dados_fixos_v199",
-                    "mariana_viagem_europa_dados_fixos_v200",
-                    "mariana_viagem_europa_dados_fixos_v201",
-                    "mariana_viagem_europa_dados_fixos_v202",
-                    "mariana_viagem_europa_dados_fixos_v203",
-                    "mariana_viagem_europa_dados_fixos_v204",
-                    "mariana_viagem_europa_dados_fixos_v207",
-                    "mariana_viagem_europa_dados_fixos_v209"
-                ]) {
-                    let oldVal = localStorage.getItem(k);
-                    if (oldVal) {
-                        salvo = oldVal;
-                        localStorage.setItem(CHAVE_APP, salvo);
-                        break;
+        const defaultCatalog_v41 = [
+            {
+                category: "Administrativa",
+                gender: "Masculino",
+                items: [
+                    { 
+                        id: 1, 
+                        nome: 'Camisa Administrativa Masculina Manga Longa', 
+                        ref: '16724398', 
+                        cor: 'Verde Vale',
+                        foto: '',
+                        tamanhos: [
+                            { cod: '16724398', tamanho: '01' },
+                            { cod: '16725077', tamanho: '02' },
+                            { cod: '16724307', tamanho: '03' }
+                        ]
+                    },
+                    { 
+                        id: 2, 
+                        nome: 'Camisa Administrativa Masculina Manga Curta', 
+                        ref: '16724400', 
+                        cor: 'Verde Vale',
+                        foto: '',
+                        tamanhos: [
+                            { cod: '16724400', tamanho: '01' },
+                            { cod: '16724412', tamanho: '02' }
+                        ]
                     }
-                }
+                ]
             }
+        ];
 
-            const manifestObj = {
-                "name": "Roteiro Europa - Mariana",
-                "short_name": "Viagem Europa",
-                "start_url": ".",
-                "display": "standalone",
-                "background_color": "#f8fafc",
-                "theme_color": "#4f46e5",
-                "icons": [{
-                    "src": "https://cdn-icons-png.flaticon.com/512/2950/2950664.png",
-                    "sizes": "512x512",
-                    "type": "image/png"
-                }]
-            };
-            const manifestBlob = new Blob([JSON.stringify(manifestObj)], {type: 'application/manifest+json'});
-            document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
+        let storedCatalog = JSON.parse(localStorage.getItem('vale_catalog_v41'));
+        let catalogSections = (storedCatalog && storedCatalog.length > 0) ? storedCatalog : defaultCatalog_v41;
+        
+        let isEditUnlocked = false;
+        let selectedCategoryFilter = "";
+        let cart = [];
 
-            if ('serviceWorker' in navigator) {
-                const swCode = `
-                    self.addEventListener('install', (e) => self.skipWaiting());
-                    self.addEventListener('activate', (e) => clients.claim());
-                    self.addEventListener('fetch', (e) => {});
-                `;
-                const swBlob = new Blob([swCode], { type: 'application/javascript' });
-                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => {});
-            }
-
-            if (!sessionStorage.getItem('sessao_ativa_v213')) {
-                document.getElementById('tela-bloqueio').classList.add('hidden');
-            }
-
-            const temaSalvo = localStorage.getItem('tema_v213');
-            if (temaSalvo === 'dark') {
-                document.body.classList.add('dark', 'bg-slate-900', 'text-slate-100');
-                document.body.classList.remove('bg-slate-100', 'text-slate-800');
-            }
-
-            try {
-                if (salvo) {
-                    let parsed = JSON.parse(salvo);
-                    if (parsed && parsed.itinerario) {
-                        dadosApp = parsed;
-                        if(!dadosApp.diasConcluidos) dadosApp.diasConcluidos = {};
-                        if(!dadosApp.coresDestinos) dadosApp.coresDestinos = { "Zurique": "#3b82f6", "Freiburg": "#f59e0b", "França": "#ec4899", "Interlaken": "#10b981", "Disney": "#8b5cf6" };
-                        if(!dadosApp.statusPersonalizados) dadosApp.statusPersonalizados = { "Concluído": "#22c55e", "Aguardando": "#f59e0b" };
-                        if(!dadosApp.cotacaoEur) dadosApp.cotacaoEur = 6.20;
-                        if(!dadosApp.cotacaoChf) dadosApp.cotacaoChf = 6.50;
-                        if(dadosApp.saldoEur === undefined) dadosApp.saldoEur = "";
-                        if(dadosApp.saldoChf === undefined) dadosApp.saldoChf = "";
-                        if(!dadosApp.voos) dadosApp.voos = [];
-                        if(!dadosApp.tarefas) dadosApp.tarefas = [];
-                        if(!dadosApp.vouchers) dadosApp.vouchers = [];
-                        if(!dadosApp.orcamento) dadosApp.orcamento = [];
-                        if(!dadosApp.checklist) dadosApp.checklist = [];
-                        if(!dadosApp.contatos) dadosApp.contatos = [];
-                        if(!dadosApp.outros) dadosApp.outros = [];
-                        if(!dadosApp.chat) dadosApp.chat = [];
-                        if(!dadosApp.compras) dadosApp.compras = [];
-                    }
-                }
-            } catch(e) {}
-
-            // Migrar formato antigo de blocos/compras para lista unificada de itens direta, se necessário
-            if(dadosApp.compras && dadosApp.compras.length > 0 && dadosApp.compras[0].local !== undefined && dadosApp.compras[0].itens) {
-                let listaUnificada = [];
-                dadosApp.compras.forEach(bloco => {
-                    if(bloco.itens) {
-                        bloco.itens.forEach(it => {
-                            listaUnificada.push({
-                                id: it.id || Date.now() + Math.random(),
-                                descricao: it.descricao || bloco.local || "Item",
-                                publico: it.publico || "Adulto",
-                                valor: it.valor || 0,
-                                moeda: it.moeda || "EUR",
-                                concluido: it.concluido || false,
-                                editando: false
-                            });
-                        });
-                    }
-                });
-                dadosApp.compras = listaUnificada;
-                salvarStorage();
-            } else if(!Array.isArray(dadosApp.compras)) {
-                dadosApp.compras = [];
-            }
-
-            try {
-                let inputEur = document.getElementById('input-cotacao-eur');
-                let inputChf = document.getElementById('input-cotacao-chf');
-                if(inputEur) inputEur.value = dadosApp.cotacaoEur;
-                if(inputChf) inputChf.value = dadosApp.cotacaoChf;
-
-                atualizarTudo();
-                let tabSalva = localStorage.getItem('tab_ativa_v213') || 'leitura';
-                mudarTab(tabSalva);
-            } catch(e) {
-                console.error("Erro ao iniciar:", e);
-            }
-        });
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
-
-        function instalarApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    deferredPrompt = null;
-                });
-            } else {
-                alert("📱 Para instalar no celular:\n\n• No Android (Chrome): Toque nos 3 pontinhos e selecione 'Adicionar à tela inicial'.\n• No iPhone (Safari): Toque em Compartilhar e escolha 'Adicionar à Tela de Início'.");
-            }
-        }
-
-        function desbloquearComPin() {
-            let pinSalvo = localStorage.getItem('app_pin_v213') || '1510';
-            let digitado = document.getElementById('input-pin').value;
-            if(digitado === pinSalvo) {
-                sessionStorage.setItem('sessao_ativa_v213', 'true');
-                document.getElementById('tela-bloqueio').classList.add('hidden');
-                document.getElementById('erro-pin').classList.add('hidden');
-            } else {
-                document.getElementById('erro-pin').classList.remove('hidden');
-            }
-        }
-
-        async function desbloquearComBiometria() {
-            sessionStorage.setItem('sessao_ativa_v213', 'true');
-            document.getElementById('tela-bloqueio').classList.add('hidden');
-        }
-
-        function alterarSenhaPin() {
-            let atual = prompt("Digite a senha atual (Padrão: 1510):");
-            let pinSalvo = localStorage.getItem('app_pin_v213') || '1510';
-            if(atual === pinSalvo) {
-                let nova = prompt("Digite a nova senha PIN:");
-                if(nova && nova.trim() !== '') {
-                    localStorage.setItem('app_pin_v213', nova.trim());
-                    alert("🔑 Senha alterada com sucesso!");
-                }
-            } else {
-                alert("Senha atual incorreta.");
-            }
-        }
-
-        function alternarTema() {
-            const body = document.body;
-            if(body.classList.contains('dark')) {
-                body.classList.remove('dark', 'bg-slate-900', 'text-slate-100');
-                body.classList.add('bg-slate-100', 'text-slate-800');
-                localStorage.setItem('tema_v213', 'light');
-            } else {
-                body.classList.add('dark', 'bg-slate-900', 'text-slate-100');
-                body.classList.remove('bg-slate-100', 'text-slate-800');
-                localStorage.setItem('tema_v213', 'dark');
-            }
-        }
-
-        function abrirGeminiModal() { document.getElementById('modal-gemini').classList.remove('hidden'); }
-        function fecharGeminiModal() { document.getElementById('modal-gemini').classList.add('hidden'); }
-
-        function enviarMensagemGemini() {
-            let input = document.getElementById('gemini-input');
-            let log = document.getElementById('gemini-chat-log');
-            let textoOriginal = input.value.trim();
-            let texto = textoOriginal.toLowerCase();
-            if(!textoOriginal) return;
-
-            log.innerHTML += '<div class="bg-slate-200 text-slate-800 p-2.5 rounded-xl text-right ml-6 font-medium"><b>Tu:</b> ' + textoOriginal + '</div>';
-            input.value = '';
-            log.scrollTop = log.scrollHeight;
-
-            setTimeout(() => {
-                let resposta = "";
-                if(texto.startsWith('anotar ') || texto.startsWith('nota: ') || texto.startsWith('adicionar nota ')) {
-                    let conteudo = textoOriginal.replace(/^(anotar|nota:|adicionar nota)\s*/i, '');
-                    if(!dadosApp.chat) dadosApp.chat = [];
-                    dadosApp.chat.unshift({ id: Date.now(), texto: conteudo });
-                    salvarStorage();
-                    renderizarHubUtilidades();
-                    resposta = "✅ Anotação adicionada com sucesso ao teu Hub de Notas/Chat no aplicativo!";
-                } else if(texto.includes('gasto') || texto.includes('saldo') || texto.includes('orcamento') || texto.includes('quanto tenho')) {
-                    let cotEur = parseFloat(dadosApp.cotacaoEur) || 6.20;
-                    let cotChf = parseFloat(dadosApp.cotacaoChf) || 6.50;
-                    let saldoE = parseFloat(dadosApp.saldoEur) || 0;
-                    let saldoC = parseFloat(dadosApp.saldoChf) || 0;
-                    resposta = `💰 Estado atual do orçamento:\n• Disponível: ${saldoE} € | ${saldoC} CHF\n• Cotações: 1€ = R$ ${cotEur} | 1CHF = R$ ${cotChf}`;
-                } else {
-                    resposta = `Compreendi, Mariana! Podes pedir-me para anotar algo escrevendo "anotar [o teu texto]" ou consultar o saldo.`;
-                }
-
-                log.innerHTML += '<div class="bg-indigo-50 text-indigo-900 p-2.5 rounded-xl mr-6 font-medium whitespace-pre-line"><b>Gemini IA:</b> ' + resposta + '</div>';
-                log.scrollTop = log.scrollHeight;
-            }, 500);
-        }
-
-        function salvarStorage() {
-            localStorage.setItem(CHAVE_APP, JSON.stringify(dadosApp));
-        }
-
-        function exportarPdfPrint() {
-            window.print();
-        }
-
-        function imprimirSeccaoCustom(titulo, htmlConteudo) {
-            let win = window.open('', '_blank');
-            win.document.write('<html><head><meta charset="utf-8"><title>' + titulo + '</title><script src="https://cdn.tailwindcss.com"><\/script></head><body class="p-6 bg-white text-slate-900">');
-            win.document.write('<h1 class="text-xl font-black mb-4">' + titulo + ' - Roteiro Europa Mariana</h1>');
-            win.document.write(htmlConteudo);
-            win.document.write('<script>setTimeout(() => { window.print(); window.close(); }, 500);<\/script></body></html>');
-            win.document.close();
-        }
-
-        function imprimirBlocoUnico(id) {
-            let item = dadosApp.itinerario.find(i => String(i.id) === String(id));
-            if(!item) return;
-            let win = window.open('', '_blank');
-            let dIni = item.dataInicio ? item.dataInicio.split('-').reverse().join('/') : '?';
-            let dFim = item.dataFim ? item.dataFim.split('-').reverse().join('/') : '?';
-            let corCard = item.cor || obterCorPorCategoria(item.categoria);
+        function switchView(viewName) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             
-            let trechosStr = '';
-            if(item.trechos && item.trechos.length > 0) {
-                item.trechos.forEach(tr => {
-                    trechosStr += '<li class="mb-2"><b>' + (tr.origem || '?') + ' ➔ ' + (tr.destino || '?') + '</b> (' + (tr.transporte || 'Trem') + ')' + (tr.valor ? ' • <b>' + tr.valor + ' ' + (tr.moeda || 'EUR') + '</b>' : '') + (tr.notas ? '<br><i>Notas: ' + tr.notas + '</i>' : '') + '</li>';
-                });
+            if(viewName === 'catalog') {
+                document.getElementById('view-catalog').classList.add('active');
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            } else if(viewName === 'cart') {
+                document.getElementById('view-cart').classList.add('active');
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                renderCartUI();
+            } else if(viewName === 'admin') {
+                document.getElementById('view-admin').classList.add('active');
+                renderAdminOrders();
+            }
+        }
+
+        function openAdminPortal() {
+            if (!isEditUnlocked) {
+                let pass = prompt("Digite a senha de Administrador (admin123):");
+                if (pass === "admin123") {
+                    isEditUnlocked = true;
+                    document.getElementById('lockBtn').innerHTML = "🔓 Modo ADM Ativo";
+                    document.getElementById('lockBtn').style.background = "#d4edda";
+                    document.getElementById('lockBtn').style.color = "#155724";
+                    document.getElementById('lockBtn').style.borderColor = "#c3e6cb";
+                    document.getElementById('adminToggleContainer').style.display = "block";
+                    switchView('admin');
+                    renderCatalog();
+                    alert("Acesso concedido! Modo de edição total ativado.");
+                } else if (pass !== null) {
+                    alert("Senha incorreta!");
+                }
             } else {
-                trechosStr = '<li>Nenhum trecho registado.</li>';
-            }
-
-            let itensStr = '';
-            if(item.itens && item.itens.length > 0) {
-                item.itens.forEach(it => {
-                    if(it.texto && it.texto.trim() !== '') {
-                        itensStr += '<li class="mb-1">• ' + it.texto + '</li>';
-                    }
-                });
-            }
-
-            win.document.write('<html><head><meta charset="utf-8"><title>Roteiro - ' + (item.categoria || '') + '</title><script src="https://cdn.tailwindcss.com"><\/script></head><body class="p-8 bg-white text-slate-900 font-sans">');
-            win.document.write('<div class="p-6 rounded-3xl border-2 shadow-sm space-y-4" style="border-color: ' + corCard + ';">');
-            win.document.write('<div class="flex justify-between items-center border-b pb-3"><h2 class="text-xl font-black uppercase text-indigo-950">' + (item.categoria || 'Destino') + '</h2><span class="font-bold text-sm text-slate-600">📅 ' + dIni + ' ➔ ' + dFim + '</span></div>');
-            win.document.write('<div><h3 class="font-bold text-xs uppercase text-slate-700 mb-1">🚄 Trechos / Rotas:</h3><ul class="list-disc pl-5 text-xs text-slate-800">' + trechosStr + '</ul></div>');
-            if(itensStr) {
-                win.document.write('<div><h3 class="font-bold text-xs uppercase text-slate-700 mb-1">📌 Notas / Textos:</h3><ul class="text-xs text-slate-800">' + itensStr + '</ul></div>');
-            }
-            win.document.write('</div>');
-            win.document.write('<script>setTimeout(() => { window.print(); window.close(); }, 500);<\/script></body></html>');
-            win.document.close();
-        }
-
-        function removerDoRoteiro(id) {
-            registarEstadoAnterior();
-            const item = dadosApp.itinerario.find(i => String(i.id) === String(id));
-            if(item) { 
-                item.bloqueado = false; 
-                salvarStorage(); 
-                atualizarTudo(); 
+                switchView('admin');
             }
         }
 
-        function alternarBloqueio(id) {
-            registarEstadoAnterior();
-            const item = dadosApp.itinerario.find(i => String(i.id) === String(id));
-            if(item) { 
-                item.bloqueado = !item.bloqueado; 
-                salvarStorage(); 
-                atualizarTudo(); 
-            }
-        }
-
-        function alternarConcluidoTrecho(itemId, trechoId) {
-            registarEstadoAnterior();
-            let item = dadosApp.itinerario.find(i => String(i.id) === String(itemId));
-            if(item && item.trechos) {
-                let tr = item.trechos.find(t => String(t.id) === String(trechoId));
-                if(tr) {
-                    tr.concluido = !tr.concluido;
-                    salvarStorage();
-                    renderizarModoLeitura();
-                }
-            }
-        }
-
-        function atualizarCorBlocoLocal(id, corHex) {
-            registarEstadoAnterior();
-            let item = dadosApp.itinerario.find(i => String(i.id) === String(id));
-            if(item) {
-                item.cor = corHex;
-                if(item.categoria) {
-                    if(!dadosApp.coresDestinos) dadosApp.coresDestinos = {};
-                    dadosApp.coresDestinos[item.categoria] = corHex;
-                }
-                salvarStorage();
-                atualizarTudo();
-            }
-        }
-
-        function atualizarCampo(id, campo, val) {
-            registarEstadoAnterior();
-            let item = dadosApp.itinerario.find(i => String(i.id) === String(id));
-            if(item) {
-                item[campo] = val;
-                salvarStorage();
-                atualizarTudo();
-            }
-        }
-
-        function apagarBloco(id) {
-            if(confirm("Deseja realmente excluir este bloco?")) {
-                registarEstadoAnterior();
-                dadosApp.itinerario = dadosApp.itinerario.filter(i => String(i.id) !== String(id));
-                salvarStorage();
-                atualizarTudo();
-            }
-        }
-
-        function moverBloco(id, direcao) {
-            registarEstadoAnterior();
-            let idx = dadosApp.itinerario.findIndex(i => String(i.id) === String(id));
-            if(idx < 0) return;
-            let targetIdx = idx + direcao;
-            if(targetIdx < 0 || targetIdx >= dadosApp.itinerario.length) return;
-            let temp = dadosApp.itinerario[idx];
-            dadosApp.itinerario[idx] = dadosApp.itinerario[targetIdx];
-            dadosApp.itinerario[targetIdx] = temp;
-            salvarStorage();
-            atualizarTudo();
-        }
-
-        function moverItemArray(arrayName, id, direcao) {
-            registarEstadoAnterior();
-            let arr = dadosApp[arrayName];
-            if(!arr) return;
-            let idx = arr.findIndex(item => String(item.id) === String(id));
-            if(idx < 0) return;
-            let targetIdx = idx + direcao;
-            if(targetIdx < 0 || targetIdx >= arr.length) return;
-            let temp = arr[idx];
-            arr[idx] = arr[targetIdx];
-            arr[targetIdx] = temp;
-            salvarStorage();
-            renderizarHubUtilidades();
-        }
-
-        function atualizarTudo() {
-            try {
-                renderizarFiltros();
-                renderizarFiltrosTarefas();
-                renderizarBlocos();
-                renderizarHubUtilidades();
-                renderizarOrcamentoTab();
-                renderizarComprasTab();
-                renderizarModoLeitura();
-            } catch(e) {
-                console.error("Erro no render:", e);
-            }
-        }
-
-        function mudarTab(tab) {
-            localStorage.setItem('tab_ativa_v213', tab);
-            if(tab === 'itinerario' || tab === 'leitura') {
-                destinoFiltro = 'todos';
-            }
-            ['leitura', 'itinerario', 'utilidades', 'orcamento', 'compras'].forEach(t => {
-                let el = document.getElementById('tab-' + t);
-                if(el) el.classList.add('hidden');
-            });
-            let target = document.getElementById('tab-' + tab);
-            if(target) target.classList.remove('hidden');
+        function renderCategoriesBar() {
+            const bar = document.getElementById('categoriesBar');
+            if(!bar) return;
+            let cats = [...new Set(catalogSections.map(s => s.category))];
             
-            ['leitura', 'itinerario', 'utilidades', 'orcamento', 'compras'].forEach(t => {
-                let btn = document.getElementById('tab-btn-' + t);
-                if(btn) {
-                    if(t === tab) {
-                        btn.className = "py-2.5 px-1 rounded-xl bg-indigo-600 text-white font-extrabold shadow-sm transition text-[11px] flex flex-col items-center gap-0.5 flex-1";
-                    } else {
-                        btn.className = "py-2.5 px-1 rounded-xl bg-white text-slate-700 font-extrabold shadow-sm transition text-[11px] flex flex-col items-center gap-0.5 flex-1 hover:bg-slate-50";
-                    }
-                }
+            let html = `<div class="cat-pill ${selectedCategoryFilter === '' ? 'active' : ''}" onclick="selectCat('')">📂 Todas as Categorias</div>`;
+            cats.forEach(c => {
+                html += `<div class="cat-pill ${selectedCategoryFilter === c ? 'active' : ''}" onclick="selectCat('${c}')">📁 ${c}</div>`;
             });
-
-            if(tab === 'leitura') { renderizarModoLeitura(); }
-            if(tab === 'utilidades') { renderizarHubUtilidades(); }
-            if(tab === 'orcamento') { renderizarOrcamentoTab(); }
-            if(tab === 'compras') { renderizarComprasTab(); }
-            if(tab === 'itinerario') { renderizarBlocos(); }
+            bar.innerHTML = html;
         }
 
-        function mudarOrcamentoSubTab(sub) {
-            orcamentoSubTab = sub;
-            ['eur', 'chf', 'conversor'].forEach(s => {
-                let btn = document.getElementById('subtab-' + s);
-                if(btn) {
-                    if(s === sub) {
-                        if(s === 'eur') btn.className = "flex-1 py-2.5 px-3 rounded-xl bg-amber-600 text-white shadow-sm transition text-center font-bold shrink-0";
-                        else if(s === 'chf') btn.className = "flex-1 py-2.5 px-3 rounded-xl bg-blue-600 text-white shadow-sm transition text-center font-bold shrink-0";
-                        else btn.className = "flex-1 py-2.5 px-3 rounded-xl bg-indigo-600 text-white shadow-sm transition text-center font-bold shrink-0";
-                    } else {
-                        btn.className = "flex-1 py-2.5 px-3 rounded-xl bg-white text-slate-700 border border-slate-200 shadow-sm transition text-center font-bold hover:bg-slate-50 shrink-0";
-                    }
-                }
-            });
-            renderizarOrcamentoTab();
+        function selectCat(cat) {
+            selectedCategoryFilter = cat;
+            renderCatalog();
         }
 
-        function obterCorPorCategoria(cat) {
-            if(!cat) return '#3b82f6';
-            if(dadosApp.coresDestinos && dadosApp.coresDestinos[cat]) {
-                return dadosApp.coresDestinos[cat];
-            }
-            let c = (cat || "").toLowerCase();
-            if(c.includes('zurique') || c.includes('zurich')) return '#3b82f6';
-            if(c.includes('freiburg')) return '#f59e0b';
-            if(c.includes('frança') || c.includes('france') || c.includes('paris')) return '#ec4899';
-            if(c.includes('interlaken')) return '#10b981';
-            if(c.includes('disney')) return '#8b5cf6';
-            
-            return '#3b82f6';
-        }
-
-        function obterInfoClima(cat) {
-            let c = (cat || "").toLowerCase();
-            if(c.includes('zurique') || c.includes('zurich') || c.includes('interlaken')) {
-                return "❄️ Frio (-2°C a 5°C) • Casaco impermeável e térmicas";
-            }
-            if(c.includes('freiburg')) {
-                return "🍂 Frio moderado (0°C a 7°C) • Cachecol e térmicas leves";
-            }
-            if(c.includes('frança') || c.includes('france') || c.includes('paris') || c.includes('disney')) {
-                return "🌧️ Frio urbano (3°C a 9°C) • Guarda-chuva e casaco";
-            }
-            return "🌤️ Frio europeu • Agasalhos recomendados";
-        }
-
-        function mostrarClimaModal(cat) {
-            let info = obterInfoClima(cat);
-            alert("🌤️ Clima e Vestuário para [" + (cat || 'Destino') + "]:\n\n" + info);
-        }
-
-        function abrirWebcam(cat) {
-            let query = encodeURIComponent((cat || 'Zurique') + ' live webcam europe');
-            window.open('https://www.youtube.com/results?search_query=' + query, '_blank');
-        }
-
-        function renderizarFiltros() {
-            const container = document.getElementById('filtros-container');
-            const containerLeitura = document.getElementById('filtros-leitura-container');
-            if(!container && !containerLeitura) return;
-
-            let html = '<button onclick="filtrarDestino(\'todos\')" class="px-3 py-1.5 ' + (destinoFiltro === 'todos' ? 'bg-indigo-600 text-white shadow-sm font-bold' : 'bg-white border border-slate-200 text-slate-700') + ' rounded-xl text-xs shrink-0 transition">Todos</button>';
-            if(!dadosApp.destinosCadastrados) dadosApp.destinosCadastrados = ["Zurique", "Freiburg", "França", "Interlaken", "Disney"];
-            
-            dadosApp.destinosCadastrados.forEach(dest => {
-                let ativo = destinoFiltro === dest;
-                let corDest = obterCorPorCategoria(dest);
-                let classeBtn = ativo ? 'bg-indigo-600 text-white font-bold shadow-sm ring-2 ring-white' : 'text-white font-semibold border border-black/20 shadow-sm';
-                let estiloBtn = 'background-color: ' + corDest + ';';
-                html += '<button onclick="filtrarDestino(\'' + dest + '\')" style="' + estiloBtn + '" class="px-3 py-1.5 rounded-xl text-xs shrink-0 transition ' + classeBtn + '">' + dest + '</button>';
-            });
-            html += '<button onclick="adicionarNovoDestinoFiltro()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shrink-0 transition shadow-sm">➕ Destino</button>';
-
-            if(container) container.innerHTML = html;
-            if(containerLeitura) containerLeitura.innerHTML = html;
-        }
-
-        function renderizarFiltrosTarefas() {
-            const container = document.getElementById('filtros-tarefas-container');
+        function renderCatalog() {
+            renderCategoriesBar();
+            const container = document.getElementById('catalogContent');
             if(!container) return;
-            let html = '<button onclick="filtrarTarefas(\'todas\')" class="px-3 py-1.5 rounded-xl text-xs font-bold ' + (tarefaFiltro === 'todas' ? 'bg-white text-indigo-950 shadow-sm' : 'bg-indigo-800 text-white') + ' transition">Todas</button>';
-            if(!dadosApp.statusPersonalizados) dadosApp.statusPersonalizados = { "Concluído": "#22c55e", "Aguardando": "#f59e0b" };
-            Object.keys(dadosApp.statusPersonalizados).forEach(st => {
-                let ativo = tarefaFiltro === st;
-                let corSt = dadosApp.statusPersonalizados[st];
-                let btnStyle = ativo ? 'background-color: #fff; color: #0f172a; border: 2px solid ' + corSt + '; shadow-sm' : 'background-color: ' + corSt + '; color: #fff;';
-                html += '<button onclick="filtrarTarefas(\'' + st + '\')" style="' + btnStyle + '" class="px-3 py-1.5 rounded-xl text-xs font-bold transition">' + st + '</button>';
+            container.innerHTML = '';
+
+            const query = document.getElementById('searchFilter').value.toLowerCase();
+            const genderFilter = document.getElementById('genderFilter').value;
+
+            catalogSections.forEach((section, sIdx) => {
+                if (selectedCategoryFilter !== "" && section.category !== selectedCategoryFilter) return;
+                if (genderFilter !== "" && section.gender !== genderFilter) return;
+
+                const filteredItems = section.items.filter(prod => {
+                    return prod.nome.toLowerCase().includes(query) || 
+                           prod.ref.toLowerCase().includes(query) ||
+                           prod.cor.toLowerCase().includes(query) ||
+                           prod.tamanhos.some(t => t.cod.includes(query) || t.tamanho.toLowerCase().includes(query));
+                });
+
+                if (filteredItems.length === 0 && !isEditUnlocked) return;
+
+                let rowsHtml = '';
+                section.items.forEach((prod, iIdx) => {
+                    let thumb = prod.foto || 'https://via.placeholder.com/45?text=Foto';
+                    let firstCod = prod.tamanhos[0] ? prod.tamanhos[0].cod : prod.ref;
+                    let options = prod.tamanhos.map(t => `<option value="${t.cod}">${t.tamanho} (Cód: ${t.cod})</option>`).join('');
+
+                    if (isEditUnlocked) {
+                        let sizesHtml = '';
+                        prod.tamanhos.forEach((t, tIdx) => {
+                            sizesHtml += `
+                                <div class="size-edit-row">
+                                    <input type="text" class="edit-input" value="${t.tamanho}" onchange="updateSize(${sIdx}, ${iIdx}, ${tIdx}, 'tamanho', this.value)" style="width:45px;" placeholder="Tam">
+                                    <input type="text" class="edit-input" value="${t.cod}" onchange="updateSize(${sIdx}, ${iIdx}, ${tIdx}, 'cod', this.value)" style="width:110px;" placeholder="Cód Vale (16...)">
+                                    <button class="btn btn-danger" onclick="removeSize(${sIdx}, ${iIdx}, ${tIdx})" style="padding:4px 8px;">×</button>
+                                </div>
+                            `;
+                        });
+                        sizesHtml += `<button class="btn" onclick="addSize(${sIdx}, ${iIdx})" style="padding:4px 10px; font-size:11px; margin-top:4px;">+ Adicionar Tamanho</button>`;
+
+                        rowsHtml += `
+                            <tr>
+                                <td>
+                                    <img src="${thumb}" class="item-img" style="margin-bottom:4px;"><br>
+                                    <input type="file" accept="image/*" onchange="updateItemPhoto(${sIdx}, ${iIdx}, event)" style="font-size:10px; width:90px;">
+                                </td>
+                                <td><input type="text" class="edit-input" value="${prod.ref}" onchange="updateItem(${sIdx}, ${iIdx}, 'ref', this.value)" style="width:110px;" placeholder="16..."></td>
+                                <td><input type="text" class="edit-input" value="${prod.nome}" onchange="updateItem(${sIdx}, ${iIdx}, 'nome', this.value)"></td>
+                                <td><input type="text" class="edit-input" value="${prod.cor}" onchange="updateItem(${sIdx}, ${iIdx}, 'cor', this.value)" style="width:90px;"></td>
+                                <td><input type="text" class="edit-input" value="${section.gender}" onchange="updateGender(${sIdx}, ${iIdx}, this.value)" style="width:90px;"></td>
+                                <td>${sizesHtml}</td>
+                                <td style="white-space: nowrap;">
+                                    <button class="btn-move" onclick="moveItem(${sIdx}, ${iIdx}, -1)">⬆️</button>
+                                    <button class="btn-move" onclick="moveItem(${sIdx}, ${iIdx}, 1)">⬇️</button>
+                                    <button class="btn btn-danger" onclick="deleteItem(${sIdx}, ${iIdx})" style="padding:7px 12px;">Excluir</button>
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        rowsHtml += `
+                            <tr>
+                                <td><img src="${thumb}" class="item-img" onerror="this.src='https://via.placeholder.com/45?text=Foto'"></td>
+                                <td><strong style="color: var(--primary);">${prod.ref || firstCod}</strong></td>
+                                <td>${prod.nome}</td>
+                                <td>${prod.cor}</td>
+                                <td><span class="badge">${section.gender}</span></td>
+                                <td><select class="select-size" id="sel-${prod.id}">${options}</select></td>
+                                <td><input type="number" class="input-qty" id="qty-${prod.id}" value="1" min="1" max="50"></td>
+                                <td><button class="btn" onclick="addToCart(${prod.id})">Adicionar</button></td>
+                            </tr>
+                        `;
+                    }
+                });
+
+                let headers = isEditUnlocked ? 
+                    `<tr><th>Foto</th><th>Cód. Vale (16...)</th><th>Nome do Item</th><th>Cor</th><th>Género</th><th>Tamanhos & Códigos (Separados)</th><th>Ações</th></tr>` :
+                    `<tr><th>Foto</th><th>Cód. Vale</th><th>Descrição do Item</th><th>Cor</th><th>Género</th><th>Tamanho</th><th>Qtd</th><th>Ação</th></tr>`;
+
+                let secHeader = isEditUnlocked ? `
+                    <div style="display:flex; gap:12px; align-items:center; width:100%; flex-wrap:wrap;">
+                        <input type="text" class="edit-input" value="${section.category}" onchange="updateSec(${sIdx}, 'category', this.value)" style="width:150px;" placeholder="Categoria">
+                        <input type="text" class="edit-input" value="${section.gender}" onchange="updateSec(${sIdx}, 'gender', this.value)" style="width:130px;" placeholder="Género">
+                        <button class="btn" onclick="addItem(${sIdx})" style="background:var(--accent);">+ Novo Item</button>
+                        <button class="btn btn-danger" onclick="deleteSec(${sIdx})">🗑️ Apagar Secção</button>
+                    </div>
+                ` : `<span>📂 Linha ${section.category} - ${section.gender}</span>`;
+
+                container.innerHTML += `
+                    <div class="table-card">
+                        <div class="table-title">${secHeader}</div>
+                        <table>
+                            <thead>${headers}</thead>
+                            <tbody>${rowsHtml}</tbody>
+                        </table>
+                    </div>
+                `;
             });
-            html += '<button onclick="adicionarNovoStatusTarefa()" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold transition shadow-sm">➕ Status</button>';
+        }
+
+        function updateItem(s, i, f, v) { catalogSections[s].items[i][f] = v.trim(); saveAndSync(); }
+        function updateSize(s, i, t, f, v) { catalogSections[s].items[i].tamanhos[t][f] = v.trim(); saveAndSync(); }
+        function addSize(s, i) { catalogSections[s].items[i].tamanhos.push({tamanho: 'Único', cod: '16700000'}); saveAndSync(); }
+        function removeSize(s, i, t) {
+            if(catalogSections[s].items[i].tamanhos.length <= 1) { alert('Mínimo 1 tamanho.'); return; }
+            catalogSections[s].items[i].tamanhos.splice(t, 1); saveAndSync();
+        }
+        function deleteItem(s, i) { if(confirm('Excluir item?')) { catalogSections[s].items.splice(i,1); saveAndSync(); } }
+        function updateItemPhoto(s, i, event) {
+            let file = event.target.files[0];
+            if(!file) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                catalogSections[s].items[i].foto = e.target.result;
+                saveAndSync();
+            };
+            reader.readAsDataURL(file);
+        }
+        function addItem(s) {
+            let nome = prompt('Nome do item:'); if(!nome) return;
+            let ref = prompt('Cód. Vale (começado por 16...):', '16724398');
+            catalogSections[s].items.push({ id: Date.now(), nome: nome, ref: ref || '16700000', cor: 'Verde Vale', foto: '', tamanhos: [{tamanho:'01', cod: ref || '16724398'}] });
+            saveAndSync();
+        }
+        function addNewSection() {
+            let cat = prompt('Nome da Categoria:'); if(!cat) return;
+            let gen = prompt('Género:', 'Unissex'); if(!gen) return;
+            catalogSections.push({ category: cat, gender: gen, items: [{ id: Date.now(), nome: 'Novo Uniforme', ref: '16700000', cor: 'Padrão', foto:'', tamanhos:[{tamanho:'Único', cod:'16700000'}] }] });
+            saveAndSync();
+        }
+        function deleteSec(s) { if(confirm('Apagar secção inteira?')) { catalogSections.splice(s, 1); saveAndSync(); } }
+        function updateSec(s, f, v) { catalogSections[s][f] = v.trim(); saveAndSync(); }
+        function moveItem(s, i, dir) {
+            let target = i + dir; if(target < 0 || target >= catalogSections[s].items.length) return;
+            let tmp = catalogSections[s].items[i]; catalogSections[s].items[i] = catalogSections[s].items[target]; catalogSections[s].items[target] = tmp;
+            saveAndSync();
+        }
+
+        function saveAndSync() {
+            localStorage.setItem('vale_catalog_v41', JSON.stringify(catalogSections));
+            renderCatalog();
+        }
+
+        function addToCart(id) {
+            let prod = null; catalogSections.forEach(s => { let m = s.items.find(x => x.id === id); if(m) prod = m; });
+            if(!prod) return;
+            let sel = document.getElementById(`sel-${id}`);
+            let qty = parseInt(document.getElementById(`qty-${id}`).value);
+            let cod = sel.value;
+            let tamObj = prod.tamanhos.find(t => t.cod === cod);
+
+            let key = `${id}-${cod}`;
+            let ex = cart.find(c => c.key === key);
+            if(ex) { ex.qty += qty; } else {
+                cart.push({ key: key, nome: prod.nome, cor: prod.cor, cod: cod, tamanho: tamObj.tamanho, qty: qty });
+            }
+            document.getElementById('cart-counter').innerText = cart.reduce((a,b)=>a+b.qty,0);
+            alert(`Adicionado ao carrinho: ${qty}x ${prod.nome}`);
+        }
+
+        function renderCartUI() {
+            let box = document.getElementById('cartItemsList');
+            if(cart.length === 0) { box.innerHTML = `<p style="color: #64748b; text-align: center; padding: 30px;">O seu carrinho está vazio.</p>`; return; }
+            let html = '';
+            cart.forEach((c, idx) => {
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px;">
+                        <div><strong>${c.nome}</strong><br><small style="color:#64748b;">Cód. Vale: ${c.cod} | Cor: ${c.cor} | Tam: ${c.tamanho} | Qtd: ${c.qty}</small></div>
+                        <button class="btn btn-danger" onclick="removeFromCart(${idx})" style="padding:5px 10px;">Remover</button>
+                    </div>
+                `;
+            });
+            box.innerHTML = html;
+        }
+
+        function removeFromCart(idx) { cart.splice(idx,1); renderCartUI(); document.getElementById('cart-counter').innerText = cart.reduce((a,b)=>a+b.qty,0); }
+
+        function enviarPedido() {
+            let nome = document.getElementById('userName').value.trim();
+            let mat = document.getElementById('userMatricula').value.trim();
+            let ret = document.getElementById('userRetirada').value;
+
+            if(!nome || !mat || !ret) { alert('Preencha todos os campos de identificação e data de retirada.'); return; }
+            if(cart.length === 0) { alert('Carrinho vazio!'); return; }
+
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v41') || '[]');
+            orders.push({ nome, matricula: mat, dataRetirada: ret, dataPedido: new Date().toLocaleString(), status: 'Pendente', itens: [...cart] });
+            localStorage.setItem('vale_orders_v41', JSON.stringify(orders));
+
+            alert('Pedido enviado com sucesso!');
+            cart = []; document.getElementById('userName').value=''; document.getElementById('userMatricula').value=''; document.getElementById('userRetirada').value='';
+            document.getElementById('cart-counter').innerText = '0';
+            switchView('catalog');
+        }
+
+        function renderAdminOrders() {
+            let container = document.getElementById('adminOrdersContainer');
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v41') || '[]');
+            if(orders.length === 0) { container.innerHTML = `<p style="color: #64748b; text-align: center; padding: 30px;">Nenhum pedido registado.</p>`; return; }
+
+            let html = '';
+            orders.forEach((o, idx) => {
+                let itensStr = o.itens.map(i => `<li>${i.qty}x ${i.nome} (Cód. Vale: ${i.cod}, Tam: ${i.tamanho})</li>`).join('');
+                let st = o.status === 'Aprovado' ? `<span style="color:#047857; font-weight:bold;">✅ Aprovado por ${o.aprovador}</span>` :
+                         o.status === 'Reprovado' ? `<span style="color:#dc2626; font-weight:bold;">❌ Reprovado por ${o.aprovador}</span>` :
+                         `<button class="btn" onclick="aprovar(${idx}, 'Aprovado')">Aprovar</button> <button class="btn btn-danger" onclick="aprovar(${idx}, 'Reprovado')">Reprovar</button>`;
+
+                html += `
+                    <div class="order-card">
+                        <strong>Pedido #${idx+1} - ${o.nome} (Mat: ${o.matricula})</strong><br>
+                        <small style="color:#64748b;">Retirada: ${o.dataRetirada} | Registado: ${o.dataPedido}</small>
+                        <ul style="margin: 8px 0 12px 15px; padding:0; color:#334155;">${itensStr}</ul>
+                        <div>Status: ${st}</div>
+                    </div>
+                `;
+            });
             container.innerHTML = html;
         }
 
-        function adicionarNovoDestinoFiltro() {
-            let novo = prompt("Nome do novo destino:");
-            if(novo && novo.trim() !== '') {
-                let limpo = novo.trim();
-                let corNova = prompt("Escolha a cor HEX para este destino (ex: #8b5cf6):", "#8b5cf6");
-                if(!dadosApp.destinosCadastrados.includes(limpo)) dadosApp.destinosCadastrados.push(limpo);
-                if(!dadosApp.coresDestinos) dadosApp.coresDestinos = {};
-                dadosApp.coresDestinos[limpo] = corNova || "#3b82f6";
-                
-                registarEstadoAnterior();
-                let novoBloco = {
-                    id: Date.now(),
-                    categoria: limpo,
-                    dataInicio: "",
-                    dataFim: "",
-                    cor: dadosApp.coresDestinos[limpo],
-                    bloqueado: false,
-                    concluido: false,
-                    trechos: [],
-                    itens: []
-                };
-                if(!dadosApp.itinerario) dadosApp.itinerario = [];
-                dadosApp.itinerario.unshift(novoBloco);
-
-                salvarStorage();
-                atualizarTudo();
-                filtrarDestino(limpo);
-            }
+        function aprovar(idx, status) {
+            let nome = prompt('Seu Nome:'); if(!nome) return;
+            let mat = prompt('Sua Matrícula:'); if(!mat) return;
+            let orders = JSON.parse(localStorage.getItem('vale_orders_v41') || '[]');
+            orders[idx].status = status;
+            orders[idx].aprovador = `${nome} (Mat: ${mat})`;
+            localStorage.setItem('vale_orders_v41', JSON.stringify(orders));
+            renderAdminOrders();
         }
 
-        function adicionarNovoStatusTarefa() {
-            registarEstadoAnterior();
-            let nomeNovo = prompt("Nome do novo status:");
-            if(nomeNovo && nomeNovo.trim() !== '') {
-                let corNova = prompt("Cor HEX do status:", "#3b82f6");
-                if(!dadosApp.statusPersonalizados) dadosApp.statusPersonalizados = {};
-                dadosApp.statusPersonalizados[nomeNovo.trim()] = corNova || "#3b82f6";
-                salvarStorage();
-                atualizarTudo();
-            }
-        }
-
-        function filtrarDestino(cat) { 
-            destinoFiltro = cat; 
-            renderizarFiltros(); 
-            renderizarBlocos(); 
-            renderizarModoLeitura();
-        }
-        function filtrarTarefas(f) { tarefaFiltro = f; renderizarFiltrosTarefas(); renderizarHubUtilidades(); }
-
-        function filtrarUtilidade(tipo) {
-            utilidadeFiltro = tipo;
-            ['todos', 'voos', 'contatos', 'tarefas', 'checklist', 'vouchers', 'chat'].forEach(t => {
-                let btn = document.getElementById('filt-util-' + t);
-                if(btn) {
-                    if(t === tipo) {
-                        btn.className = "px-3 py-1.5 rounded-xl bg-white text-indigo-950 font-bold text-xs shrink-0 transition shadow-sm";
-                    } else {
-                        btn.className = "px-3 py-1.5 rounded-xl bg-indigo-800 text-white font-bold text-xs shrink-0 transition";
-                    }
-                }
-            });
-            renderizarHubUtilidades();
-        }
-
-        // ROTEIRO (CONCLUÍDO POR LINHA / TRECHO)
-        function renderizarModoLeitura() {
-            const container = document.getElementById('lista-leitura-html');
-            const progressoEl = document.getElementById('progresso-viagem');
-            if(!container) return;
-            container.innerHTML = '';
-
-            let blocosAprovados = dadosApp.itinerario.filter(item => item.bloqueado === true);
-            if(destinoFiltro !== 'todos') {
-                blocosAprovados = blocosAprovados.filter(i => (i.categoria || "").toLowerCase().includes(destinoFiltro.toLowerCase()));
-            }
-
-            let total = blocosAprovados.length;
-            let concluidos = blocosAprovados.filter(b => b.trechos && b.trechos.length > 0 && b.trechos.every(t => t.concluido)).length;
-            if(progressoEl) progressoEl.innerText = concluidos + ' / ' + total + ' Aprovados';
-
-            if(total === 0) {
-                container.innerHTML = '<div class="col-span-full bg-white p-5 rounded-2xl text-center text-xs text-slate-500 border border-slate-200 shadow-sm">Nenhum bloco aprovado. Vá à aba <b>📅 Editar</b> e clique no cadeado <b>(🔒)</b> do bloco para enviá-lo para cá!</div>';
-                return;
-            }
-
-            blocosAprovados.forEach(item => {
-                let corMaster = item.cor || obterCorPorCategoria(item.categoria);
-                let dIni = item.dataInicio ? item.dataInicio.split('-').reverse().join('/') : '?';
-                let dFim = item.dataFim ? item.dataFim.split('-').reverse().join('/') : '?';
-
-                let trechosTexto = '';
-                if(item.trechos && item.trechos.length > 0) {
-                    item.trechos.forEach(tr => {
-                        let trConcluido = tr.concluido ? true : false;
-                        let trBg = trConcluido ? 'bg-emerald-50/80 opacity-75 border-emerald-300' : 'bg-slate-50 border-slate-200';
-                        let trText = trConcluido ? 'line-through text-slate-400' : 'text-slate-900';
-                        let mapsUrl = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(tr.origem || '') + '&destination=' + encodeURIComponent(tr.destino || '') + '&travelmode=transit';
-                        
-                        trechosTexto += '<div class="text-xs ' + trBg + ' p-2.5 rounded-xl border flex flex-col gap-2 my-1.5 shadow-sm">' +
-                            '<div class="flex justify-between items-start gap-2">' +
-                                '<div class="flex-1 min-w-0 break-words">' +
-                                    '<span class="font-bold text-xs ' + trText + '">🚄 ' + (tr.origem || '?') + ' ➔ ' + (tr.destino || '?') + '</span> ' +
-                                    '<span class="font-medium ' + trText + '">(' + (tr.transporte || 'Trem') + ')</span>' +
-                                    (tr.valor ? ' • <span class="font-black ' + trText + '">' + tr.valor + ' ' + (tr.moeda || 'EUR') + '</span>' : '') +
-                                    (tr.notas ? '<div class="text-[11px] italic mt-1 whitespace-pre-wrap break-words ' + trText + '">📝 ' + tr.notas + '</div>' : '') +
-                                '</div>' +
-                                '<label class="flex items-center gap-1 cursor-pointer font-bold bg-white px-2 py-1 rounded-lg border text-[11px] shrink-0 shadow-sm">' +
-                                    '<input type="checkbox" ' + (trConcluido ? 'checked' : '') + ' onchange="alternarConcluidoTrecho(\'' + item.id + '\', \'' + tr.id + '\')" class="w-3.5 h-3.5 accent-emerald-600 rounded cursor-pointer">' +
-                                    '<span>Feito</span>' +
-                                '</label>' +
-                            '</div>' +
-                            '<div class="flex gap-1.5 flex-wrap border-t border-slate-200 pt-2">' +
-                                '<a href="' + mapsUrl + '" target="_blank" class="bg-sky-100 text-sky-800 hover:bg-sky-200 px-2.5 py-1 rounded-lg font-bold text-[10px] transition inline-block text-center">🗺️ Mapa</a>' +
-                                '<button onclick="abrirWebcam(\'' + (tr.destino || item.categoria) + '\')" class="bg-purple-100 text-purple-800 hover:bg-purple-200 px-2.5 py-1 rounded-lg font-bold text-[10px] transition">📹 Câmera</button>' +
-                                '<button onclick="mostrarClimaModal(\'' + (tr.destino || item.categoria) + '\')" class="bg-amber-100 text-amber-800 hover:bg-amber-200 px-2.5 py-1 rounded-lg font-bold text-[10px] transition">🌤️ Clima</button>' +
-                            '</div>' +
-                        '</div>';
-                    });
-                }
-
-                let itensTexto = '';
-                if(item.itens && item.itens.length > 0) {
-                    item.itens.forEach(it => {
-                        if(it.texto && it.texto.trim() !== '') {
-                            itensTexto += '<div class="text-xs bg-slate-50 p-2 rounded-xl border border-slate-200 my-1 text-slate-800 font-medium">• ' + it.texto + '</div>';
-                        }
-                    });
-                }
-
-                let card = document.createElement('div');
-                card.className = 'p-3.5 rounded-2xl border shadow-sm space-y-2.5 transition flex flex-col justify-between bg-white border-slate-200';
-                card.style.borderLeft = '6px solid ' + corMaster;
-
-                card.innerHTML = '<div class="space-y-1.5"><div class="flex justify-between items-center gap-2 flex-wrap border-b border-slate-100 pb-2"><div class="flex items-center gap-1.5"><span class="font-black px-2 py-0.5 rounded-lg text-[10px] text-white shadow-sm" style="background-color: ' + corMaster + ';">' + (item.categoria || 'Geral') + '</span><span class="font-bold text-xs text-slate-600">📅 ' + dIni + ' ➔ ' + dFim + '</span></div><button onclick="removerDoRoteiro(\'' + item.id + '\')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 px-2 py-1 rounded-xl font-bold text-xs" title="Retirar do Roteiro">✕</button></div><div class="space-y-1.5 pt-0.5">' + (trechosTexto || '<span class="text-xs text-slate-400 italic">Nenhum trecho adicionado.</span>') + (itensTexto ? '<div class="mt-2 pt-2 border-t border-slate-200 space-y-1"><span class="text-[11px] font-extrabold uppercase text-slate-600">📌 Notas / Textos:</span>' + itensTexto + '</div>' : '') + '</div></div>';
-                container.appendChild(card);
-            });
-        }
-
-        // RENDERIZAR EDITAR
-        function renderizarBlocos() {
-            const container = document.getElementById('lista-blocos');
-            if(!container) return;
-            container.innerHTML = '';
-            
-            let filtrados = dadosApp.itinerario;
-            if(destinoFiltro !== 'todos') {
-                filtrados = dadosApp.itinerario.filter(i => (i.categoria || "").toLowerCase().includes(destinoFiltro.toLowerCase()));
-            }
-
-            if(filtrados.length === 0) {
-                container.innerHTML = '<div class="bg-white p-5 rounded-2xl text-center text-xs text-slate-400 border border-slate-200 shadow-sm space-y-2"><p class="font-bold text-slate-700">Nenhum bloco encontrado.</p><button onclick="destinoFiltro=\'todos\'; atualizarTudo();" class="bg-indigo-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs">Mostrar Todos</button></div>';
-                return;
-            }
-
-            filtrados.forEach((item) => {
-                let corHex = item.cor || obterCorPorCategoria(item.categoria);
-                item.cor = corHex;
-                let totalDias = calcularDias(item.dataInicio, item.dataFim);
-                let lockIcon = item.bloqueado ? '🔒 Roteiro OK' : '🔓 Editar';
-                let lockBg = item.bloqueado ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700';
-
-                let opcoesDestino = '';
-                if(!dadosApp.destinosCadastrados.includes(item.categoria)) dadosApp.destinosCadastrados.push(item.categoria);
-                dadosApp.destinosCadastrados.forEach(d => {
-                    opcoesDestino += '<option value="' + d + '" ' + (item.categoria === d ? 'selected' : '') + '>' + d + '</option>';
-                });
-                opcoesDestino += '<option value="novo_destino">➕ Outro...</option>';
-
-                let trechosHtml = '';
-                if(item.trechos && item.trechos.length > 0) {
-                    item.trechos.forEach(tr => {
-                        let opcoesOrigem = '';
-                        dadosApp.locaisCadastrados.forEach(l => {
-                            opcoesOrigem += '<option value="' + l + '" ' + (tr.origem === l ? 'selected' : '') + '>' + l + '</option>';
-                        });
-                        opcoesOrigem += '<option value="outro_local">➕ Outro...</option>';
-
-                        let opcoesDest = '';
-                        dadosApp.locaisCadastrados.forEach(l => {
-                            opcoesDest += '<option value="' + l + '" ' + (tr.destino === l ? 'selected' : '') + '>' + l + '</option>';
-                        });
-                        opcoesDest += '<option value="outro_local">➕ Outro...</option>';
-
-                        trechosHtml += '<div class="bg-white p-2.5 rounded-xl border border-slate-200 flex flex-col gap-2 text-xs mb-2 shadow-sm min-w-0">' +
-                            '<div class="flex items-center gap-1.5 min-w-0">' +
-                                '<select onchange="lidarSelecaoLocalTrecho(\'' + item.id + '\', \'' + tr.id + '\', \'origem\', this.value)" class="flex-1 min-w-0 p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs truncate"><option value="">Origem...</option>' + opcoesOrigem + '</select>' +
-                                '<span class="shrink-0 font-bold text-slate-400">➔</span>' +
-                                '<select onchange="lidarSelecaoLocalTrecho(\'' + item.id + '\', \'' + tr.id + '\', \'destino\', this.value)" class="flex-1 min-w-0 p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs truncate"><option value="">Destino...</option>' + opcoesDest + '</select>' +
-                                '<button onclick="removerTrecho(\'' + item.id + '\', \'' + tr.id + '\')" class="text-red-500 font-bold px-2.5 py-1.5 rounded-xl bg-red-50 text-xs shrink-0 hover:bg-red-100 transition">✕</button>' +
-                            '</div>' +
-                            '<div class="flex items-center gap-1.5 min-w-0">' +
-                                '<select onchange="atualizarTrecho(\'' + item.id + '\', \'' + tr.id + '\', \'transporte\', this.value)" class="flex-1 min-w-0 p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs">' +
-                                    '<option value="Trem" ' + (tr.transporte==='Trem'?'selected':'') + '>Trem</option>' +
-                                    '<option value="Ônibus" ' + (tr.transporte==='Ônibus'?'selected':'') + '>Ônibus</option>' +
-                                    '<option value="Avião" ' + (tr.transporte==='Avião'?'selected':'') + '>Avião</option>' +
-                                    '<option value="Metrô" ' + (tr.transporte==='Metrô'?'selected':'') + '>Metrô</option>' +
-                                    '<option value="Carro" ' + (tr.transporte==='Carro'?'selected':'') + '>Carro</option>' +
-                                    '<option value="Outro" ' + (tr.transporte==='Outro'?'selected':'') + '>Outro</option>' +
-                                '</select>' +
-                                '<input type="text" value="' + (tr.valor || 0) + '" onchange="atualizarTrecho(\'' + item.id + '\', \'' + tr.id + '\', \'valor\', limparNumero(this.value)); atualizarTudo();" class="w-20 shrink-0 p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs" placeholder="0">' +
-                                '<select onchange="atualizarTrecho(\'' + item.id + '\', \'' + tr.id + '\', \'moeda\', this.value); atualizarTudo();" class="w-20 shrink-0 p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs">' +
-                                    '<option value="EUR" ' + (tr.moeda==='EUR'?'selected':'') + '>EUR</option>' +
-                                    '<option value="CHF" ' + (tr.moeda==='CHF'?'selected':'') + '>CHF</option>' +
-                                '</select>' +
-                            '</div>' +
-                            '<input type="text" value="' + (tr.notas || '') + '" onchange="atualizarTrecho(\'' + item.id + '\', \'' + tr.id + '\', \'notas\', this.value)" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl font-medium text-xs" placeholder="Informações adicionais para este trecho...">' +
-                        '</div>';
-                    });
-                }
-
-                let itensHtml = '';
-                if(item.itens && item.itens.length > 0) {
-                    item.itens.forEach(it => {
-                        let itTextoSafe = (it.texto || '').replace(/"/g, '&quot;');
-                        itensHtml += '<div class="flex items-center gap-1.5 bg-white p-2 rounded-xl border border-slate-200 text-xs min-w-0 mb-1.5 shadow-sm">' +
-                            '<input type="text" value="' + itTextoSafe + '" onchange="atualizarTextoItemBloco(\'' + item.id + '\', \'' + it.id + '\', this.value)" class="flex-1 min-w-0 bg-transparent outline-none font-bold text-slate-800 text-xs" placeholder="Escreva um texto livre...">' +
-                            '<button onclick="removerItemBloco(\'' + item.id + '\', \'' + it.id + '\')" class="text-red-500 font-bold px-2.5 py-1.5 rounded-xl bg-red-50 text-xs shrink-0 hover:bg-red-100 transition">✕</button>' +
-                        '</div>';
-                    });
-                }
-
-                let card = document.createElement('div');
-                card.className = 'p-4 rounded-2xl border border-slate-300 space-y-3 transition shadow-sm min-w-0';
-                card.style.backgroundColor = corHex;
-
-                let coresPaleta = ["#3b82f6", "#f59e0b", "#ec4899", "#10b981", "#8b5cf6", "#ef4444", "#06b6d4", "#64748b"];
-                let paletaHtml = '<div class="flex items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-slate-300 shadow-sm flex-wrap"><span class="font-bold text-[11px] text-slate-700 mr-1">Cor:</span>';
-                coresPaleta.forEach(col => {
-                    let ring = corHex === col ? 'ring-2 ring-slate-900 scale-110' : '';
-                    paletaHtml += '<button onclick="atualizarCorBlocoLocal(\'' + item.id + '\', \'' + col + '\')" style="background-color: ' + col + ';" class="w-5 h-5 rounded-full shadow-sm transition transform hover:scale-110 ' + ring + '"></button>';
-                });
-                paletaHtml += '</div>';
-
-                card.innerHTML = '<div class="flex flex-col gap-2 border-b border-black/10 pb-2.5">' +
-                    '<div class="flex justify-between items-center gap-2 flex-wrap">' +
-                        '<div class="flex items-center gap-2 flex-wrap">' +
-                            '<select onchange="lidarSelecaoDestino(\'' + item.id + '\', this.value)" class="bg-white text-indigo-950 font-black px-3 py-1.5 rounded-xl text-xs border border-slate-300 outline-none shadow-sm">' + opcoesDestino + '</select>' +
-                            '<span class="bg-indigo-600 text-white font-bold px-2.5 py-1 rounded-xl text-xs shadow-sm">📅 ' + totalDias + 'd</span>' +
-                        '</div>' +
-                        '<button onclick="imprimirBlocoUnico(\'' + item.id + '\')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">🖨️ Imprimir Bloco</button>' +
-                    '</div>' +
-                    '<div class="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-300 text-xs font-bold shadow-sm self-start">' +
-                        '<input type="date" value="' + (item.dataInicio || '') + '" onchange="atualizarDataInicio(\'' + item.id + '\', this.value)" class="bg-transparent outline-none text-xs" title="Início">' +
-                        '<span>➔</span>' +
-                        '<input type="date" value="' + (item.dataFim || '') + '" onchange="atualizarCampo(\'' + item.id + '\', \'dataFim\', this.value)" class="bg-transparent outline-none text-xs" title="Fim">' +
-                    '</div>' +
-                '</div>' +
-                    '<div class="bg-white/95 p-3 rounded-2xl border border-slate-200 space-y-3 text-xs min-w-0 shadow-inner">' +
-                        '<div class="space-y-1.5">' +
-                            '<div class="flex justify-between items-center"><span class="font-bold text-slate-700 uppercase text-[10px]">🚄 Trechos</span><button onclick="adicionarTrecho(\'' + item.id + '\')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-xl text-[11px] font-bold transition shadow-sm">➕ Trecho</button></div>' +
-                            '<div class="space-y-1.5 min-w-0">' + (trechosHtml || '<p class="text-xs text-slate-400 italic">Nenhum trecho adicionado.</p>') + '</div>' +
-                        '</div>' +
-                        '<div class="space-y-1.5 pt-2.5 border-t border-slate-200">' +
-                            '<div class="flex justify-between items-center"><span class="font-bold text-slate-700 uppercase text-[10px]">📌 Notas</span><button onclick="adicionarItemBloco(\'' + item.id + '\')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-xl text-[11px] font-bold transition shadow-sm">➕ Texto</button></div>' +
-                            '<div class="space-y-1.5 min-w-0">' + (itensHtml || '<p class="text-xs text-slate-400 italic">Nenhum texto adicionado.</p>') + '</div>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="flex justify-between items-center pt-2 border-t border-black/10 flex-wrap gap-2">' +
-                        paletaHtml +
-                        '<div class="flex items-center gap-1.5">' +
-                            '<button onclick="alternarBloqueio(\'' + item.id + '\')" class="' + lockBg + ' px-3 py-1.5 rounded-xl font-bold text-xs shadow-sm transition">' + lockIcon + '</button>' +
-                            '<button onclick="moverBloco(\'' + item.id + '\', -1)" class="bg-slate-200 hover:bg-slate-300 px-2 py-1.5 rounded-xl font-bold transition">⬆️</button>' +
-                            '<button onclick="moverBloco(\'' + item.id + '\', 1)" class="bg-slate-200 hover:bg-slate-300 px-2 py-1.5 rounded-xl font-bold transition">⬇️</button>' +
-                            '<button onclick="apagarBloco(\'' + item.id + '\')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-xl font-bold transition">Excluir ✕</button>' +
-                        '</div>' +
-                    '</div>';
-                container.appendChild(card);
-            });
-        }
-
-        function adicionarItemBloco(itemId) {
-            registarEstadoAnterior();
-            let item = dadosApp.itinerario.find(i => String(i.id) === String(itemId));
-            if(item) {
-                if(!item.itens) item.itens = [];
-                item.itens.push({ id: Date.now(), texto: "" });
-                salvarStorage();
-                renderizarBlocos();
-            }
-        }
-
-        function removerItemBloco(itemId, subId) {
-            registarEstadoAnterior();
-            let item = dadosApp.itinerario.find(i => String(i.id) === String(itemId));
-            if(item && item.itens) {
-                item.itens = item.itens.filter(i => String(i.id) !== String(subId));
-                salvarStorage();
-                renderizarBlocos();
-            }
-        }
-
-        function atualizarTextoItemBloco(itemId, subId, val) {
-            let item = dadosApp.itinerario.find(i => String(i.id) === String(itemId));
-            if(item && item.itens) {
-                let it = item.itens.find(i => String(i.id) === String(subId));
-                if(it) {
-                    it.texto = val;
-                    localStorage.setItem(CHAVE_APP, JSON.stringify(dadosApp));
-                }
-            }
-        }
-
-        function atualizarDataInicio(id, val) {
-            registarEstadoAnterior();
-            let item = dadosApp.itinerario.find(i => String(i.id) === String(id));
-            if(item) {
-                item.dataInicio = val;
-                if(!item.dataFim || item.dataFim < val) {
-                    item.dataFim = val;
-                }
-                salvarStorage();
-                atualizarTudo();
-            }
-        }
-
-        function lidarSelecaoLocalTrecho(itemId, trechoId, campo, valor) {
-            registarEstadoAnterior();
-            if(valor === 'outro_local') {
-                let novo = prompt("Novo local:");
-                if(novo && novo.trim() !== '') {
-                    let limpo = novo.trim();
-                    if(!dadosApp.locaisCadastrados.includes(limpo)) dadosApp.locaisCadastrados.push(limpo);
-                    atualizarTrecho(itemId, trechoId, campo, limpo);
-                } else { renderizarBlocos(); }
-            } else {
-                atualizarTrecho(itemId, trechoId, campo, valor);
-            }
-        }
-
-        function adicionarTrecho(itemId) {
-            registarEstadoAnterior();
-            let item = dadosApp.itinerario.find(i => String(i.id) === String(itemId));
-            if(item) {
-                if(!item.trechos) item.trechos = [];
-                item.trechos.push({ id: Date.now(), origem: "", destino: "", transporte: "Trem", valor: 0, moeda: "EUR", notas: "", concluido: false });
-                salvarStorage();
-                atualizarTudo();
-            }
-        }
-
-        function removerTrecho(itemId, trechoId) {
-            registarEstadoAnterior();
-            let item = dadosApp.itinerario.find(i => String(i.id) === String(itemId));
-            if(item && item.trechos) {
-                item.trechos = item.trechos.filter(t => String(t.id) !== String(trechoId));
-                salvarStorage();
-                atualizarTudo();
-            }
-        }
-
-        function atualizarTrecho(itemId, trechoId, campo, val) {
-            let item = dadosApp.itinerario.find(i => String(i.id) === String(itemId));
-            if(item && item.trechos) {
-                let tr = item.trechos.find(t => String(t.id) === String(trechoId));
-                if(tr) {
-                    tr[campo] = val;
-                    localStorage.setItem(CHAVE_APP, JSON.stringify(dadosApp));
-                }
-            }
-        }
-
-        function adicionarBloco() {
-            registarEstadoAnterior();
-            let destinoInicial = (destinoFiltro !== 'todos') ? destinoFiltro : ((dadosApp.destinosCadastrados && dadosApp.destinosCadastrados.length > 0) ? dadosApp.destinosCadastrados[0] : "Zurique");
-            
-            let novoItem = {
-                id: Date.now(), 
-                categoria: destinoInicial, 
-                dataInicio: "", 
-                dataFim: "", 
-                cor: obterCorPorCategoria(destinoInicial), 
-                bloqueado: false, 
-                concluido: false, 
-                trechos: [], 
-                itens: []
-            };
-            if(!dadosApp.itinerario) dadosApp.itinerario = [];
-            dadosApp.itinerario.unshift(novoItem);
-            salvarStorage();
-            mudarTab('itinerario');
-            atualizarTudo();
-        }
-
-        function lidarSelecaoDestino(id, valor) {
-            registarEstadoAnterior();
-            if(valor === 'novo_destino') {
-                let novo = prompt("Nome do destino:");
-                if(novo && novo.trim() !== '') {
-                    let limpo = novo.trim();
-                    if(!dadosApp.destinosCadastrados.includes(limpo)) dadosApp.destinosCadastrados.push(limpo);
-                    let corNova = prompt("Escolha a cor HEX para este destino (ex: #8b5cf6):", "#8b5cf6");
-                    if(!dadosApp.coresDestinos) dadosApp.coresDestinos = {};
-                    dadosApp.coresDestinos[limpo] = corNova || "#3b82f6";
-                    
-                    let item = dadosApp.itinerario.find(i => String(i.id) === String(id));
-                    if(item) {
-                        item.categoria = limpo;
-                        item.cor = dadosApp.coresDestinos[limpo];
-                    }
-                    salvarStorage();
-                    atualizarTudo();
-                } else { renderizarBlocos(); }
-            } else {
-                let item = dadosApp.itinerario.find(i => String(i.id) === String(id));
-                if(item) {
-                    item.categoria = valor;
-                    item.cor = obterCorPorCategoria(valor);
-                }
-                salvarStorage();
-                atualizarTudo();
-            }
-        }
-
-        // RENDERIZAR HUB DE UTILIDADES COM SEGURANÇA TOTAL PARA VOUCHERS E PDFS
-        function renderizarHubUtilidades() {
-            const container = document.getElementById('hub-utilidades-grid');
-            if(!container) return;
-            container.innerHTML = '';
-
-            let mostrarVoos = (utilidadeFiltro === 'todos' || utilidadeFiltro === 'voos');
-            let mostrarContatos = (utilidadeFiltro === 'todos' || utilidadeFiltro === 'contatos');
-            let mostrarTarefas = (utilidadeFiltro === 'todos' || utilidadeFiltro === 'tarefas');
-            let mostrarChecklist = (utilidadeFiltro === 'todos' || utilidadeFiltro === 'checklist');
-            let mostrarVouchers = (utilidadeFiltro === 'todos' || utilidadeFiltro === 'vouchers');
-            let mostrarChat = (utilidadeFiltro === 'todos' || utilidadeFiltro === 'chat');
-
-            if(mostrarVoos) {
-                let voosHtml = '';
-                if(!dadosApp.voos || dadosApp.voos.length === 0) {
-                    voosHtml = '<p class="text-xs text-slate-400 italic text-center py-2">Nenhum voo registado.</p>';
-                } else {
-                    dadosApp.voos.forEach(v => {
-                        let pdfAction = v.pdfData ? '<button onclick="abrirLeitorPdf(\'' + v.id + '\', \'Passagem ' + (v.voo || 'Voo') + '\')" class="bg-indigo-600 text-white px-2 py-1 rounded-xl text-xs font-bold shadow-sm">📄 PDF</button>' : '<label class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded-xl text-xs font-bold cursor-pointer border shadow-sm">📎 PDF<input type="file" accept="application/pdf" onchange="anexarPdfVoo(' + v.id + ', event)" class="hidden"></label>';
-                        let ciaSafe = (v.cia || '').replace(/"/g, '&quot;');
-                        let vooSafe = (v.voo || '').replace(/"/g, '&quot;');
-                        let pnrSafe = (v.pnr || '').replace(/"/g, '&quot;');
-                        let rotaSafe = (v.rota || '').replace(/"/g, '&quot;');
-                        voosHtml += '<div class="p-2.5 rounded-2xl border border-slate-200 bg-white space-y-2 shadow-sm text-xs min-w-0"><div class="flex gap-1.5 items-center min-w-0"><input type="text" value="' + ciaSafe + '" oninput="atualizarVoo(' + v.id + ', \'cia\', this.value)" class="w-16 shrink-0 p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs" placeholder="Cia"><input type="text" value="' + vooSafe + '" oninput="atualizarVoo(' + v.id + ', \'voo\', this.value)" class="w-14 shrink-0 p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs" placeholder="Voo"><input type="text" value="' + pnrSafe + '" oninput="atualizarVoo(' + v.id + ', \'pnr\', this.value)" class="flex-1 min-w-0 p-1.5 bg-amber-50 border border-amber-300 rounded-xl font-black text-amber-900 text-xs truncate" placeholder="PNR"></div><div class="flex gap-1.5 items-center min-w-0"><input type="text" value="' + rotaSafe + '" oninput="atualizarVoo(' + v.id + ', \'rota\', this.value)" class="flex-1 min-w-0 p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs truncate" placeholder="Rota"><input type="date" value="' + (v.data || '') + '" onchange="atualizarVoo(' + v.id + ', \'data\', this.value)" class="w-28 shrink-0 p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs"><div class="shrink-0 flex items-center gap-1">' + pdfAction + '<button onclick="moverItemArray(\'voos\', ' + v.id + ', -1)" class="bg-slate-200 px-2 py-1 rounded-lg font-bold">⬆️</button><button onclick="moverItemArray(\'voos\', ' + v.id + ', 1)" class="bg-slate-200 px-2 py-1 rounded-lg font-bold">⬇️</button><button onclick="apagarVoo(' + v.id + ')" class="text-red-500 font-bold px-2 py-1 rounded-xl bg-red-50 hover:bg-red-100 text-xs">✕</button></div></div></div>';
-                    });
-                }
-                container.innerHTML += '<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3 min-w-0" id="card-voos"><div class="flex justify-between items-center border-b pb-2"><h3 class="font-bold text-xs uppercase text-slate-800">✈️ Voos & Passagens</h3><button onclick="adicionarVoo()" class="bg-indigo-600 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow-sm">➕ Voo</button></div><div class="space-y-2 min-w-0">' + voosHtml + '</div></div>';
-            }
-
-            if(mostrarContatos) {
-                let contatosHtml = '';
-                if(!dadosApp.contatos || dadosApp.contatos.length === 0) {
-                    contatosHtml = '<p class="text-xs text-slate-400 italic text-center py-2">Nenhum contato registado.</p>';
-                } else {
-                    dadosApp.contatos.forEach(ct => {
-                        let numeroLimpo = ct.numero ? String(ct.numero).replace(/\s+/g, '') : '';
-                        let telHref = numeroLimpo ? 'tel:' + numeroLimpo : '#';
-                        let nomeSafe = (ct.nome || '').replace(/"/g, '&quot;');
-                        let numSafe = (ct.numero || '').replace(/"/g, '&quot;');
-                        contatosHtml += '<div class="p-2.5 rounded-2xl border border-slate-200 bg-white flex items-center gap-1.5 shadow-sm text-xs min-w-0">' +
-                            '<input type="text" value="' + nomeSafe + '" oninput="atualizarContatoNome(' + ct.id + ', this.value)" class="flex-1 min-w-0 bg-transparent outline-none font-bold text-slate-800 text-xs truncate" placeholder="Nome...">' +
-                            '<input type="text" value="' + numSafe + '" oninput="atualizarContatoNumero(' + ct.id + ', this.value)" class="w-24 shrink-0 p-1 bg-slate-50 border border-slate-300 rounded-xl font-black text-xs text-center" placeholder="Número...">' +
-                            '<a href="' + telHref + '" class="bg-emerald-600 text-white px-2 py-1 rounded-xl font-bold text-[10px] shrink-0" title="Ligar">📞</a>' +
-                            '<button onclick="moverItemArray(\'contatos\', ' + ct.id + ', -1)" class="bg-slate-200 px-1.5 py-1 rounded-lg font-bold">⬆️</button>' +
-                            '<button onclick="moverItemArray(\'contatos\', ' + ct.id + ', 1)" class="bg-slate-200 px-1.5 py-1 rounded-lg font-bold">⬇️</button>' +
-                            '<button onclick="apagarContato(' + ct.id + ')" class="text-red-500 font-bold bg-red-50 hover:bg-red-100 px-2 py-1 rounded-xl text-xs">✕</button>' +
-                        '</div>';
-                    });
-                }
-                container.innerHTML += '<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3 min-w-0" id="card-contatos"><div class="flex justify-between items-center border-b pb-2"><h3 class="font-bold text-xs uppercase text-slate-800">📞 Contatos Úteis</h3><button onclick="adicionarContato()" class="bg-indigo-600 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow-sm">➕ Contato</button></div><div class="space-y-2 min-w-0">' + contatosHtml + '</div></div>';
-            }
-
-            if(mostrarTarefas) {
-                let tarefasHtml = '';
-                let filtradas = dadosApp.tarefas;
-                if(filtradas.length === 0) {
-                    tarefasHtml = '<p class="text-xs text-slate-400 italic text-center py-2">Nenhuma tarefa registada.</p>';
-                } else {
-                    filtradas.forEach(t => {
-                        let statusAtual = t.status || "";
-                        let corStatus = dadosApp.statusPersonalizados[statusAtual] || "#94a3b8";
-                        let corDestino = obterCorPorCategoria(t.categoria || '');
-                        let textStyle = (statusAtual === 'Concluído') ? 'line-through text-slate-400 font-normal' : 'font-bold text-slate-800';
-
-                        let opcoesStatus = '<option value="" ' + (statusAtual === "" ? 'selected' : '') + '>Status...</option>';
-                        Object.keys(dadosApp.statusPersonalizados).forEach(st => {
-                            opcoesStatus += '<option value="' + st + '" ' + (statusAtual === st ? 'selected' : '') + '>' + st + '</option>';
-                        });
-
-                        let opcoesDestinoT = '<option value="" ' + (!t.categoria ? 'selected' : '') + '>Destino...</option>';
-                        if(!dadosApp.destinosCadastrados.includes(t.categoria) && t.categoria) dadosApp.destinosCadastrados.push(t.categoria);
-                        dadosApp.destinosCadastrados.forEach(d => {
-                            opcoesDestinoT += '<option value="' + d + '" ' + ((t.categoria || '') === d ? 'selected' : '') + '>' + d + '</option>';
-                        });
-
-                        let textoSafe = (t.texto || '').replace(/"/g, '&quot;');
-                        tarefasHtml += '<div class="p-3 rounded-2xl border border-slate-200 bg-white flex flex-col gap-2 shadow-sm" style="border-left: 4px solid ' + (t.categoria ? corDestino : '#94a3b8') + ';"><div class="flex items-center gap-2"><input type="text" value="' + textoSafe + '" oninput="atualizarTarefaTexto(' + t.id + ', this.value)" class="flex-1 min-w-0 p-1 bg-transparent outline-none ' + textStyle + ' text-xs" placeholder="Tarefa..."><button onclick="moverItemArray(\'tarefas\', ' + t.id + ', -1)" class="bg-slate-200 px-1.5 py-1 rounded-lg font-bold">⬆️</button><button onclick="moverItemArray(\'tarefas\', ' + t.id + ', 1)" class="bg-slate-200 px-1.5 py-1 rounded-lg font-bold">⬇️</button><button onclick="apagarTarefa(' + t.id + ')" class="text-red-500 font-bold text-xs bg-red-50 hover:bg-red-100 px-2 py-1 rounded-xl">✕</button></div><div class="flex gap-2 items-center"><select onchange="lidarSelecaoDestinoTarefa(' + t.id + ', this.value)" class="flex-1 border border-slate-300 rounded-xl px-2.5 py-1 text-xs font-bold text-white shadow-sm" style="background-color: ' + (t.categoria ? corDestino : '#64748b') + ';">' + opcoesDestinoT + '</select><select onchange="lidarSelecaoStatusTarefa(' + t.id + ', this.value)" class="flex-1 border border-slate-300 rounded-xl px-2.5 py-1 text-xs font-bold text-white shadow-sm" style="background-color: ' + (statusAtual ? corStatus : '#64748b') + ';">' + opcoesStatus + '</select></div></div>';
-                    });
-                }
-                container.innerHTML += '<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3" id="card-tarefas"><div class="flex justify-between items-center border-b pb-2"><h3 class="font-bold text-xs uppercase text-slate-800">📋 Tarefas</h3><button onclick="adicionarTarefa()" class="bg-indigo-600 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow-sm">➕ Tarefa</button></div><div class="space-y-2.5 text-xs">' + tarefasHtml + '</div></div>';
-            }
-
-            if(mostrarChecklist) {
-                let checklistHtml = '';
-                if(!dadosApp.checklist || dadosApp.checklist.length === 0) {
-                    checklistHtml = '<p class="text-xs text-slate-400 italic text-center py-2">Nenhum item no checklist.</p>';
-                } else {
-                    dadosApp.checklist.forEach(c => {
-                        let itemSafe = (c.item || '').replace(/"/g, '&quot;');
-                        checklistHtml += '<div class="p-2.5 rounded-2xl border border-slate-200 bg-white flex items-center justify-between gap-2 shadow-sm text-xs"><label class="flex items-center gap-2 flex-1 cursor-pointer min-w-0"><input type="checkbox" ' + (c.feito ? 'checked' : '') + ' onchange="alternarItemChecklist(' + c.id + ')" class="w-4 h-4 accent-indigo-600 rounded cursor-pointer shrink-0"><input type="text" value="' + itemSafe + '" oninput="atualizarItemChecklistText(' + c.id + ', this.value)" class="flex-1 bg-transparent outline-none font-bold ' + (c.feito ? 'line-through text-slate-400' : 'text-slate-800') + ' truncate text-xs" placeholder="Item..."></label><div class="flex gap-1 shrink-0"><button onclick="moverItemArray(\'checklist\', ' + c.id + ', -1)" class="bg-slate-200 px-1.5 py-1 rounded-lg font-bold">⬆️</button><button onclick="moverItemArray(\'checklist\', ' + c.id + ', 1)" class="bg-slate-200 px-1.5 py-1 rounded-lg font-bold">⬇️</button><button onclick="apagarItemChecklist(' + c.id + ')" class="text-red-500 font-bold bg-red-50 hover:bg-red-100 px-2 py-1 rounded-xl text-xs">✕</button></div></div>';
-                    });
-                }
-                container.innerHTML += '<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3" id="card-checklist"><div class="flex justify-between items-center border-b pb-2"><h3 class="font-bold text-xs uppercase text-slate-800">🎒 Checklist</h3><button onclick="adicionarItemChecklist()" class="bg-emerald-600 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow-sm">➕ Item</button></div><div class="space-y-2 text-xs">' + checklistHtml + '</div></div>';
-            }
-
-            if(mostrarVouchers) {
-                let vouchersHubHtml = '';
-                if(!dadosApp.vouchers || dadosApp.vouchers.length === 0) {
-                    vouchersHubHtml = '<p class="text-xs text-slate-400 italic text-center py-2">Nenhum voucher registado.</p>';
-                } else {
-                    dadosApp.vouchers.forEach(v => {
-                        let pdfAct = v.pdfData ? '<button onclick="abrirLeitorPdf(\'' + v.id + '\', \'' + (v.titulo || 'Voucher').replace(/'/g, "\\'") + '\')" class="bg-indigo-600 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow-sm">📄 PDF</button>' : '<label class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-xl text-xs font-bold cursor-pointer border shadow-sm">📎 PDF<input type="file" accept="application/pdf" onchange="anexarPdfVoucher(' + v.id + ', event)" class="hidden"></label>';
-                        let tituloSafe = (v.titulo || '').replace(/"/g, '&quot;');
-                        vouchersHubHtml += '<div class="p-2.5 rounded-2xl border border-slate-200 bg-white flex items-center justify-between gap-2 shadow-sm"><input type="text" value="' + tituloSafe + '" oninput="atualizarVoucherTitulo(' + v.id + ', this.value)" class="flex-1 bg-transparent outline-none font-bold text-slate-800 text-xs truncate" placeholder="Título...">' + pdfAct + '<div class="flex gap-1 shrink-0"><button onclick="moverItemArray(\'vouchers\', ' + v.id + ', -1)" class="bg-slate-200 px-1.5 py-1 rounded-lg font-bold">⬆️</button><button onclick="moverItemArray(\'vouchers\', ' + v.id + ', 1)" class="bg-slate-200 px-1.5 py-1 rounded-lg font-bold">⬇️</button><button onclick="apagarVoucher(' + v.id + ')" class="text-red-500 font-bold bg-red-50 hover:bg-red-100 px-2 py-1 rounded-xl text-xs">✕</button></div></div>';
-                    });
-                }
-                container.innerHTML += '<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3" id="card-vouchers"><div class="flex justify-between items-center border-b pb-2"><h3 class="font-bold text-xs uppercase text-slate-800">🎟️ Vouchers & PDFs</h3><button onclick="adicionarVoucher()" class="bg-indigo-600 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow-sm">➕ Voucher</button></div><div class="space-y-2 text-xs">' + vouchersHubHtml + '</div></div>';
-            }
-
-            if(mostrarChat) {
-                let chatHubHtml = '';
-                if(!dadosApp.chat || dadosApp.chat.length === 0) {
-                    chatHubHtml = '<p class="text-xs text-slate-400 italic text-center py-2">Nenhuma nota registada.</p>';
-                } else {
-                    dadosApp.chat.forEach(ch => {
-                        let textoSafe = (ch.texto || '').replace(/"/g, '&quot;');
-                        chatHubHtml += '<div class="p-2.5 rounded-2xl border border-slate-200 bg-white flex items-center justify-between gap-2 shadow-sm text-xs"><input type="text" value="' + textoSafe + '" oninput="atualizarChat(' + ch.id + ', this.value)" class="flex-1 bg-transparent outline-none font-bold text-slate-800 text-xs truncate" placeholder="Escreva uma nota..."><div class="flex gap-1 shrink-0"><button onclick="moverItemArray(\'chat\', ' + ch.id + ', -1)" class="bg-slate-200 px-1.5 py-1 rounded-lg font-bold">⬆️</button><button onclick="moverItemArray(\'chat\', ' + ch.id + ', 1)" class="bg-slate-200 px-1.5 py-1 rounded-lg font-bold">⬇️</button><button onclick="apagarChat(' + ch.id + ')" class="text-red-500 font-bold bg-red-50 hover:bg-red-100 px-2 py-1 rounded-xl text-xs">✕</button></div></div>';
-                    });
-                }
-                container.innerHTML += '<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3" id="card-chat"><div class="flex justify-between items-center border-b pb-2"><h3 class="font-bold text-xs uppercase text-slate-800">💬 Chat / Notas Rápidas</h3><button onclick="adicionarChat()" class="bg-indigo-600 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow-sm">➕ Nota</button></div><div class="space-y-2 text-xs">' + chatHubHtml + '</div></div>';
-            }
-        }
-
-        function adicionarChat() {
-            registarEstadoAnterior();
-            if(!dadosApp.chat) dadosApp.chat = [];
-            dadosApp.chat.unshift({ id: Date.now(), texto: "Nova anotação..." });
-            salvarStorage();
-            renderizarHubUtilidades();
-        }
-
-        function apagarChat(id) {
-            registarEstadoAnterior();
-            dadosApp.chat = dadosApp.chat.filter(c => c.id !== id);
-            salvarStorage();
-            renderizarHubUtilidades();
-        }
-
-        function atualizarChat(id, val) {
-            let c = dadosApp.chat.find(item => item.id === id);
-            if(c) { c.texto = val; salvarStorage(); }
-        }
-
-        function atualizarContatoNome(id, val) {
-            let c = dadosApp.contatos.find(item => item.id === id);
-            if(c) { c.nome = val; salvarStorage(); }
-        }
-
-        function atualizarContatoNumero(id, val) {
-            let c = dadosApp.contatos.find(item => item.id === id);
-            if(c) { c.numero = val; salvarStorage(); }
-        }
-
-        function adicionarContato() {
-            registarEstadoAnterior();
-            if(!dadosApp.contatos) dadosApp.contatos = [];
-            dadosApp.contatos.unshift({ id: Date.now(), nome: "Contato", numero: "" });
-            salvarStorage();
-            renderizarHubUtilidades();
-        }
-
-        function apagarContato(id) {
-            registarEstadoAnterior();
-            dadosApp.contatos = dadosApp.contatos.filter(c => c.id !== id);
-            salvarStorage();
-            renderizarHubUtilidades();
-        }
-
-        function adicionarVoo() {
-            registarEstadoAnterior();
-            if(!dadosApp.voos) dadosApp.voos = [];
-            dadosApp.voos.unshift({ id: Date.now(), cia: "Latam", voo: "", pnr: "", rota: "GIG ➔ ZRH", data: "", pdfData: "", pdfNome: "" });
-            salvarStorage();
-            renderizarHubUtilidades();
-        }
-
-        function apagarVoo(id) {
-            registarEstadoAnterior();
-            dadosApp.voos = dadosApp.voos.filter(v => v.id !== id);
-            salvarStorage();
-            renderizarHubUtilidades();
-        }
-
-        function atualizarVoo(id, campo, val) {
-            let v = dadosApp.voos.find(item => item.id === id);
-            if(v) { v[campo] = val; salvarStorage(); }
-        }
-
-        function anexarPdfVoo(id, event) {
-            const file = event.target.files[0];
-            if(file) {
-                registarEstadoAnterior();
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    const v = dadosApp.voos.find(item => item.id === id);
-                    if(v) { 
-                        v.pdfData = evt.target.result; 
-                        v.pdfNome = file.name; 
-                        salvarStorage(); 
-                        renderizarHubUtilidades(); 
-                        abrirLeitorPdf(v.id, 'Passagem ' + (v.voo || 'Voo'));
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function adicionarTarefa() {
-            registarEstadoAnterior();
-            if(!dadosApp.tarefas) dadosApp.tarefas = [];
-            dadosApp.tarefas.unshift({ id: Date.now(), texto: "Nova tarefa...", status: "", categoria: "" });
-            salvarStorage();
-            renderizarHubUtilidades();
-        }
-
-        function apagarTarefa(id) {
-            registarEstadoAnterior();
-            dadosApp.tarefas = dadosApp.tarefas.filter(t => t.id !== id);
-            salvarStorage();
-            renderizarHubUtilidades();
-        }
-
-        function atualizarTarefaTexto(id, val) {
-            let t = dadosApp.tarefas.find(item => item.id === id);
-            if(t) { t.texto = val; salvarStorage(); }
-        }
-
-        function lidarSelecaoDestinoTarefa(id, val) {
-            registarEstadoAnterior();
-            let t = dadosApp.tarefas.find(item => item.id === id);
-            if(t) { t.categoria = val; salvarStorage(); renderizarHubUtilidades(); }
-        }
-
-        function lidarSelecaoStatusTarefa(id, val) {
-            registarEstadoAnterior();
-            let t = dadosApp.tarefas.find(item => item.id === id);
-            if(t) { t.status = val; salvarStorage(); renderizarHubUtilidades(); }
-        }
-
-        function adicionarItemChecklist() {
-            registarEstadoAnterior();
-            if(!dadosApp.checklist) dadosApp.checklist = [];
-            dadosApp.checklist.push({ id: Date.now(), item: "Novo item...", feito: false });
-            salvarStorage();
-            renderizarHubUtilidades();
-        }
-
-        function apagarItemChecklist(id) {
-            registarEstadoAnterior();
-            dadosApp.checklist = dadosApp.checklist.filter(c => c.id !== id);
-            salvarStorage();
-            renderizarHubUtilidades();
-        }
-
-        function alternarItemChecklist(id) {
-            registarEstadoAnterior();
-            let c = dadosApp.checklist.find(item => item.id === id);
-            if(c) { c.feito = !c.feito; salvarStorage(); renderizarHubUtilidades(); }
-        }
-
-        function atualizarItemChecklistText(id, val) {
-            let c = dadosApp.checklist.find(item => item.id === id);
-            if(c) { c.item = val; salvarStorage(); }
-        }
-
-        function adicionarVoucher() {
-            registarEstadoAnterior();
-            if(!dadosApp.vouchers) dadosApp.vouchers = [];
-            dadosApp.vouchers.unshift({ id: Date.now(), titulo: "Hotel / Reserva", pdfData: "", pdfNome: "" });
-            salvarStorage();
-            renderizarHubUtilidades();
-        }
-
-        function apagarVoucher(id) {
-            registarEstadoAnterior();
-            dadosApp.vouchers = dadosApp.vouchers.filter(v => v.id !== id);
-            salvarStorage();
-            renderizarHubUtilidades();
-        }
-
-        function atualizarVoucherTitulo(id, val) {
-            let v = dadosApp.vouchers.find(item => item.id === id);
-            if(v) { v.titulo = val; salvarStorage(); }
-        }
-
-        function anexarPdfVoucher(id, event) {
-            const file = event.target.files[0];
-            if(file) {
-                registarEstadoAnterior();
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    const v = dadosApp.vouchers.find(item => item.id === id);
-                    if(v) { 
-                        v.pdfData = evt.target.result; 
-                        v.pdfNome = file.name; 
-                        salvarStorage(); 
-                        renderizarHubUtilidades(); 
-                        abrirLeitorPdf(v.id, v.titulo);
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function abrirLeitorPdf(id, titulo) {
-            const v = dadosApp.vouchers.find(item => String(item.id) === String(id)) || dadosApp.voos.find(item => String(item.id) === String(id));
-            if(v && v.pdfData) {
-                document.getElementById('pdf-titulo-modal').innerText = '📄 ' + titulo + ' (' + (v.pdfNome || 'documento.pdf') + ')';
-                document.getElementById('pdf-iframe-view').src = v.pdfData;
-                document.getElementById('pdf-btn-download').href = v.pdfData;
-                document.getElementById('pdf-btn-download').download = v.pdfNome || 'documento.pdf';
-                document.getElementById('modal-leitor-pdf').classList.remove('hidden');
-            }
-        }
-
-        function fecharLeitorPdf() {
-            document.getElementById('modal-leitor-pdf').classList.add('hidden');
-            document.getElementById('pdf-iframe-view').src = '';
-        }
-
-        // ORÇAMENTO & GERAL
-        function renderizarOrcamentoTab() {
-            const container = document.getElementById('orcamento-conteudo');
-            const resumoTotalGastoBrl = document.getElementById('resumo-total-gasto-brl');
-            if(!container) return;
-            container.innerHTML = '';
-
-            try {
-                let cotEur = parseFloat(dadosApp.cotacaoEur) || 6.20;
-                let cotChf = parseFloat(dadosApp.cotacaoChf) || 6.50;
-
-                let gastoEur = 0;
-                let gastoChf = 0;
-                let gastoBrl = 0;
-
-                if(dadosApp.itinerario) {
-                    dadosApp.itinerario.forEach(item => {
-                        if(item.trechos && item.trechos.length > 0) {
-                            item.trechos.forEach(tr => {
-                                let val = limparNumero(tr.valor);
-                                let moeda = tr.moeda || 'EUR';
-                                if(val > 0) {
-                                    if(moeda === 'EUR') gastoEur += val;
-                                    else if(moeda === 'CHF') gastoChf += val;
-                                    else if(moeda === 'BRL') gastoBrl += val;
-                                }
-                            });
-                        }
-                    });
-                }
-
-                if(dadosApp.orcamento && dadosApp.orcamento.length > 0) {
-                    dadosApp.orcamento.forEach(d => {
-                        let val = limparNumero(d.valor);
-                        let moeda = d.moeda || 'EUR';
-                        if(val > 0) {
-                            if(moeda === 'EUR') gastoEur += val;
-                            else if(moeda === 'CHF') gastoChf += val;
-                            else if(moeda === 'BRL') gastoBrl += val;
-                        }
-                    });
-                }
-
-                if(dadosApp.compras && dadosApp.compras.length > 0) {
-                    dadosApp.compras.forEach(it => {
-                        let val = limparNumero(it.valor);
-                        let moeda = it.moeda || 'EUR';
-                        if(val > 0) {
-                            if(moeda === 'EUR') gastoEur += val;
-                            else if(moeda === 'CHF') gastoChf += val;
-                            else if(moeda === 'BRL') gastoBrl += val;
-                        }
-                    });
-                }
-
-                let totalGastoBrl = (gastoEur * cotEur) + (gastoChf * cotChf) + gastoBrl;
-                if(resumoTotalGastoBrl) resumoTotalGastoBrl.innerText = 'R$ ' + totalGastoBrl.toFixed(2);
-
-                if (orcamentoSubTab === 'eur') {
-                    let despesasEurHtml = '';
-                    if(dadosApp.itinerario) {
-                        dadosApp.itinerario.forEach(item => {
-                            if(item.trechos) {
-                                item.trechos.forEach(tr => {
-                                    let val = limparNumero(tr.valor);
-                                    if(val > 0 && tr.moeda === 'EUR') {
-                                        let valBrl = val * cotEur;
-                                        let origemStr = (tr.origem || '?').replace(/"/g, '&quot;');
-                                        let destinoStr = (tr.destino || '?').replace(/"/g, '&quot;');
-                                        despesasEurHtml += '<div class="p-3 rounded-xl bg-white border border-slate-200 flex flex-col gap-1.5 text-xs shadow-sm"><span class="font-bold text-slate-800 truncate">🚄 ' + origemStr + ' ➔ ' + destinoStr + '</span><div class="flex justify-between items-center border-t border-slate-100 pt-1.5"><span class="text-slate-500 font-medium">Trecho Oficial</span><div class="text-right whitespace-nowrap"><span class="font-black text-amber-900 text-sm">' + val.toFixed(2) + ' €</span><span class="text-emerald-700 font-bold text-[11px] block">R$ ' + valBrl.toFixed(2) + '</span></div></div></div>';
-                                    }
-                                });
-                            }
-                        });
-                    }
-
-                    if(dadosApp.orcamento) {
-                        dadosApp.orcamento.forEach(d => {
-                            if(d.moeda === 'EUR') {
-                                let val = limparNumero(d.valor);
-                                let descSafe = (d.descricao || '').replace(/"/g, '&quot;');
-                                despesasEurHtml += '<div class="p-3 rounded-xl bg-white border border-slate-200 flex flex-col gap-2 text-xs shadow-sm">' +
-                                    '<input type="text" value="' + descSafe + '" oninput="atualizarOrcamentoDescricao(' + d.id + ', this.value)" class="w-full bg-transparent outline-none font-bold text-slate-800 text-xs border-b pb-1" placeholder="Descrição...">' +
-                                    '<div class="flex items-center justify-between gap-2">' +
-                                        '<span class="text-slate-500 font-medium">Valor (€):</span>' +
-                                        '<div class="flex items-center gap-1.5"><input type="text" value="' + (val !== 0 ? val : '') + '" id="despesa-val-' + d.id + '" class="w-20 p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-black text-right text-xs outline-none" placeholder="0">' +
-                                        '<button onclick="salvarDespesaValor(' + d.id + ', document.getElementById(\'despesa-val-' + d.id + '\').value)" class="bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg font-bold text-[10px]">OK</button></div>' +
-                                        '<button onclick="apagarDespesa(' + d.id + ')" class="text-red-500 font-bold px-2 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-xs">✕</button></div>' +
-                                    '</div>';
-                            }
-                        });
-                    }
-                    if(despesasEurHtml === '') despesasEurHtml = '<p class="text-xs text-slate-400 italic">Sem despesas em Euros registadas.</p>';
-
-                    let saldoEurNum = limparNumero(dadosApp.saldoEur);
-                    let sobraEur = saldoEurNum - gastoEur;
-                    container.innerHTML = `
-                        <div class="bg-amber-50/50 p-4 rounded-2xl border border-amber-200 space-y-3 shadow-sm">
-                            <h3 class="font-black text-amber-900 text-xs uppercase border-b border-amber-200 pb-1.5">💶 Gestão de Euros (€)</h3>
-                            <div>
-                                <label class="block font-bold text-xs text-amber-800 mb-1">Disponível (€)</label>
-                                <div class="flex gap-1.5">
-                                    <input type="text" id="input-saldo-eur" value="${dadosApp.saldoEur !== "" ? dadosApp.saldoEur : ''}" class="flex-1 p-2.5 bg-white border border-amber-300 rounded-xl font-black text-amber-900 text-sm shadow-inner outline-none" placeholder="0">
-                                    <button onclick="salvarSaldo('EUR', document.getElementById('input-saldo-eur').value)" class="bg-emerald-600 text-white px-3 py-2 rounded-xl font-bold text-xs">OK</button>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-amber-100 text-xs shadow-sm">
-                                <span class="font-semibold text-slate-600">Restante:</span>
-                                <span class="font-black text-amber-900 text-sm">${sobraEur.toFixed(2)} €</span>
-                            </div>
-                            <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-amber-100 text-xs shadow-sm">
-                                <span class="font-semibold text-slate-600">Em Reais (R$):</span>
-                                <span class="font-black text-emerald-700 text-sm">R$ ${(sobraEur * cotEur).toFixed(2)}</span>
-                            </div>
-                            <div class="space-y-2 pt-2">
-                                <span class="font-bold text-xs text-amber-900 uppercase block">Despesas em Euros (€):</span>
-                                <div class="space-y-2.5">${despesasEurHtml}</div>
-                            </div>
-                            <button onclick="adicionarDespesa('EUR')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm mt-3">➕ Nova Despesa EUR</button>
-                        </div>
-                    `;
-
-                } else if (orcamentoSubTab === 'chf') {
-                    let despesasChfHtml = '';
-                    if(dadosApp.itinerario) {
-                        dadosApp.itinerario.forEach(item => {
-                            if(item.trechos) {
-                                item.trechos.forEach(tr => {
-                                    let val = limparNumero(tr.valor);
-                                    if(val > 0 && tr.moeda === 'CHF') {
-                                        let valBrl = val * cotChf;
-                                        let origemStr = (tr.origem || '?').replace(/"/g, '&quot;');
-                                        let destinoStr = (tr.destino || '?').replace(/"/g, '&quot;');
-                                        despesasChfHtml += '<div class="p-3 rounded-xl bg-white border border-slate-200 flex flex-col gap-1.5 text-xs shadow-sm"><span class="font-bold text-slate-800 truncate">🚄 ' + origemStr + ' ➔ ' + destinoStr + '</span><div class="flex justify-between items-center border-t border-slate-100 pt-1.5"><span class="text-slate-500 font-medium">Trecho Oficial</span><div class="text-right whitespace-nowrap"><span class="font-black text-blue-900 text-sm">' + val.toFixed(2) + ' CHF</span><span class="text-emerald-700 font-bold text-[11px] block">R$ ' + valBrl.toFixed(2) + '</span></div></div></div>';
-                                    }
-                                });
-                            }
-                        });
-                    }
-
-                    if(dadosApp.orcamento) {
-                        dadosApp.orcamento.forEach(d => {
-                            if(d.moeda === 'CHF') {
-                                let val = limparNumero(d.valor);
-                                let descSafe = (d.descricao || '').replace(/"/g, '&quot;');
-                                despesasChfHtml += '<div class="p-3 rounded-xl bg-white border border-slate-200 flex flex-col gap-2 text-xs shadow-sm">' +
-                                    '<input type="text" value="' + descSafe + '" oninput="atualizarOrcamentoDescricao(' + d.id + ', this.value)" class="w-full bg-transparent outline-none font-bold text-slate-800 text-xs border-b pb-1" placeholder="Descrição...">' +
-                                    '<div class="flex items-center justify-between gap-2">' +
-                                        '<span class="text-slate-500 font-medium">Valor (CHF):</span>' +
-                                        '<div class="flex items-center gap-1.5"><input type="text" value="' + (val !== 0 ? val : '') + '" id="despesa-val-' + d.id + '" class="w-20 p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-black text-right text-xs outline-none" placeholder="0">' +
-                                        '<button onclick="salvarDespesaValor(' + d.id + ', document.getElementById(\'despesa-val-' + d.id + '\').value)" class="bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg font-bold text-[10px]">OK</button></div>' +
-                                        '<button onclick="apagarDespesa(' + d.id + ')" class="text-red-500 font-bold px-2 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-xs">✕</button></div>' +
-                                    '</div>';
-                            }
-                        });
-                    }
-                    if(despesasChfHtml === '') despesasChfHtml = '<p class="text-xs text-slate-400 italic">Sem despesas em Francos registadas.</p>';
-
-                    let saldoChfNum = limparNumero(dadosApp.saldoChf);
-                    let sobraChf = saldoChfNum - gastoChf;
-                    container.innerHTML = `
-                        <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-200 space-y-3 shadow-sm">
-                            <h3 class="font-black text-blue-900 text-xs uppercase border-b border-blue-200 pb-1.5">🇨🇭 Gestão de Francos (CHF)</h3>
-                            <div>
-                                <label class="block font-bold text-xs text-blue-800 mb-1">Disponível (CHF)</label>
-                                <div class="flex gap-1">
-                                    <input type="text" id="input-saldo-chf" value="${dadosApp.saldoChf !== "" ? dadosApp.saldoChf : ''}" class="flex-1 p-2.5 bg-white border border-blue-300 rounded-xl font-black text-blue-900 text-sm shadow-inner outline-none" placeholder="0">
-                                    <button onclick="salvarSaldo('CHF', document.getElementById('input-saldo-chf').value)" class="bg-emerald-600 text-white px-3 py-2 rounded-xl font-bold text-xs">OK</button>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-blue-100 text-xs shadow-sm">
-                                <span class="font-semibold text-slate-600">Restante:</span>
-                                <span class="font-black text-blue-900 text-sm">${sobraChf.toFixed(2)} CHF</span>
-                            </div>
-                            <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-blue-100 text-xs shadow-sm">
-                                <span class="font-semibold text-slate-600">Em Reais (R$):</span>
-                                <span class="font-black text-emerald-700 text-sm">R$ ${(sobraChf * cotChf).toFixed(2)}</span>
-                            </div>
-                            <div class="space-y-2 pt-2">
-                                <span class="font-bold text-xs text-blue-900 uppercase block">Despesas em Francos (CHF):</span>
-                                <div class="space-y-2.5">${despesasChfHtml}</div>
-                            </div>
-                            <button onclick="adicionarDespesa('CHF')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm mt-3">➕ Nova Despesa CHF</button>
-                        </div>
-                    `;
-
-                } else if (orcamentoSubTab === 'conversor') {
-                    container.innerHTML = `
-                        <div class="bg-indigo-50/70 p-4 rounded-2xl border border-indigo-200 space-y-3 shadow-sm">
-                            <h3 class="font-black text-indigo-900 text-xs uppercase border-b border-indigo-200 pb-1.5">🧮 Conversor Rápido de Moeda</h3>
-                            <div>
-                                <label class="block font-bold text-xs text-indigo-800 mb-1">Valor Estrangeiro</label>
-                                <input type="text" id="conv-valor" class="w-full p-2.5 bg-white border border-indigo-200 rounded-xl font-black text-xs text-indigo-950 outline-none" placeholder="0.00">
-                            </div>
-                            <div>
-                                <label class="block font-bold text-xs text-indigo-800 mb-1">Moeda</label>
-                                <select id="conv-moeda" class="w-full p-2.5 bg-white border border-indigo-200 rounded-xl font-bold text-xs text-indigo-950 outline-none">
-                                    <option value="EUR">Euros (€)</option>
-                                    <option value="CHF">Francos (CHF)</option>
-                                </select>
-                            </div>
-                            <button onclick="calcularConversaoRapida()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">Converter</button>
-                            <div class="bg-white p-3 rounded-xl border border-indigo-200 text-sm font-black text-emerald-700 text-center shadow-inner" id="conv-resultado">
-                                R$ 0.00
-                            </div>
-                        </div>
-                    `;
-                }
-            } catch(err) {
-                console.error("Erro no orçamento:", err);
-                container.innerHTML = '<div class="p-3 bg-red-50 text-red-600 rounded-xl text-xs">Erro ao carregar orçamento. Tente atualizar a página.</div>';
-            }
-        }
-
-        // RENDERIZAR ABA DE COMPRAS (LISTA ÚNICA DIRETA COM CARINHAS E CAIXINHA DE FEITO)
-        function renderizarComprasTab() {
-            const containerResumo = document.getElementById('compras-resumo-topo');
-            const containerLista = document.getElementById('compras-lista-blocos');
-            if(!containerResumo || !containerLista) return;
-
-            try {
-                let cotEur = parseFloat(dadosApp.cotacaoEur) || 6.20;
-                let cotChf = parseFloat(dadosApp.cotacaoChf) || 6.50;
-
-                let totalAdultosEur = 0, totalAdultosChf = 0, totalAdultosBrl = 0;
-                let totalCriancasEur = 0, totalCriancasChf = 0, totalCriancasBrl = 0;
-
-                if(!Array.isArray(dadosApp.compras)) dadosApp.compras = [];
-
-                dadosApp.compras.forEach(it => {
-                    let val = limparNumero(it.valor);
-                    let moeda = it.moeda || 'EUR';
-                    let pub = it.publico || 'Adulto';
-                    if(val > 0) {
-                        if(pub === 'Adulto') {
-                            if(moeda === 'EUR') totalAdultosEur += val;
-                            else if(moeda === 'CHF') totalAdultosChf += val;
-                            else if(moeda === 'BRL') totalAdultosBrl += val;
-                        } else {
-                            if(moeda === 'EUR') totalCriancasEur += val;
-                            else if(moeda === 'CHF') totalCriancasChf += val;
-                            else if(moeda === 'BRL') totalCriancasBrl += val;
-                        }
-                    }
-                });
-                // Ordenar para que os concluídos fiquem em baixo
-                dadosApp.compras.sort((a, b) => (a.concluido === b.concluido) ? 0 : a.concluido ? 1 : -1);
-
-                let finalAdultosBrl = (totalAdultosEur * cotEur) + (totalAdultosChf * cotChf) + totalAdultosBrl;
-                let finalCriancasBrl = (totalCriancasEur * cotEur) + (totalCriancasChf * cotChf) + totalCriancasBrl;
-
-                containerResumo.innerHTML = `
-                    <div class="bg-purple-50 p-3 rounded-xl border border-purple-200 shadow-sm text-center space-y-0.5 min-w-0">
-                        <span class="font-bold text-[10px] text-purple-900 uppercase block truncate">👤 Total Adultos</span>
-                        <div class="font-black text-[11px] text-slate-800 truncate">${totalAdultosEur.toFixed(2)}€ | ${totalAdultosChf.toFixed(2)}CHF</div>
-                        <div class="font-bold text-[11px] text-emerald-700 truncate">R$ ${finalAdultosBrl.toFixed(2)}</div>
-                    </div>
-                    <div class="bg-purple-50 p-3 rounded-xl border border-purple-200 shadow-sm text-center space-y-0.5 min-w-0">
-                        <span class="font-bold text-[10px] text-purple-900 uppercase block truncate">👧 Total Crianças</span>
-                        <div class="font-black text-[11px] text-slate-800 truncate">${totalCriancasEur.toFixed(2)}€ | ${totalCriancasChf.toFixed(2)}CHF</div>
-                        <div class="font-bold text-[11px] text-emerald-700 truncate">R$ ${finalCriancasBrl.toFixed(2)}</div>
-                    </div>
-                `;
-
-                let itensHtml = '';
-                if(dadosApp.compras.length === 0) {
-                    itensHtml = '<p class="text-xs text-slate-400 italic text-center py-6">Nenhum item adicionado. Clique em "➕ Adicionar Item" acima.</p>';
-                } else {
-                    dadosApp.compras.forEach(it => {
-                        let val = limparNumero(it.valor);
-                        let moeda = it.moeda || 'EUR';
-                        let pub = it.publico || 'Adulto';
-                        let valBrl = moeda === 'EUR' ? val * cotEur : (moeda === 'CHF' ? val * cotChf : val);
-                        let descSafe = (it.descricao || '').replace(/"/g, '&quot;');
-                        let editando = it.editando !== undefined ? it.editando : false;
-                        let concluido = it.concluido ? true : false;
-                        let emojiCarinha = pub === 'Adulto' ? '👤' : '👧';
-                        let moedaSimbolo = moeda === 'EUR' ? '€' : (moeda === 'CHF' ? 'CHF' : 'R$');
-
-                        if(editando) {
-                            itensHtml += `
-                                <div class="p-3 rounded-xl border bg-white border-indigo-300 space-y-2 text-xs shadow-sm min-w-0">
-                                    <div class="flex items-center gap-1.5 min-w-0">
-                                        <input type="text" id="desc-${it.id}" value="${descSafe}" class="flex-1 min-w-0 p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs" placeholder="Nome do item...">
-                                        <select id="pub-${it.id}" class="p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs shrink-0">
-                                            <option value="Adulto" ${pub==='Adulto'?'selected':''}>👤 Adulto</option>
-                                            <option value="Criança (Sofia)" ${pub==='Criança (Sofia)'?'selected':''}>👧 Criança</option>
-                                        </select>
-                                        <button onclick="apagarItemDireto('${it.id}')" class="text-red-500 font-bold px-2 py-1.5 rounded-xl bg-red-50 text-xs shrink-0">✕</button>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-1.5 flex-wrap border-t border-slate-100 pt-1.5">
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="text-slate-500 font-bold">Valor:</span>
-                                            <input type="text" value="${val !== 0 ? val : ''}" id="val-${it.id}" class="w-20 p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-black text-right text-xs" placeholder="0">
-                                            <select id="moeda-${it.id}" class="p-1.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs">
-                                                <option value="EUR" ${moeda==='EUR'?'selected':''}>€</option>
-                                                <option value="CHF" ${moeda==='CHF'?'selected':''}>CHF</option>
-                                                <option value="BRL" ${moeda==='BRL'?'selected':''}>R$</option>
-                                            </select>
-                                            <button onclick="salvarEFecharItemDireto('${it.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs shadow-sm">✓ OK (Salvar)</button>
-                                        </div>
-                                        <div class="text-right text-[11px] font-bold text-emerald-700">R$ ${valBrl.toFixed(2)}</div>
-                                    </div>
-                                </div>
-                            `;
-                        } else {
-                            let linhaRiscada = concluido ? 'line-through text-slate-400 bg-emerald-50/60 border-emerald-300' : 'text-slate-900 bg-slate-50 border-slate-200';
-                            itensHtml += `
-                                <div class="p-2.5 rounded-xl border ${linhaRiscada} flex items-center justify-between gap-2 text-xs shadow-sm min-w-0">
-                                    <div class="flex items-center gap-2 min-w-0 flex-1">
-                                        <input type="checkbox" ${concluido ? 'checked' : ''} onchange="alternarConcluidoItemDireto('${it.id}')" class="w-4 h-4 accent-emerald-600 rounded cursor-pointer shrink-0" title="Marcar como feito">
-                                        <span class="font-bold truncate ${concluido ? 'line-through text-slate-400' : 'text-slate-900'}">${descSafe}</span>
-                                        <span class="text-sm shrink-0" title="${pub}">${emojiCarinha}</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <span class="font-black text-indigo-900 ${concluido ? 'line-through text-slate-400' : ''}">${val > 0 ? val + ' ' + moedaSimbolo : 'Grátis'}</span>
-                                        <span class="text-emerald-700 font-bold ${concluido ? 'line-through text-slate-400' : ''}">R$ ${valBrl.toFixed(2)}</span>
-                                        <button onclick="abrirEdicaoItemDireto('${it.id}')" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-2.5 py-1 rounded-lg font-bold text-[11px]" title="Editar com Lápis">✏️</button>
-                                        <button onclick="apagarItemDireto('${it.id}')" class="text-red-500 font-bold px-1.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-xs">✕</button>
-                                    </div>
-                                </div>
-                            `;
-                        }
-                    });
-                }
-
-                containerLista.innerHTML = `<div class="space-y-2 min-w-0">${itensHtml}</div>`;
-            } catch(err) {
-                console.error("Erro nas compras:", err);
-            }
-        }
-
-        function adicionarItemCompraDireto() {
-            registarEstadoAnterior();
-            if(!Array.isArray(dadosApp.compras)) dadosApp.compras = [];
-            dadosApp.compras.unshift({
-                id: Date.now(),
-                descricao: "",
-                publico: "Adulto",
-                valor: 0,
-                moeda: "EUR",
-                concluido: false,
-                editando: true
-            });
-            salvarStorage();
-            atualizarTudo();
-        }
-
-        function salvarEFecharItemDireto(itemId) {
-            registarEstadoAnterior();
-            let it = dadosApp.compras.find(i => String(i.id) === String(itemId));
-            if(it) {
-                let desc = document.getElementById('desc-' + itemId).value;
-                let pub = document.getElementById('pub-' + itemId).value;
-                let val = document.getElementById('val-' + itemId).value;
-                let moeda = document.getElementById('moeda-' + itemId).value;
-
-                it.descricao = desc ? desc.trim() : "Item";
-                it.publico = pub;
-                it.valor = val !== "" ? limparNumero(val) : 0;
-                it.moeda = moeda;
-                it.editando = false;
-
-                salvarStorage();
-                atualizarTudo();
-            }
-        }
-
-        function abrirEdicaoItemDireto(itemId) {
-            registarEstadoAnterior();
-            let it = dadosApp.compras.find(i => String(i.id) === String(itemId));
-            if(it) {
-                it.editando = true;
-                salvarStorage();
-                atualizarTudo();
-            }
-        }
-
-        function alternarConcluidoItemDireto(itemId) {
-            registarEstadoAnterior();
-            let it = dadosApp.compras.find(i => String(i.id) === String(itemId));
-            if(it) {
-                it.concluido = !it.concluido;
-                salvarStorage();
-                atualizarTudo();
-            }
-        }
-
-        function apagarItemDireto(itemId) {
-            registarEstadoAnterior();
-            dadosApp.compras = dadosApp.compras.filter(i => String(i.id) !== String(itemId));
-            salvarStorage();
-            atualizarTudo();
-        }
-
-        function salvarSaldo(moeda, val) {
-            registarEstadoAnterior();
-            let num = limparNumero(val);
-            if(moeda === 'EUR') dadosApp.saldoEur = val !== "" ? num : "";
-            if(moeda === 'CHF') dadosApp.saldoChf = val !== "" ? num : "";
-            salvarStorage();
-            renderizarOrcamentoTab();
-            alert("💾 Saldo guardado com sucesso!");
-        }
-
-        function salvarCotacao(moeda, val) {
-            registarEstadoAnterior();
-            let num = limparNumero(val);
-            if(moeda === 'EUR') dadosApp.cotacaoEur = num > 0 ? num : 6.20;
-            if(moeda === 'CHF') dadosApp.cotacaoChf = num > 0 ? num : 6.50;
-            salvarStorage();
-            renderizarOrcamentoTab();
-            renderizarComprasTab();
-            alert("💾 Cotação guardada com sucesso!");
-        }
-
-        function salvarDespesaValor(id, val) {
-            registarEstadoAnterior();
-            let d = dadosApp.orcamento.find(item => String(item.id) === String(id));
-            if(d) {
-                d.valor = val !== "" ? limparNumero(val) : 0;
-                salvarStorage();
-                renderizarOrcamentoTab();
-            }
-        }
-
-        function calcularConversaoRapida() {
-            let elVal = document.getElementById('conv-valor');
-            let elMoeda = document.getElementById('conv-moeda');
-            let elRes = document.getElementById('conv-resultado');
-            if(!elVal || !elMoeda || !elRes) return;
-            let val = limparNumero(elVal.value);
-            let moeda = elMoeda.value;
-            let cotEur = parseFloat(dadosApp.cotacaoEur) || 6.20;
-            let cotChf = parseFloat(dadosApp.cotacaoChf) || 6.50;
-            let resultado = moeda === 'EUR' ? val * cotEur : (moeda === 'CHF' ? val * cotChf : val);
-            elRes.innerText = 'R$ ' + resultado.toFixed(2);
-        }
-
-        function adicionarDespesa(moedaForcada) {
-            registarEstadoAnterior();
-            if(!dadosApp.orcamento) dadosApp.orcamento = [];
-            dadosApp.orcamento.unshift({ id: Date.now(), descricao: "Despesa", valor: 0, moeda: moedaForcada });
-            salvarStorage();
-            renderizarOrcamentoTab();
-        }
-
-        function apagarDespesa(id) {
-            registarEstadoAnterior();
-            dadosApp.orcamento = dadosApp.orcamento.filter(d => String(d.id) !== String(id));
-            salvarStorage();
-            renderizarOrcamentoTab();
-        }
-
-        function atualizarOrcamentoDescricao(id, val) {
-            let d = dadosApp.orcamento.find(item => String(item.id) === String(id));
-            if(d) { d.descricao = val; localStorage.setItem(CHAVE_APP, JSON.stringify(dadosApp)); }
-        }
-
-        function ativarMicrofone() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) { alert("Sem suporte a voz."); return; }
-            if (!campoFocoAtual) {
-                alert("Por favor, clique primeiro num campo de texto onde deseja ditar.");
-                return;
-            }
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'pt-BR';
-            recognition.onresult = function(event) {
-                campoFocoAtual.value = event.results[0][0].transcript;
-                campoFocoAtual.dispatchEvent(new Event('input'));
-                campoFocoAtual.dispatchEvent(new Event('change'));
-            };
-            recognition.start();
-        }
+        window.onload = renderCatalog;
     </script>
 </body>
 </html>
