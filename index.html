@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v3.4)</title>
+    <title>Gestão de Uniformes - Vale (v3.7)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -25,7 +25,7 @@
 
             <div class="space-y-3 text-left">
                 <div>
-                    <label class="block font-semibold text-slate-600 mb-1">Matrícula ou Nome</label>
+                    <label class="block font-semibold text-slate-600 mb-1" id="labelMatricula">Matrícula</label>
                     <input type="text" id="authMatricula" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: 81025364">
                 </div>
                 <div id="divNomeRegistro" class="hidden">
@@ -52,29 +52,33 @@
         </div>
     </div>
 
-    <!-- MODAL DE AUTENTICAÇÃO ADMIN (PIN 1510) -->
+    <!-- MODAL DE AUTENTICAÇÃO ADMIN (COM O MESMO ESTILO BONITO) -->
     <div id="modalAdminLogin" class="fixed inset-0 z-[150] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
             <button onclick="fecharModalAdminLogin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
-            <div class="w-14 h-14 bg-emerald-100 text-emerald-700 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">🔒</div>
+            
+            <div class="w-14 h-14 bg-amber-100 text-amber-700 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">🔒</div>
             <div>
                 <h2 class="text-sm font-black text-slate-900">Acesso Administrador</h2>
                 <p class="text-slate-500 mt-0.5 text-[11px]">Insira a senha PIN para aceder ao painel de gestão.</p>
             </div>
-            <div class="space-y-2.5">
-                <input type="password" id="inputAdminPin" maxlength="6" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-center text-base font-black tracking-widest outline-none text-slate-900 focus:border-emerald-600" placeholder="••••">
-                <button onclick="verificarAdminPin()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl transition text-xs shadow-sm">
+
+            <div class="space-y-3 text-left">
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-1">Senha PIN</label>
+                    <input type="password" id="inputAdminPin" maxlength="6" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl font-bold text-center tracking-widest outline-none text-slate-900 focus:border-amber-600" placeholder="••••">
+                </div>
+
+                <div id="erroAdminPin" class="text-red-500 font-bold text-[11px] hidden text-center">Senha incorreta (Padrão: 1510).</div>
+
+                <button onclick="verificarAdminPin()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl transition text-xs shadow-sm">
                     🔓 Entrar como Admin
                 </button>
-                <button onclick="fecharModalAdminLogin()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl transition text-xs">
-                    Cancelar
-                </button>
             </div>
-            <div id="erroAdminPin" class="text-red-500 font-bold text-[11px] hidden">Senha incorreta (Padrão: 1510).</div>
         </div>
     </div>
 
-    <!-- MODAL DE GESTÃO DE UTILIZADORES (BONEQUINHOS 👥) -->
+    <!-- MODAL DE GESTÃO DE UTILIZADORES (ADMIN) -->
     <div id="modalUtilizadoresAdmin" class="fixed inset-0 z-[160] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-lg w-full space-y-4 text-xs relative">
             <button onclick="fecharModalUtilizadoresAdmin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
@@ -87,13 +91,50 @@
             </div>
 
             <div class="flex gap-2">
-                <button onclick="adicionarUtilizadorAdmin()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl font-bold text-xs transition shadow-sm">➕ Cadastrar Novo Utilizador</button>
+                <button onclick="abrirModalCadastrarUtilizador()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2.5 rounded-xl font-bold text-xs transition shadow-sm flex items-center gap-1">➕ Cadastrar Novo Utilizador</button>
             </div>
 
             <div id="listaUtilizadoresAdmin" class="max-h-60 overflow-y-auto space-y-2"></div>
 
             <div class="flex justify-end pt-2 border-t">
                 <button onclick="fecharModalUtilizadoresAdmin()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl font-bold">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELINHA DE CADASTRO DE UTILIZADOR PELO ADMIN -->
+    <div id="modalCadastrarUtilizador" class="fixed inset-0 z-[170] bg-slate-900/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
+            <button onclick="fecharModalCadastrarUtilizador()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
+
+            <div class="w-14 h-14 bg-emerald-100 text-emerald-700 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">👤</div>
+            <div>
+                <h2 class="text-sm font-black text-slate-900">Novo Utilizador</h2>
+                <p class="text-slate-500 mt-0.5 text-[11px]">Insira os dados para cadastrar o colaborador.</p>
+            </div>
+
+            <div class="space-y-3 text-left">
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-1">Matrícula</label>
+                    <input type="text" id="novoAdminMatricula" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: 123456">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-1">Nome Completo</label>
+                    <input type="text" id="novoAdminNome" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: João Silva">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-1">Senha de Acesso</label>
+                    <input type="password" id="novoAdminSenha" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="••••">
+                </div>
+
+                <div id="erroNovoUser" class="text-red-500 font-bold text-[11px] hidden text-center"></div>
+
+                <button onclick="salvarNovoUtilizadorAdmin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition text-xs shadow-sm">
+                    ✓ Salvar e Cadastrar
+                </button>
+                <button onclick="fecharModalCadastrarUtilizador()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl transition text-xs">
+                    Cancelar
+                </button>
             </div>
         </div>
     </div>
@@ -194,9 +235,9 @@
 
     </div>
 
-    <!-- RODAPÉ COM FAIXA VERDE, VERSÃO E O BOTÃO DOS BONEQUINHOS (👥) SEMPRE VISÍVEL -->
+    <!-- RODAPÉ COM FAIXA VERDE E BOTÃO DOS BONEQUINHOS (👥) PARA O ADMIN -->
     <footer class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-emerald-900 text-white px-4 py-2.5 flex justify-between items-center max-w-5xl mx-auto rounded-t-2xl shadow-2xl border-t border-emerald-800 text-xs">
-        <span class="font-bold tracking-wider">Uniformes Vale • Versão v3.4</span>
+        <span class="font-bold tracking-wider">Uniformes Vale • Versão v3.7</span>
         <button onclick="clicarBotaoBonequinhos()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition" title="Utilizadores Cadastrados">
             <span>👥</span> Utilizadores
         </button>
@@ -280,7 +321,6 @@
                 } catch(e) {}
             }
 
-            // Garante que a conta da Mariana está sempre presente
             if(!dadosApp.utilizadores.some(u => u.matricula === "81025364")) {
                 dadosApp.utilizadores.push({ matricula: "81025364", nome: "Mariana Pereira Cruz", senha: "1510" });
             }
@@ -288,6 +328,7 @@
             let sessaoSalva = sessionStorage.getItem('usuario_logado_vale');
             if (sessaoSalva) {
                 usuarioAtual = JSON.parse(sessaoSalva);
+                document.getElementById('modalUserAuth').classList.add('hidden');
                 atualizarCabecalhoUtilizador();
             } else {
                 abrirModalAuth();
@@ -310,6 +351,9 @@
         }
 
         function abrirModalAuth() {
+            document.getElementById('authMatricula').value = '';
+            document.getElementById('authSenha').value = '';
+            if(modoRegisto) alternarModoAuth();
             document.getElementById('modalUserAuth').classList.remove('hidden');
         }
 
@@ -322,19 +366,22 @@
             const sub = document.getElementById('authSubtitulo');
             const btn = document.getElementById('btnAuthAcao');
             const link = document.getElementById('linkTrocaAuth');
+            const labelMat = document.getElementById('labelMatricula');
             const divNome = document.getElementById('divNomeRegistro');
             const erro = document.getElementById('erroAuth');
             erro.classList.add('hidden');
 
             if(modoRegisto) {
-                sub.innerText = "Crie a sua conta informando a sua matrícula, nome e senha.";
+                sub.innerText = "Crie a sua conta informando a matrícula, nome e senha.";
                 btn.innerText = "Registar Conta";
                 link.innerText = "Já tem conta? Faça login aqui.";
+                labelMat.innerText = "Matrícula";
                 divNome.classList.remove('hidden');
             } else {
                 sub.innerText = "Insira a sua matrícula e senha para entrar.";
                 btn.innerText = "Entrar no Sistema";
                 link.innerText = "Primeiro acesso? Crie a sua conta aqui.";
+                labelMat.innerText = "Matrícula";
                 divNome.classList.add('hidden');
             }
         }
@@ -374,14 +421,14 @@
                 alternarModoAuth();
                 document.getElementById('authSenha').value = '';
             } else {
-                let user = dadosApp.utilizadores.find(u => (u.matricula === mat || u.nome.toLowerCase() === mat.toLowerCase()) && u.senha === senha);
+                let user = dadosApp.utilizadores.find(u => u.matricula === mat && u.senha === senha);
                 if(user) {
                     usuarioAtual = user;
                     sessionStorage.setItem('usuario_logado_vale', JSON.stringify(user));
                     document.getElementById('modalUserAuth').classList.add('hidden');
                     atualizarCabecalhoUtilizador();
                 } else {
-                    erro.innerText = "Matrícula/Nome ou senha incorretas (ou conta não criada).";
+                    erro.innerText = "Matrícula ou senha incorretas.";
                     erro.classList.remove('hidden');
                 }
             }
@@ -396,28 +443,39 @@
         function sairDaConta() {
             sessionStorage.removeItem('usuario_logado_vale');
             usuarioAtual = null;
-            document.getElementById('authMatricula').value = '';
-            document.getElementById('authSenha').value = '';
-            document.getElementById('modalUserAuth').classList.remove('hidden');
+            abrirModalAuth();
             if(modoAdmin) toggleModoAdmin();
         }
 
-        // CLIQUE NOS BONEQUINHOS DO RODAPÉ (EXIGE PIN ADMIN 1510)
         function clicarBotaoBonequinhos() {
             if(modoAdmin) {
                 abrirModalUtilizadoresAdmin();
             } else {
-                let pin = prompt("🔐 Insira a senha PIN de Administrador (1510) para aceder aos utilizadores:", "");
-                if(pin === "1510") {
-                    modoAdmin = true;
-                    document.getElementById('badgeModo').innerText = "Modo: Administrador";
-                    document.getElementById('btnModoAdmin').innerText = "👤 Sair Admin";
-                    document.getElementById('tab-btn-admin').classList.remove('hidden');
-                    document.getElementById('tab-btn-gerir').classList.remove('hidden');
-                    abrirModalUtilizadoresAdmin();
-                } else if(pin !== null) {
-                    alert("Senha PIN incorreta!");
-                }
+                document.getElementById('modalAdminLogin').classList.remove('hidden');
+                document.getElementById('inputAdminPin').value = '';
+                document.getElementById('inputAdminPin').focus();
+            }
+        }
+
+        function fecharModalAdminLogin() {
+            document.getElementById('modalAdminLogin').classList.add('hidden');
+            document.getElementById('erroAdminPin').classList.add('hidden');
+        }
+
+        function verificarAdminPin() {
+            let pin = document.getElementById('inputAdminPin').value;
+            if (pin === "1510") {
+                modoAdmin = true;
+                fecharModalAdminLogin();
+                document.getElementById('badgeModo').innerText = "Modo: Administrador";
+                document.getElementById('btnModoAdmin').innerText = "👤 Sair Admin";
+                document.getElementById('tab-btn-admin').classList.remove('hidden');
+                document.getElementById('tab-btn-gerir').classList.remove('hidden');
+                mudarTab('admin');
+                abrirModalUtilizadoresAdmin();
+                atualizarTudo();
+            } else {
+                document.getElementById('erroAdminPin').classList.remove('hidden');
             }
         }
 
@@ -428,6 +486,45 @@
 
         function fecharModalUtilizadoresAdmin() {
             document.getElementById('modalUtilizadoresAdmin').classList.add('hidden');
+        }
+
+        function abrirModalCadastrarUtilizador() {
+            document.getElementById('novoAdminMatricula').value = '';
+            document.getElementById('novoAdminNome').value = '';
+            document.getElementById('novoAdminSenha').value = '';
+            document.getElementById('erroNovoUser').classList.add('hidden');
+            document.getElementById('modalCadastrarUtilizador').classList.remove('hidden');
+        }
+
+        function fecharModalCadastrarUtilizador() {
+            document.getElementById('modalCadastrarUtilizador').classList.add('hidden');
+        }
+
+        function salvarNovoUtilizadorAdmin() {
+            let mat = document.getElementById('novoAdminMatricula').value.trim();
+            let nome = document.getElementById('novoAdminNome').value.trim();
+            let senha = document.getElementById('novoAdminSenha').value.trim();
+            let erro = document.getElementById('erroNovoUser');
+            erro.classList.add('hidden');
+
+            if(!mat || !nome || !senha) {
+                erro.innerText = "Preencha todos os campos.";
+                erro.classList.remove('hidden');
+                return;
+            }
+
+            let existente = dadosApp.utilizadores.find(u => u.matricula === mat);
+            if(existente) {
+                erro.innerText = "Esta matrícula já está cadastrada.";
+                erro.classList.remove('hidden');
+                return;
+            }
+
+            dadosApp.utilizadores.push({ matricula: mat, nome: nome, senha: senha });
+            salvarStorage();
+            renderizarUtilizadoresAdmin();
+            fecharModalCadastrarUtilizador();
+            alert("✅ Utilizador cadastrado com sucesso!");
         }
 
         function renderizarUtilizadoresAdmin() {
@@ -452,19 +549,6 @@
                 `;
             });
             container.innerHTML = html;
-        }
-
-        function adicionarUtilizadorAdmin() {
-            let mat = prompt("Digite a matrícula do novo colaborador:");
-            let nome = prompt("Digite o nome completo:");
-            let senha = prompt("Crie uma senha de acesso:", "1234");
-            if(mat && mat.trim() !== "" && nome && nome.trim() !== "" && senha && senha.trim() !== "") {
-                if(!dadosApp.utilizadores) dadosApp.utilizadores = [];
-                dadosApp.utilizadores.push({ matricula: mat.trim(), nome: nome.trim(), senha: senha.trim() });
-                salvarStorage();
-                renderizarUtilizadoresAdmin();
-                alert("✅ Utilizador cadastrado com sucesso!");
-            }
         }
 
         function removerUtilizador(idx) {
@@ -506,27 +590,6 @@
                 document.getElementById('modalAdminLogin').classList.remove('hidden');
                 document.getElementById('inputAdminPin').value = '';
                 document.getElementById('inputAdminPin').focus();
-            }
-        }
-
-        function fecharModalAdminLogin() {
-            document.getElementById('modalAdminLogin').classList.add('hidden');
-            document.getElementById('erroAdminPin').classList.add('hidden');
-        }
-
-        function verificarAdminPin() {
-            let pin = document.getElementById('inputAdminPin').value;
-            if (pin === "1510") {
-                modoAdmin = true;
-                fecharModalAdminLogin();
-                document.getElementById('badgeModo').innerText = "Modo: Administrador";
-                document.getElementById('btnModoAdmin').innerText = "👤 Sair Admin";
-                document.getElementById('tab-btn-admin').classList.remove('hidden');
-                document.getElementById('tab-btn-gerir').classList.remove('hidden');
-                mudarTab('admin');
-                atualizarTudo();
-            } else {
-                document.getElementById('erroAdminPin').classList.remove('hidden');
             }
         }
 
