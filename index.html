@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v2.7)</title>
+    <title>Gestão de Uniformes - Vale (v2.8)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,8 +12,8 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen pb-32 select-none transition-colors duration-200 font-sans">
 
-    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR -->
-    <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4">
+    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR (OCULTA POR DEFEITO PARA NÃO PRENDER O ECRÃ) -->
+    <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
             <button onclick="fecharModalUserAuth()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
 
@@ -93,11 +93,11 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <div class="max-w-5xl mx-auto p-3 sm:p-6 space-y-4 pt-4">
 
-        <!-- ABAS DE NAVEGAÇÃO -->
+        <!-- ABAS DE NAVEGAÇÃO (COM OS BONEQUINHOS 👥 ALINHADOS NO ADMIN) -->
         <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl shadow-inner overflow-x-auto no-scrollbar">
             <button onclick="mudarTab('catalogo')" id="tab-btn-catalogo" class="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5"><span>👕</span> Catálogo</button>
             <button onclick="mudarTab('carrinho')" id="tab-btn-carrinho" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50"><span>🛒</span> Carrinho <span id="contadorCarrinho" class="bg-emerald-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
-            <button onclick="mudarTab('usuarios')" id="tab-btn-usuarios" class="py-3 px-4 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden" title="Utilizadores"><span>👥</span></button>
+            <button onclick="mudarTab('usuarios')" id="tab-btn-usuarios" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden" title="Utilizadores"><span>👥</span></button>
             <button onclick="mudarTab('admin')" id="tab-btn-admin" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>📊</span> Pedidos <span id="contadorPedidos" class="bg-amber-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
             <button onclick="mudarTab('gerir')" id="tab-btn-gerir" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>✏️</span> Catálogo</button>
         </div>
@@ -187,7 +187,7 @@
 
     <!-- RODAPÉ COM A VERSÃO -->
     <footer class="text-center py-6 text-xs text-slate-400 font-bold tracking-wider">
-        Uniformes Vale • Versão v2.7
+        Uniformes Vale • Versão v2.8
     </footer>
 
     <!-- SCRIPT DA APLICAÇÃO -->
@@ -245,7 +245,6 @@
             let sessaoSalva = sessionStorage.getItem('usuario_logado_vale');
             if (sessaoSalva) {
                 usuarioAtual = JSON.parse(sessaoSalva);
-                document.getElementById('modalUserAuth').classList.add('hidden');
                 atualizarCabecalhoUtilizador();
             }
 
