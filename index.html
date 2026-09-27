@@ -1,104 +1,139 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v5.2)</title>
+    <title>Gestão de Uniformes - Vale (v5.3)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = { darkMode: 'class' }
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vale: {
+                            DEFAULT: '#007e7a',
+                            dark: '#005a57',
+                            light: '#e6f4f4',
+                            amber: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
     </script>
+    <style>
+        * { box-sizing: border-box; }
+        @media print {
+            @page { size: A4 portrait; margin: 8mm 10mm; }
+            body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            table { border-collapse: collapse !important; width: 100% !important; }
+            th, td { border: 1px solid #334155 !important; }
+            th { background-color: #007e7a !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+        .print-only { display: none; }
+    </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen pb-32 select-none transition-colors duration-200 font-sans">
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-24 font-sans select-none transition-colors">
 
-    <!-- TELA DE LOGIN / REGISTO DE UTILIZADOR -->
-    <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
+    <!-- TOAST NOTIFICAÇÃO -->
+    <div id="toastNotificacao" class="fixed bottom-16 right-6 bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-xl opacity-0 translate-y-3 pointer-events-none transition-all duration-300 z-[300]">
+        Mensagem
+    </div>
+
+    <!-- MODAL DE LOGIN / REGISTRO DE USUÁRIO -->
+    <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden no-print">
+        <div class="bg-white p-6 sm:p-7 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative border border-slate-100">
             <button onclick="fecharModalUserAuth()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
 
-            <div class="w-14 h-14 bg-indigo-100 text-indigo-700 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">👕</div>
+            <div class="w-14 h-14 bg-teal-50 text-[#007e7a] rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">👕</div>
             <div>
-                <h2 class="text-sm font-black text-slate-900">Uniformes Vale - Acesso</h2>
-                <p class="text-slate-500 mt-0.5 text-[11px]" id="authSubtitulo">Insira a sua matrícula e senha para entrar.</p>
+                <h2 class="text-sm font-black text-slate-900">Uniformes Vale - Identificação</h2>
+                <p class="text-slate-500 mt-0.5 text-[11px]" id="authSubtitulo">Insira sua matrícula e senha para acessar.</p>
             </div>
 
             <div class="space-y-3 text-left">
                 <div>
-                    <label class="block font-semibold text-slate-600 mb-1" id="labelMatricula">Matrícula</label>
-                    <input type="text" id="authMatricula" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: 81025364">
+                    <label class="block font-bold text-slate-600 mb-1" id="labelMatricula">Matrícula</label>
+                    <input type="text" id="authMatricula" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900 focus:border-[#007e7a]" placeholder="Ex: 81025364">
                 </div>
                 <div id="divNomeRegistro" class="hidden">
-                    <label class="block font-semibold text-slate-600 mb-1">Nome Completo</label>
-                    <input type="text" id="authNome" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: Mariana Cruz">
+                    <label class="block font-bold text-slate-600 mb-1">Nome Completo</label>
+                    <input type="text" id="authNome" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900 focus:border-[#007e7a]" placeholder="Ex: Mariana Cruz">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-600 mb-1">Senha</label>
-                    <input type="password" id="authSenha" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="••••">
+                    <label class="block font-bold text-slate-600 mb-1">Senha</label>
+                    <input type="password" id="authSenha" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900 focus:border-[#007e7a]" placeholder="••••">
                 </div>
 
-                <div id="erroAuth" class="text-red-500 font-bold text-[11px] hidden text-center"></div>
+                <div id="erroAuth" class="text-rose-500 font-bold text-[11px] hidden text-center"></div>
 
-                <button onclick="processarAutenticacao()" id="btnAuthAcao" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition text-xs shadow-sm">
+                <button onclick="processarAutenticacao()" id="btnAuthAcao" class="w-full bg-[#007e7a] hover:bg-[#005a57] text-white font-bold py-3 rounded-xl transition text-xs shadow-md">
                     Entrar no Sistema
                 </button>
             </div>
 
             <div class="pt-2 border-t text-center">
-                <button onclick="alternarModoAuth()" id="linkTrocaAuth" class="text-indigo-600 font-bold text-[11px] hover:underline">
-                    Primeiro acesso? Crie a sua conta aqui.
+                <button onclick="alternarModoAuth()" id="linkTrocaAuth" class="text-[#007e7a] font-bold text-[11px] hover:underline">
+                    Primeiro acesso? Crie sua conta aqui.
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- TELA DE LOGIN DE ADMINISTRADOR -->
-    <div id="modalAdminLogin" class="fixed inset-0 z-[150] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
+    <!-- MODAL DE LOGIN ADMIN -->
+    <div id="modalAdminLogin" class="fixed inset-0 z-[150] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white p-6 sm:p-7 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
             <button onclick="fecharModalAdminLogin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
 
-            <div class="w-14 h-14 bg-amber-100 text-amber-700 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">🔒</div>
+            <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">🔒</div>
             <div>
-                <h2 class="text-sm font-black text-slate-900">Acesso Administrador</h2>
-                <p class="text-slate-500 mt-0.5 text-[11px]">Insira a sua matrícula e senha de admin para gerir.</p>
+                <h2 class="text-sm font-black text-slate-900">Acesso Administrativo</h2>
+                <p class="text-slate-500 mt-0.5 text-[11px]">Insira a matrícula e senha de gestor.</p>
             </div>
 
             <div class="space-y-3 text-left">
                 <div>
-                    <label class="block font-semibold text-slate-600 mb-1">Matrícula</label>
+                    <label class="block font-bold text-slate-600 mb-1">Matrícula</label>
                     <input type="text" id="adminMatricula" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: 81025364">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-600 mb-1">Senha</label>
+                    <label class="block font-bold text-slate-600 mb-1">Senha de Admin</label>
                     <input type="password" id="adminSenha" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="••••">
                 </div>
 
-                <div id="erroAdminLogin" class="text-red-500 font-bold text-[11px] hidden text-center">Matrícula ou senha de admin incorretas.</div>
+                <div id="erroAdminLogin" class="text-rose-500 font-bold text-[11px] hidden text-center">Matrícula ou senha de admin incorretas.</div>
 
-                <button onclick="verificarAdminLogin()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl transition text-xs shadow-sm">
-                    🔓 Entrar como Admin
+                <button onclick="verificarAdminLogin()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl transition text-xs shadow-md">
+                    🔓 Autenticar como Gestor
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE GESTÃO DE UTILIZADORES (ADMIN) -->
-    <div id="modalUtilizadoresAdmin" class="fixed inset-0 z-[160] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <!-- MODAL DE USUÁRIOS (ADMIN) -->
+    <div id="modalUtilizadoresAdmin" class="fixed inset-0 z-[160] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
         <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-lg w-full space-y-4 text-xs relative">
             <button onclick="fecharModalUtilizadoresAdmin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
             <div class="flex items-center gap-2 border-b pb-3">
                 <span class="text-xl">👥</span>
                 <div>
-                    <h3 class="font-black uppercase text-slate-900 text-sm">Painel de Utilizadores Cadastrados</h3>
-                    <p class="text-[11px] text-slate-500">Visualize as contas de colaboradores cadastradas.</p>
+                    <h3 class="font-black uppercase text-slate-900 text-sm">Usuários Cadastrados</h3>
+                    <p class="text-[11px] text-slate-500">Contas de colaboradores autorizados a solicitar uniformes.</p>
                 </div>
             </div>
 
-            <div class="flex gap-2">
-                <button onclick="abrirModalCadastrarUtilizador()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2.5 rounded-xl font-bold text-xs transition shadow-sm flex items-center gap-1">➕ Cadastrar Novo Utilizador</button>
+            <div class="flex justify-between items-center gap-2">
+                <button onclick="abrirModalCadastrarUtilizador()" class="bg-[#007e7a] hover:bg-[#005a57] text-white px-3 py-2 rounded-xl font-bold text-xs transition shadow-sm flex items-center gap-1">
+                    ➕ Novo Usuário
+                </button>
+                <span id="totalUsuariosBadge" class="font-bold text-slate-400">0 usuário(s)</span>
             </div>
 
-            <div id="listaUtilizadoresAdmin" class="max-h-60 overflow-y-auto space-y-2"></div>
+            <div id="listaUtilizadoresAdmin" class="max-h-64 overflow-y-auto space-y-2"></div>
 
             <div class="flex justify-end pt-2 border-t">
                 <button onclick="fecharModalUtilizadoresAdmin()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl font-bold">Fechar</button>
@@ -106,142 +141,172 @@
         </div>
     </div>
 
-    <!-- TELINHA DE CADASTRO DE UTILIZADOR PELO ADMIN -->
-    <div id="modalCadastrarUtilizador" class="fixed inset-0 z-[170] bg-slate-900/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
+    <!-- MODAL CADASTRO USUÁRIO PELO ADMIN -->
+    <div id="modalCadastrarUtilizador" class="fixed inset-0 z-[170] bg-slate-900/90 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white p-6 sm:p-7 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
             <button onclick="fecharModalCadastrarUtilizador()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
 
-            <div class="w-14 h-14 bg-emerald-100 text-emerald-700 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">👤</div>
+            <div class="w-14 h-14 bg-teal-50 text-[#007e7a] rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">👤</div>
             <div>
-                <h2 class="text-sm font-black text-slate-900">Novo Utilizador</h2>
-                <p class="text-slate-500 mt-0.5 text-[11px]">Insira os dados para cadastrar o colaborador.</p>
+                <h2 class="text-sm font-black text-slate-900">Cadastrar Colaborador</h2>
+                <p class="text-slate-500 mt-0.5 text-[11px]">Adicione os dados para habilitar o acesso.</p>
             </div>
 
             <div class="space-y-3 text-left">
                 <div>
-                    <label class="block font-semibold text-slate-600 mb-1">Matrícula</label>
-                    <input type="text" id="novoAdminMatricula" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: 123456">
+                    <label class="block font-bold text-slate-600 mb-1">Matrícula</label>
+                    <input type="text" id="novoAdminMatricula" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: 81025364">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-600 mb-1">Nome Completo</label>
-                    <input type="text" id="novoAdminNome" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: João Silva">
+                    <label class="block font-bold text-slate-600 mb-1">Nome Completo</label>
+                    <input type="text" id="novoAdminNome" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: João da Silva">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-600 mb-1">Senha de Acesso</label>
+                    <label class="block font-bold text-slate-600 mb-1">Senha Inicial</label>
                     <input type="password" id="novoAdminSenha" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="••••">
                 </div>
 
-                <div id="erroNovoUser" class="text-red-500 font-bold text-[11px] hidden text-center"></div>
+                <div id="erroNovoUser" class="text-rose-500 font-bold text-[11px] hidden text-center"></div>
 
-                <button onclick="salvarNovoUtilizadorAdmin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition text-xs shadow-sm">
-                    ✓ Salvar e Cadastrar
-                </button>
-                <button onclick="fecharModalCadastrarUtilizador()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl transition text-xs">
-                    Cancelar
+                <button onclick="salvarNovoUtilizadorAdmin()" class="w-full bg-[#007e7a] hover:bg-[#005a57] text-white font-bold py-3 rounded-xl transition text-xs shadow-md">
+                    ✓ Salvar Usuário
                 </button>
             </div>
         </div>
     </div>
 
     <!-- CABEÇALHO SUPERIOR -->
-    <header class="bg-emerald-900 text-white px-4 py-3 shadow-md border-b border-emerald-800 text-xs flex justify-between items-center z-50 relative">
-        <div class="flex items-center gap-2">
-            <span class="text-base">👔</span>
-            <span class="font-black tracking-wide text-sm" id="headerSaudacao">Uniformes Vale - Gestão & Pedidos</span>
+    <header class="bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white px-4 py-3 shadow-md border-b border-teal-800 text-xs flex justify-between items-center z-50 relative no-print">
+        <div class="flex items-center gap-3">
+            <span class="font-black text-base tracking-widest text-teal-100">VALE</span>
+            <div class="h-4 w-px bg-teal-300/40"></div>
+            <span class="font-extrabold tracking-wide text-xs sm:text-sm" id="headerSaudacao">Gestão de Uniformes & EPIs</span>
         </div>
         <div class="flex items-center gap-2">
-            <button onclick="abrirModalAuth()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]" title="Mudar Conta">Conta</button>
-            <span id="badgeModo" class="bg-emerald-800 px-2.5 py-1 rounded-lg font-bold text-[10px] uppercase">Modo: Utilizador</span>
-            <button onclick="toggleModoAdmin()" id="btnModoAdmin" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">
+            <button onclick="abrirModalAuth()" class="bg-white/10 hover:bg-white/20 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] transition border border-white/20">
+                Conta
+            </button>
+            <span id="badgeModo" class="bg-teal-950/60 px-2.5 py-1 rounded-lg font-bold text-[10px] uppercase text-teal-200 border border-teal-800">
+                Modo: Colaborador
+            </span>
+            <button onclick="toggleModoAdmin()" id="btnModoAdmin" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">
                 ⚙️ Admin
             </button>
-            <button onclick="sairDaConta()" id="btnSair" class="bg-red-800 hover:bg-red-900 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm hidden">
+            <button onclick="sairDaConta()" id="btnSair" class="bg-rose-700 hover:bg-rose-800 text-white px-2.5 py-1.5 rounded-xl font-bold text-xs transition shadow-sm hidden">
                 Sair
             </button>
         </div>
     </header>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <div class="max-w-5xl mx-auto p-3 sm:p-6 space-y-4 pt-4">
+    <!-- CONTEÚDO PRINCIPAL (TELA) -->
+    <div class="max-w-5xl mx-auto p-3 sm:p-6 space-y-4 pt-4 no-print">
 
         <!-- ABAS DE NAVEGAÇÃO -->
-        <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl shadow-inner overflow-x-auto no-scrollbar">
-            <button onclick="mudarTab('catalogo')" id="tab-btn-catalogo" class="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5"><span>👕</span> Catálogo</button>
-            <button onclick="mudarTab('carrinho')" id="tab-btn-carrinho" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50"><span>🛒</span> Carrinho <span id="contadorCarrinho" class="bg-emerald-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
-            <button onclick="mudarTab('admin')" id="tab-btn-admin" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>📊</span> Pedidos <span id="contadorPedidos" class="bg-amber-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
-            <button onclick="mudarTab('gerir')" id="tab-btn-gerir" class="flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden"><span>✏️</span> Catálogo</button>
+        <div class="flex gap-2 bg-slate-200/80 p-1.5 rounded-2xl shadow-inner overflow-x-auto">
+            <button onclick="mudarTab('catalogo')" id="tab-btn-catalogo" class="flex-1 py-2.5 rounded-xl bg-[#007e7a] text-white font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5">
+                <span>👕</span> Catálogo
+            </button>
+            <button onclick="mudarTab('carrinho')" id="tab-btn-carrinho" class="flex-1 py-2.5 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50">
+                <span>🛒</span> Carrinho <span id="contadorCarrinho" class="bg-[#007e7a] text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span>
+            </button>
+            <button onclick="mudarTab('admin')" id="tab-btn-admin" class="flex-1 py-2.5 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden">
+                <span>📊</span> Pedidos <span id="contadorPedidos" class="bg-amber-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span>
+            </button>
+            <button onclick="mudarTab('gerir')" id="tab-btn-gerir" class="flex-1 py-2.5 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden">
+                <span>✏️</span> Gerenciar Itens
+            </button>
         </div>
 
         <!-- TAB 1: CATÁLOGO DE UNIFORMES -->
         <div id="tab-catalogo" class="space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                 <div>
                     <h2 class="text-sm font-black uppercase text-slate-800">Catálogo Oficial de Uniformes Vale</h2>
-                    <p class="text-[11px] text-slate-500">Selecione o tamanho e adicione os itens pretendidos ao carrinho.</p>
+                    <p class="text-[11px] text-slate-500">Selecione os tamanhos padronizados e adicione ao carrinho para solicitar.</p>
                 </div>
-                <input type="text" id="filtroCatalogo" oninput="renderizarCatalogo()" placeholder="🔍 Pesquisar por nome ou código..." class="w-full sm:w-64 p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold outline-none focus:border-indigo-600">
+                <div class="flex gap-2 w-full md:w-auto">
+                    <input type="text" id="filtroCatalogo" oninput="renderizarCatalogo()" placeholder="🔍 Buscar por nome, código SAP ou ref..." class="w-full md:w-64 p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold outline-none focus:border-[#007e7a]">
+                </div>
+            </div>
+
+            <!-- FILTRO DE CATEGORIAS RÁPIDAS -->
+            <div class="flex gap-2 overflow-x-auto pb-1 text-xs">
+                <button onclick="filtrarCategoria('todos')" class="btn-cat active px-3 py-1.5 rounded-lg font-bold bg-[#007e7a] text-white">Todos</button>
+                <button onclick="filtrarCategoria('masculino')" class="btn-cat px-3 py-1.5 rounded-lg font-bold bg-white text-slate-700 border border-slate-200">Masculino</button>
+                <button onclick="filtrarCategoria('feminino')" class="btn-cat px-3 py-1.5 rounded-lg font-bold bg-white text-slate-700 border border-slate-200">Feminino</button>
+                <button onclick="filtrarCategoria('calca')" class="btn-cat px-3 py-1.5 rounded-lg font-bold bg-white text-slate-700 border border-slate-200">Calças</button>
+                <button onclick="filtrarCategoria('polo')" class="btn-cat px-3 py-1.5 rounded-lg font-bold bg-white text-slate-700 border border-slate-200">Polos</button>
             </div>
 
             <div id="grelhaCatalogo" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </div>
 
-        <!-- TAB 2: CARRINHO / ENVIAR PEDIDO -->
+        <!-- TAB 2: CARRINHO -->
         <div id="tab-carrinho" class="space-y-4 hidden">
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="border-b pb-3">
-                    <h2 class="text-sm font-black uppercase text-slate-800">🛒 O seu Carrinho de Uniformes</h2>
-                    <p class="text-[11px] text-slate-500">Confirme os itens selecionados e defina os dados para retirada.</p>
+                    <h2 class="text-sm font-black uppercase text-slate-800">🛒 Carrinho de Solicitação</h2>
+                    <p class="text-[11px] text-slate-500">Revise suas peças e preencha a data pretendida para retirada no almoxarifado.</p>
                 </div>
 
                 <div id="listaItensCarrinho" class="space-y-3"></div>
 
                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-xs text-slate-700 uppercase">📝 Dados para Retirada e Identificação</h3>
+                    <h3 class="font-bold text-xs text-slate-700 uppercase">📝 Dados do Solicitante e Retirada</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                         <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Matrícula</label>
+                            <label class="block font-bold text-slate-600 mb-1">Matrícula</label>
                             <input type="text" id="pedidoMatricula" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: 81025364">
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Nome Completo</label>
+                            <label class="block font-bold text-slate-600 mb-1">Nome Completo</label>
                             <input type="text" id="pedidoNome" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: Mariana Cruz">
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Data da Retirada</label>
+                            <label class="block font-bold text-slate-600 mb-1">Data Desejada para Retirada</label>
                             <input type="date" id="pedidoData" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold outline-none">
                         </div>
                     </div>
-                    <button onclick="finalizarPedido()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition text-xs shadow-sm">
+                    <button onclick="finalizarPedido()" class="w-full bg-[#007e7a] hover:bg-[#005a57] text-white font-bold py-3 rounded-xl transition text-xs shadow-md">
                         🚀 Enviar Pedido para Aprovação
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 3: PAINEL DE APROVAÇÃO (ADMIN) -->
+        <!-- TAB 3: APROVAÇÃO (ADMIN) -->
         <div id="tab-admin" class="space-y-4 hidden">
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
                     <div>
-                        <h2 class="text-sm font-black uppercase text-slate-800">📊 Painel de Aprovação de Pedidos</h2>
-                        <p class="text-[11px] text-slate-500">Analise os pedidos dos colaboradores e aprove ou rejeite.</p>
+                        <h2 class="text-sm font-black uppercase text-slate-800">📊 Painel de Aprovação e Almoxarifado</h2>
+                        <p class="text-[11px] text-slate-500">Aprove pedidos e emita o termo de entrega para assinatura.</p>
                     </div>
-                    <button onclick="limparHistoricoPedidos()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-xl font-bold text-xs transition">Limpar Histórico</button>
+                    <div class="flex gap-2">
+                        <button onclick="exportarPedidosCSV()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition flex items-center gap-1 shadow-sm">
+                            📊 Exportar Excel
+                        </button>
+                        <button onclick="limparHistoricoPedidos()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-1.5 rounded-xl font-bold text-xs transition">
+                            Limpar Histórico
+                        </button>
+                    </div>
                 </div>
 
                 <div id="listaPedidosAdmin" class="space-y-3"></div>
             </div>
         </div>
 
-        <!-- TAB 4: GERIR CATÁLOGO (ADMIN) -->
+        <!-- TAB 4: GERENCIAR CATÁLOGO (ADMIN) -->
         <div id="tab-gerir" class="space-y-4 hidden">
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
                     <div>
-                        <h2 class="text-sm font-black uppercase text-slate-800">✏️ Gestão e Edição do Catálogo</h2>
-                        <p class="text-[11px] text-slate-500">Adicione novos uniformes, carregue fotos, crie caixas de tamanhos e códigos VALE livremente.</p>
+                        <h2 class="text-sm font-black uppercase text-slate-800">✏️ Gerenciamento do Catálogo</h2>
+                        <p class="text-[11px] text-slate-500">Cadastre novas peças, fotos, tamanhos e códigos SAP da Vale.</p>
                     </div>
-                    <button onclick="adicionarNovoUniforme()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">➕ Adicionar Novo Uniforme</button>
+                    <button onclick="adicionarNovoUniforme()" class="bg-[#007e7a] hover:bg-[#005a57] text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">
+                        ➕ Adicionar Nova Peça
+                    </button>
                 </div>
 
                 <div id="listaGerirUniformes" class="space-y-4"></div>
@@ -250,13 +315,66 @@
 
     </div>
 
-    <!-- RODAPÉ COM FAIXA VERDE E BOTÃO DOS BONEQUINHOS (👥) PARA ABRIR UTILIZADORES -->
-    <footer class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-emerald-900 text-white px-4 py-2.5 flex justify-between items-center max-w-5xl mx-auto rounded-t-2xl shadow-2xl border-t border-emerald-800 text-xs">
-        <span class="font-bold tracking-wider">Uniformes Vale • Versão v5.2</span>
-        <button onclick="clicarBotaoBonequinhos()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition" title="Utilizadores Cadastrados">
-            <span>👥</span> Utilizadores
+    <!-- RODAPÉ FIXO -->
+    <footer class="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white px-4 py-2.5 flex justify-between items-center max-w-5xl mx-auto rounded-t-2xl shadow-2xl border-t border-teal-800 text-xs no-print">
+        <span class="font-bold tracking-wider text-[11px]">Uniformes Vale • Versão v5.3</span>
+        <button onclick="clicarBotaoBonequinhos()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition border border-white/20">
+            <span>👥</span> Usuários
         </button>
     </footer>
+
+    <!-- ========================================================================= -->
+    <!-- TERMO OFICIAL DE ENTREGA E CAUTELA (A4 PRINT NATIVO)                       -->
+    <!-- ========================================================================= -->
+    <div id="termoEntregaA4" class="print-only">
+        <div style="border: 1.5px solid #0f172a; margin-bottom: 8px;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 90px; text-align: center; font-weight: 900; font-size: 16px; color: #007e7a; padding: 8px; border-right: 1px solid #334155; background: #f8fafc;">VALE</td>
+                    <td style="text-align: center; font-weight: 800; font-size: 11px; text-transform: uppercase; color: #0f172a; padding: 6px;">
+                        TERMO DE ENTREGA E CAUTELA DE UNIFORMES E EQUIPAMENTOS
+                    </td>
+                    <td style="width: 120px; font-size: 8px; text-align: left; padding: 4px 6px; border-left: 1px solid #334155; background: #f8fafc;">
+                        <strong>Nº Pedido:</strong> <span id="printPedidoId">---</span><br>
+                        <strong>Data:</strong> <span id="printPedidoData">---</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="font-size: 9px; margin-bottom: 8px; border: 1px solid #334155; padding: 6px; background: #f8fafc;">
+            <strong>COLABORADOR:</strong> <span id="printColaboradorNome">---</span> &nbsp;|&nbsp;
+            <strong>MATRÍCULA:</strong> <span id="printColaboradorMatricula">---</span> &nbsp;|&nbsp;
+            <strong>RETIRADA:</strong> <span id="printColaboradorRetirada">---</span>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 14px;">
+            <thead>
+                <tr style="background: #007e7a; color: #fff;">
+                    <th style="padding: 5px 4px; width: 35px; text-align: center;">ITEM</th>
+                    <th style="padding: 5px 6px; text-align: left;">DESCRIÇÃO DA PEÇA / UNIFORME</th>
+                    <th style="padding: 5px 6px; width: 60px; text-align: center;">REF.</th>
+                    <th style="padding: 5px 6px; width: 60px; text-align: center;">TAMANHO</th>
+                    <th style="padding: 5px 6px; width: 100px; text-align: center;">CÓDIGO SAP</th>
+                    <th style="padding: 5px 6px; width: 50px; text-align: center;">QTD</th>
+                </tr>
+            </thead>
+            <tbody id="printItensTabela"></tbody>
+        </table>
+
+        <div style="font-size: 8px; color: #475569; line-height: 1.4; border: 1px dashed #94a3b8; padding: 6px; margin-bottom: 30px;">
+            Declaro ter recebido da VALE S.A., a título de cautela, os uniformes e/ou EPIs acima discriminados, em perfeitas condições de uso, comprometendo-me a zelar pela sua conservação e a utilizá-los estritamente no exercício de minhas atividades profissionais.
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 9px; text-align: center;">
+            <div style="width: 250px; border-top: 1px solid #000; padding-top: 4px;">
+                Assinatura do Colaborador<br><span style="font-size: 7.5px; color:#666;">(Recebedor)</span>
+            </div>
+            <div style="width: 250px; border-top: 1px solid #000; padding-top: 4px;">
+                Almoxarifado / Suprimentos<br><span style="font-size: 7.5px; color:#666;">(Responsável pela Entrega)</span>
+            </div>
+        </div>
+    </div>
 
     <!-- SCRIPT DA APLICAÇÃO -->
     <script>
@@ -265,6 +383,7 @@
         let carrinho = [];
         let usuarioAtual = null;
         let modoRegisto = false;
+        let categoriaAtiva = 'todos';
 
         let dadosUniformesPadrao = [
             {
@@ -272,6 +391,7 @@
                 nome: "Camisa administrativa masculina manga curta",
                 cor: "Verde Vale / Cinza",
                 referencia: "CM-443",
+                categoria: "masculino",
                 imagem: "https://cdn-icons-png.flaticon.com/512/3163/3163179.png",
                 tamanhos: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13"],
                 codigos: {"01": "16724400", "02": "16724412", "03": "16724642", "04": "16724406", "05": "16724290", "06": "16725084", "07": "16724640", "08": "16724679", "09": "16724399", "10": "16724357", "11": "13300303", "12": "13308561", "13": "13329458"}
@@ -281,6 +401,7 @@
                 nome: "Camisa administrativa feminina manga curta",
                 cor: "Verde Vale / Cinza",
                 referencia: "CM-918",
+                categoria: "feminino",
                 imagem: "https://cdn-icons-png.flaticon.com/512/3163/3163179.png",
                 tamanhos: ["36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60"],
                 codigos: {"36": "16724419", "38": "16724632", "40": "15500269", "42": "16724557", "44": "16724179", "46": "16724435", "48": "16724631", "50": "16724654", "52": "15500271", "54": "16724434", "56": "13307872", "58": "13307871", "60": "13307870"}
@@ -290,6 +411,7 @@
                 nome: "Polo masculina (administrativa)",
                 cor: "Cinza / Branco",
                 referencia: "CM-540",
+                categoria: "polo",
                 imagem: "https://cdn-icons-png.flaticon.com/512/892/892458.png",
                 tamanhos: ["XP", "P", "M", "G", "GG", "3G", "4G", "5G", "6G"],
                 codigos: {"XP": "13306603", "P": "13306602", "M": "13306601", "G": "13306600", "GG": "13306549", "3G": "13306548", "4G": "13306547", "5G": "13306546", "6G": "13306545"}
@@ -299,6 +421,7 @@
                 nome: "Calça jeans administrativo feminina",
                 cor: "Azul Marinho",
                 referencia: "CL-285",
+                categoria: "calca",
                 imagem: "https://cdn-icons-png.flaticon.com/512/2613/2613204.png",
                 tamanhos: ["34", "36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60"],
                 codigos: {"34": "13315330", "36": "13315329", "38": "13315328", "40": "13315327", "42": "13315326", "44": "13315351", "46": "13315350", "48": "13315349", "50": "13315348", "52": "13315347", "54": "13315346", "56": "13315345", "58": "13315300", "60": "13314839"}
@@ -313,23 +436,24 @@
             ]
         };
 
+        function mostrarToast(msg) {
+            const toast = document.getElementById('toastNotificacao');
+            toast.innerText = msg;
+            toast.classList.remove('opacity-0', 'translate-y-3');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-3');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 2600);
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             let salvo = localStorage.getItem(CHAVE_APP);
-            if (!salvo) {
-                let oldVal = localStorage.getItem("mariana_uniformes_vale_dados_fixos_v2");
-                if (oldVal) {
-                    salvo = oldVal;
-                    localStorage.setItem(CHAVE_APP, salvo);
-                }
-            }
-
             if (salvo) {
                 try {
                     let parsed = JSON.parse(salvo);
                     if (parsed) {
-                        if (parsed.uniformes && parsed.uniformes.length > 0) {
-                            dadosApp.uniformes = parsed.uniformes;
-                        }
+                        if (parsed.uniformes && parsed.uniformes.length > 0) dadosApp.uniformes = parsed.uniformes;
                         if (parsed.pedidos) dadosApp.pedidos = parsed.pedidos;
                         if (parsed.utilizadores) dadosApp.utilizadores = parsed.utilizadores;
                     }
@@ -344,13 +468,12 @@
             if (sessaoSalva) {
                 usuarioAtual = JSON.parse(sessaoSalva);
                 atualizarCabecalhoUtilizador();
-                
                 if(usuarioAtual.matricula === "81025364" && usuarioAtual.senha === "1510") {
                     ativarModoAdminVisual();
                 }
             } else {
                 usuarioAtual = null;
-                document.getElementById('headerSaudacao').innerText = "Uniformes Vale - Gestão & Pedidos";
+                document.getElementById('headerSaudacao').innerText = "Gestão de Uniformes & EPIs";
                 document.getElementById('btnSair').classList.add('hidden');
             }
 
@@ -370,6 +493,15 @@
             renderizarUtilizadoresAdmin();
         }
 
+        function filtrarCategoria(cat) {
+            categoriaAtiva = cat;
+            document.querySelectorAll('.btn-cat').forEach(b => {
+                b.className = "btn-cat px-3 py-1.5 rounded-lg font-bold bg-white text-slate-700 border border-slate-200";
+            });
+            event.target.className = "btn-cat px-3 py-1.5 rounded-lg font-bold bg-[#007e7a] text-white";
+            renderizarCatalogo();
+        }
+
         function abrirModalAuth() {
             document.getElementById('authMatricula').value = '';
             document.getElementById('authSenha').value = '';
@@ -386,22 +518,19 @@
             const sub = document.getElementById('authSubtitulo');
             const btn = document.getElementById('btnAuthAcao');
             const link = document.getElementById('linkTrocaAuth');
-            const labelMat = document.getElementById('labelMatricula');
             const divNome = document.getElementById('divNomeRegistro');
             const erro = document.getElementById('erroAuth');
             erro.classList.add('hidden');
 
             if(modoRegisto) {
-                sub.innerText = "Crie a sua conta informando a matrícula, nome e senha.";
-                btn.innerText = "Registar Conta";
-                link.innerText = "Já tem conta? Faça login aqui.";
-                labelMat.innerText = "Matrícula";
+                sub.innerText = "Cadastre sua conta informando matrícula, nome e senha.";
+                btn.innerText = "Criar Minha Conta";
+                link.innerText = "Já possui cadastro? Faça login aqui.";
                 divNome.classList.remove('hidden');
             } else {
-                sub.innerText = "Insira a sua matrícula e senha para entrar.";
+                sub.innerText = "Insira sua matrícula e senha para acessar.";
                 btn.innerText = "Entrar no Sistema";
-                link.innerText = "Primeiro acesso? Crie a sua conta aqui.";
-                labelMat.innerText = "Matrícula";
+                link.innerText = "Primeiro acesso? Crie sua conta aqui.";
                 divNome.classList.add('hidden');
             }
         }
@@ -428,16 +557,14 @@
 
                 let existente = dadosApp.utilizadores.find(u => u.matricula === mat);
                 if(existente) {
-                    erro.innerText = "Esta matrícula já tem conta criada. Faça login.";
+                    erro.innerText = "Esta matrícula já possui cadastro. Faça login.";
                     erro.classList.remove('hidden');
                     return;
                 }
 
-                let novoUser = { matricula: mat, nome: nome, senha: senha };
-                dadosApp.utilizadores.push(novoUser);
+                dadosApp.utilizadores.push({ matricula: mat, nome: nome, senha: senha });
                 salvarStorage();
-
-                alert("✅ Conta criada com sucesso! Faça login agora.");
+                mostrarToast("Conta criada com sucesso! Faça login.");
                 alternarModoAuth();
                 document.getElementById('authSenha').value = '';
             } else {
@@ -452,7 +579,7 @@
                         ativarModoAdminVisual();
                     } else {
                         modoAdmin = false;
-                        document.getElementById('badgeModo').innerText = "Modo: Utilizador";
+                        document.getElementById('badgeModo').innerText = "Modo: Colaborador";
                         document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
                         document.getElementById('tab-btn-catalogo').classList.remove('hidden');
                         document.getElementById('tab-btn-carrinho').classList.remove('hidden');
@@ -460,6 +587,7 @@
                         document.getElementById('tab-btn-gerir').classList.add('hidden');
                         mudarTab('catalogo');
                     }
+                    mostrarToast(`Bem-vindo(a), ${user.nome.split(' ')[0]}!`);
                 } else {
                     erro.innerText = "Matrícula ou senha incorretas.";
                     erro.classList.remove('hidden');
@@ -469,7 +597,7 @@
 
         function atualizarCabecalhoUtilizador() {
             if(usuarioAtual) {
-                document.getElementById('headerSaudacao').innerText = `Olá, ${usuarioAtual.nome} (Mat: ${usuarioAtual.matricula})`;
+                document.getElementById('headerSaudacao').innerText = `Olá, ${usuarioAtual.nome} (${usuarioAtual.matricula})`;
                 document.getElementById('btnSair').classList.remove('hidden');
                 document.getElementById('pedidoMatricula').value = usuarioAtual.matricula;
                 document.getElementById('pedidoNome').value = usuarioAtual.nome;
@@ -480,9 +608,9 @@
             sessionStorage.removeItem('usuario_logado_vale');
             usuarioAtual = null;
             modoAdmin = false;
-            document.getElementById('badgeModo').innerText = "Modo: Utilizador";
+            document.getElementById('badgeModo').innerText = "Modo: Colaborador";
             document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
-            document.getElementById('headerSaudacao').innerText = "Uniformes Vale - Gestão & Pedidos";
+            document.getElementById('headerSaudacao').innerText = "Gestão de Uniformes & EPIs";
             document.getElementById('btnSair').classList.add('hidden');
             document.getElementById('tab-btn-catalogo').classList.remove('hidden');
             document.getElementById('tab-btn-carrinho').classList.remove('hidden');
@@ -491,16 +619,16 @@
             document.getElementById('pedidoMatricula').value = '';
             document.getElementById('pedidoNome').value = '';
             mudarTab('catalogo');
+            mostrarToast("Sessão finalizada.");
         }
 
         function ativarModoAdminVisual() {
             modoAdmin = true;
-            document.getElementById('badgeModo').innerText = "Modo: Administrador";
-            document.getElementById('btnModoAdmin').innerText = "👤 Sair Admin";
+            document.getElementById('badgeModo').innerText = "Modo: Gestor / Admin";
+            document.getElementById('btnModoAdmin').innerText = "👤 Modo Colaborador";
             
             document.getElementById('tab-btn-catalogo').classList.add('hidden');
             document.getElementById('tab-btn-carrinho').classList.add('hidden');
-            
             document.getElementById('tab-btn-admin').classList.remove('hidden');
             document.getElementById('tab-btn-gerir').classList.remove('hidden');
             
@@ -511,7 +639,7 @@
         function toggleModoAdmin() {
             if(modoAdmin) {
                 modoAdmin = false;
-                document.getElementById('badgeModo').innerText = "Modo: Utilizador";
+                document.getElementById('badgeModo').innerText = "Modo: Colaborador";
                 document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
                 document.getElementById('tab-btn-catalogo').classList.remove('hidden');
                 document.getElementById('tab-btn-carrinho').classList.remove('hidden');
@@ -542,6 +670,7 @@
                 sessionStorage.setItem('usuario_logado_vale', JSON.stringify(usuarioAtual));
                 atualizarCabecalhoUtilizador();
                 ativarModoAdminVisual();
+                mostrarToast("Modo administrador liberado!");
             } else {
                 erro.classList.remove('hidden');
             }
@@ -601,15 +730,17 @@
             salvarStorage();
             renderizarUtilizadoresAdmin();
             fecharModalCadastrarUtilizador();
-            alert("✅ Utilizador cadastrado com sucesso!");
+            mostrarToast("Usuário cadastrado com sucesso!");
         }
 
         function renderizarUtilizadoresAdmin() {
             const container = document.getElementById('listaUtilizadoresAdmin');
             if(!container) return;
 
+            document.getElementById('totalUsuariosBadge').innerText = `${dadosApp.utilizadores.length} usuário(s)`;
+
             if(!dadosApp.utilizadores || dadosApp.utilizadores.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-4">Nenhum utilizador registado.</p>';
+                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-4">Nenhum usuário cadastrado.</p>';
                 return;
             }
 
@@ -618,10 +749,10 @@
                 html += `
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
                         <div>
-                            <span class="font-black text-slate-900">${u.nome}</span>
+                            <span class="font-bold text-slate-900">${u.nome}</span>
                             <span class="text-slate-500 font-semibold ml-2">Matrícula: <b>${u.matricula}</b> | Senha: <b>${u.senha}</b></span>
                         </div>
-                        <button onclick="removerUtilizador(${idx})" class="text-red-500 font-bold bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-xl">✕ Apagar</button>
+                        <button onclick="removerUtilizador(${idx})" class="text-rose-600 font-bold bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-xl transition">✕ Apagar</button>
                     </div>
                 `;
             });
@@ -629,10 +760,11 @@
         }
 
         function removerUtilizador(idx) {
-            if(confirm("Deseja realmente apagar esta conta de utilizador?")) {
+            if(confirm("Confirmar exclusão deste usuário?")) {
                 dadosApp.utilizadores.splice(idx, 1);
                 salvarStorage();
                 renderizarUtilizadoresAdmin();
+                mostrarToast("Usuário removido.");
             }
         }
 
@@ -642,7 +774,7 @@
                 if(el) el.classList.add('hidden');
                 let btn = document.getElementById('tab-btn-' + t);
                 if(btn && !btn.classList.contains('hidden')) {
-                    btn.className = "flex-1 py-3 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50";
+                    btn.className = "flex-1 py-2.5 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50";
                 }
             });
 
@@ -651,7 +783,7 @@
 
             let activeBtn = document.getElementById('tab-btn-' + tab);
             if(activeBtn) {
-                activeBtn.className = "flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5";
+                activeBtn.className = "flex-1 py-2.5 rounded-xl bg-[#007e7a] text-white font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5";
             }
         }
 
@@ -661,10 +793,14 @@
             if(!container) return;
             container.innerHTML = '';
 
-            let lista = dadosApp.uniformes.filter(u => u.nome.toLowerCase().includes(filtro) || u.referencia.toLowerCase().includes(filtro));
+            let lista = dadosApp.uniformes.filter(u => {
+                const matchTexto = u.nome.toLowerCase().includes(filtro) || u.referencia.toLowerCase().includes(filtro);
+                const matchCat = (categoriaAtiva === 'todos') || (u.categoria && u.categoria.toLowerCase().includes(categoriaAtiva)) || (u.nome.toLowerCase().includes(categoriaAtiva));
+                return matchTexto && matchCat;
+            });
 
             if(lista.length === 0) {
-                container.innerHTML = '<p class="col-span-full text-center text-xs text-slate-400 py-6">Nenhum uniforme encontrado.</p>';
+                container.innerHTML = '<p class="col-span-full text-center text-xs text-slate-400 py-8">Nenhum uniforme encontrado para os critérios selecionados.</p>';
                 return;
             }
 
@@ -673,20 +809,20 @@
                 if(item.tamanhos && item.tamanhos.length > 0) {
                     item.tamanhos.forEach(tam => {
                         let cod = (item.codigos && item.codigos[tam]) ? item.codigos[tam] : '---';
-                        tamanhosHtml += `<option value="${tam}">Tam: ${tam} (Cód: ${cod})</option>`;
+                        tamanhosHtml += `<option value="${tam}">Tam: ${tam} (Cód SAP: ${cod})</option>`;
                     });
                 } else {
                     tamanhosHtml = `<option value="">Sem tamanhos definidos</option>`;
                 }
 
                 container.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between hover:border-teal-300 transition-colors">
                         <div class="flex gap-3 items-center">
-                            <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center p-2 border shrink-0 overflow-hidden">
+                            <div class="w-16 h-16 bg-slate-50 rounded-xl flex items-center justify-center p-2 border border-slate-200 shrink-0 overflow-hidden">
                                 <img src="${item.imagem}" alt="Uniforme" class="max-h-full max-w-full object-contain">
                             </div>
                             <div class="min-w-0 flex-1">
-                                <span class="bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded text-[10px]">${item.referencia}</span>
+                                <span class="bg-teal-50 text-[#007e7a] border border-teal-200 font-black px-2 py-0.5 rounded text-[10px]">${item.referencia}</span>
                                 <h3 class="font-bold text-xs text-slate-800 truncate mt-1" title="${item.nome}">${item.nome}</h3>
                                 <p class="text-[11px] text-slate-500 font-medium">Cor: ${item.cor}</p>
                             </div>
@@ -699,7 +835,7 @@
                                 </select>
                                 <input type="number" id="qtd-${item.id}" value="1" min="1" max="10" class="w-14 p-2 bg-slate-50 border border-slate-300 rounded-xl font-black text-center text-xs outline-none" title="Quantidade">
                             </div>
-                            <button onclick="adicionarAoCarrinho(${item.id})" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition text-xs shadow-sm">
+                            <button onclick="adicionarAoCarrinho(${item.id})" class="w-full bg-[#007e7a] hover:bg-[#005a57] text-white font-bold py-2.5 rounded-xl transition text-xs shadow-sm flex items-center justify-center gap-1.5">
                                 🛒 Adicionar ao Carrinho
                             </button>
                         </div>
@@ -712,7 +848,7 @@
             let item = dadosApp.uniformes.find(u => u.id === id);
             let selTam = document.getElementById(`sel-tam-${id}`).value;
             if(!selTam) {
-                alert("Por favor, selecione um tamanho válido.");
+                mostrarToast("Selecione um tamanho válido.");
                 return;
             }
             let qtd = parseInt(document.getElementById(`qtd-${id}`).value) || 1;
@@ -730,7 +866,7 @@
             });
 
             renderizarCarrinho();
-            alert(`✅ ${item.nome} (Tam: ${selTam}) adicionado ao carrinho!`);
+            mostrarToast(`${item.nome} (${selTam}) adicionado!`);
         }
 
         function renderizarCarrinho() {
@@ -739,7 +875,7 @@
             document.getElementById('contadorCarrinho').innerText = carrinho.length;
 
             if(carrinho.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-4">O seu carrinho está vazio.</p>';
+                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-6">O seu carrinho está vazio.</p>';
                 return;
             }
 
@@ -749,9 +885,9 @@
                     <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-center text-xs">
                         <div class="min-w-0 flex-1 pr-2">
                             <span class="font-bold text-slate-900 block truncate">${c.nome}</span>
-                            <span class="text-[11px] text-slate-500 font-medium">Tam: <b>${c.tamanho}</b> | Cód VALE: <b>${c.codigo}</b> | Qtd: <b>${c.quantidade}</b></span>
+                            <span class="text-[11px] text-slate-500 font-medium">Tam: <b>${c.tamanho}</b> | Cód SAP: <b>${c.codigo}</b> | Qtd: <b>${c.quantidade}</b></span>
                         </div>
-                        <button onclick="removerDoCarrinho(${idx})" class="text-red-500 font-bold bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-xl text-xs shrink-0">✕</button>
+                        <button onclick="removerDoCarrinho(${idx})" class="text-rose-600 font-bold bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-xl text-xs shrink-0 transition">✕</button>
                     </div>
                 `;
             });
@@ -761,6 +897,7 @@
         function removerDoCarrinho(idx) {
             carrinho.splice(idx, 1);
             renderizarCarrinho();
+            mostrarToast("Item removido do carrinho.");
         }
 
         function finalizarPedido() {
@@ -769,12 +906,12 @@
             let dataRet = document.getElementById('pedidoData').value;
 
             if(!mat || !nome || !dataRet) {
-                alert("Por favor, preencha a Matrícula, o Nome e a Data da Retirada.");
+                mostrarToast("Preencha Matrícula, Nome e Data de Retirada.");
                 return;
             }
 
             if(carrinho.length === 0) {
-                alert("O seu carrinho está vazio.");
+                mostrarToast("Seu carrinho está vazio.");
                 return;
             }
 
@@ -783,7 +920,7 @@
                 matricula: mat,
                 nome: nome,
                 dataRetirada: dataRet,
-                dataPedido: new Date().toLocaleDateString('pt-PT'),
+                dataPedido: new Date().toLocaleDateString('pt-BR'),
                 status: 'Pendente',
                 itens: [...carrinho]
             };
@@ -795,7 +932,7 @@
             renderizarCarrinho();
             renderizarAdminPedidos();
 
-            alert("🚀 Pedido enviado com sucesso para aprovação!");
+            mostrarToast("🚀 Pedido enviado com sucesso para aprovação!");
             mudarTab('catalogo');
         }
 
@@ -807,25 +944,30 @@
             document.getElementById('contadorPedidos').innerText = pendentes;
 
             if(dadosApp.pedidos.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-6">Nenhum pedido registado no sistema.</p>';
+                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-8">Nenhum pedido registrado no sistema.</p>';
                 return;
             }
 
             let html = '';
             dadosApp.pedidos.forEach(p => {
-                let statusBadge = p.status === 'Pendente' ? 'bg-amber-100 text-amber-800 border-amber-300' : (p.status === 'Aprovado' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300');
+                let statusBadge = p.status === 'Pendente' ? 'bg-amber-100 text-amber-800 border-amber-300' : (p.status === 'Aprovado' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300');
                 
                 let itensStr = '';
                 p.itens.forEach(it => {
-                    itensStr += `<li class="text-[11px] text-slate-700">• ${it.quantidade}x ${it.nome} (Tam: <b>${it.tamanho}</b> | Cód: <b>${it.codigo}</b>)</li>`;
+                    itensStr += `<li class="text-[11px] text-slate-700">• ${it.quantidade}x ${it.nome} (Tam: <b>${it.tamanho}</b> | Cód SAP: <b>${it.codigo}</b>)</li>`;
                 });
 
-                let botoesAcao = p.status === 'Pendente' ? `
-                    <div class="flex gap-2 pt-2 border-t border-slate-100">
-                        <button onclick="mudarStatusPedido(${p.id}, 'Aprovado')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl font-bold text-xs transition">✓ Aprovar Pedido</button>
-                        <button onclick="mudarStatusPedido(${p.id}, 'Rejeitado')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-bold text-xs transition">✕ Rejeitar</button>
+                let botoesAcao = `
+                    <div class="flex gap-2 pt-2 border-t border-slate-100 flex-wrap">
+                        ${p.status === 'Pendente' ? `
+                            <button onclick="mudarStatusPedido(${p.id}, 'Aprovado')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl font-bold text-xs transition">✓ Aprovar Pedido</button>
+                            <button onclick="mudarStatusPedido(${p.id}, 'Rejeitado')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-xl font-bold text-xs transition">✕ Rejeitar</button>
+                        ` : ''}
+                        <button onclick="imprimirCautelaEntrega(${p.id})" class="bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-2 rounded-xl font-bold text-xs transition flex items-center gap-1 shadow-sm">
+                            🖨️ Imprimir Cautela (A4)
+                        </button>
                     </div>
-                ` : '';
+                `;
 
                 html += `
                     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3 text-xs">
@@ -839,7 +981,7 @@
                                 <span class="px-2.5 py-1 rounded-lg font-black text-[10px] uppercase border ${statusBadge}">${p.status}</span>
                             </div>
                         </div>
-                        <ul class="space-y-1 bg-slate-50 p-2.5 rounded-xl border">${itensStr}</ul>
+                        <ul class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">${itensStr}</ul>
                         ${botoesAcao}
                     </div>
                 `;
@@ -853,15 +995,69 @@
                 p.status = novoStatus;
                 salvarStorage();
                 renderizarAdminPedidos();
+                mostrarToast(`Pedido marcado como ${novoStatus}!`);
             }
         }
 
         function limparHistoricoPedidos() {
-            if(confirm("Deseja apagar todos os pedidos do histórico?")) {
+            if(confirm("Confirmar a exclusão de todos os pedidos do histórico?")) {
                 dadosApp.pedidos = [];
                 salvarStorage();
                 renderizarAdminPedidos();
+                mostrarToast("Histórico de pedidos limpo.");
             }
+        }
+
+        function imprimirCautelaEntrega(id) {
+            let p = dadosApp.pedidos.find(item => item.id === id);
+            if(!p) return;
+
+            document.getElementById('printPedidoId').innerText = p.id;
+            document.getElementById('printPedidoData').innerText = p.dataPedido;
+            document.getElementById('printColaboradorNome').innerText = p.nome;
+            document.getElementById('printColaboradorMatricula').innerText = p.matricula;
+            document.getElementById('printColaboradorRetirada').innerText = p.dataRetirada.split('-').reverse().join('/');
+
+            const tbody = document.getElementById('printItensTabela');
+            tbody.innerHTML = '';
+
+            p.itens.forEach((it, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="padding:4px; text-align:center;">${idx + 1}</td>
+                        <td style="padding:4px 6px; font-weight:bold;">${it.nome}</td>
+                        <td style="padding:4px 6px; text-align:center;">${it.referencia}</td>
+                        <td style="padding:4px 6px; text-align:center; font-weight:bold;">${it.tamanho}</td>
+                        <td style="padding:4px 6px; text-align:center;">${it.codigo}</td>
+                        <td style="padding:4px 6px; text-align:center; font-weight:bold;">${it.quantidade}</td>
+                    </tr>
+                `;
+            });
+
+            window.print();
+        }
+
+        function exportarPedidosCSV() {
+            if(dadosApp.pedidos.length === 0) {
+                mostrarToast("Nenhum pedido para exportar.");
+                return;
+            }
+
+            let csv = "ID Pedido;Data Pedido;Matricula;Nome;Data Retirada;Status;Peca;Tamanho;Codigo SAP;Quantidade\n";
+            dadosApp.pedidos.forEach(p => {
+                p.itens.forEach(it => {
+                    csv += `"${p.id}";"${p.dataPedido}";"${p.matricula}";"${p.nome}";"${p.dataRetirada}";"${p.status}";"${it.nome}";"${it.tamanho}";"${it.codigo}";"${it.quantidade}"\n`;
+                });
+            });
+
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pedidos_uniformes_vale_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            mostrarToast("Planilha CSV de pedidos exportada!");
         }
 
         function renderizarGerirUniformes() {
@@ -876,15 +1072,15 @@
                         let cod = (u.codigos && u.codigos[tam]) ? u.codigos[tam] : '';
                         tamanhosListHtml += `
                             <div class="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs shadow-sm">
-                                <div class="flex flex-col w-24">
+                                <div class="flex flex-col w-20">
                                     <label class="text-[9px] font-extrabold text-slate-500 uppercase">Tamanho</label>
                                     <input type="text" value="${tam}" onchange="atualizarNomeTamanho(${u.id}, '${tam}', this.value)" class="bg-white p-2 border border-slate-300 rounded-lg font-bold text-xs text-center" placeholder="Tam...">
                                 </div>
                                 <div class="flex flex-col flex-1 min-w-0">
-                                    <label class="text-[9px] font-extrabold text-slate-500 uppercase">Código VALE</label>
-                                    <input type="text" value="${cod}" oninput="atualizarCodigoTamanho(${u.id}, '${tam}', this.value)" class="bg-white p-2 border border-slate-300 rounded-lg font-mono font-bold text-xs" placeholder="Cód VALE...">
+                                    <label class="text-[9px] font-extrabold text-slate-500 uppercase">Código SAP</label>
+                                    <input type="text" value="${cod}" oninput="atualizarCodigoTamanho(${u.id}, '${tam}', this.value)" class="bg-white p-2 border border-slate-300 rounded-lg font-mono font-bold text-xs" placeholder="Cód SAP...">
                                 </div>
-                                <button onclick="removerTamanhoUniforme(${u.id}, '${tam}')" class="text-red-500 font-bold p-2 bg-red-50 hover:bg-red-100 rounded-lg mt-4" title="Remover Caixa">✕</button>
+                                <button onclick="removerTamanhoUniforme(${u.id}, '${tam}')" class="text-rose-500 font-bold p-2 bg-rose-50 hover:bg-rose-100 rounded-lg mt-4 transition" title="Remover Tamanho">✕</button>
                             </div>
                         `;
                     });
@@ -893,10 +1089,10 @@
                 html += `
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-300 space-y-3 text-xs shadow-sm">
                         <div class="flex justify-between items-center gap-2 flex-wrap border-b pb-3">
-                            <input type="text" value="${u.nome}" oninput="atualizarUniformeProp(${u.id}, 'nome', this.value)" class="flex-1 bg-white p-2 border border-slate-300 rounded-xl font-bold text-slate-900 outline-none" placeholder="Nome do Uniforme...">
+                            <input type="text" value="${u.nome}" oninput="atualizarUniformeProp(${u.id}, 'nome', this.value)" class="flex-1 min-w-[200px] bg-white p-2 border border-slate-300 rounded-xl font-bold text-slate-900 outline-none" placeholder="Descrição do Uniforme...">
                             <input type="text" value="${u.referencia}" oninput="atualizarUniformeProp(${u.id}, 'referencia', this.value)" class="w-24 bg-white p-2 border border-slate-300 rounded-xl font-bold text-center outline-none" placeholder="Ref...">
                             <input type="text" value="${u.cor}" oninput="atualizarUniformeProp(${u.id}, 'cor', this.value)" class="w-28 bg-white p-2 border border-slate-300 rounded-xl font-bold text-center outline-none" placeholder="Cor...">
-                            <button onclick="apagarUniforme(${u.id})" class="text-red-600 font-bold bg-red-100 hover:bg-red-200 px-3 py-2 rounded-xl transition">Excluir ✕</button>
+                            <button onclick="apagarUniforme(${u.id})" class="text-rose-600 font-bold bg-rose-100 hover:bg-rose-200 px-3 py-2 rounded-xl transition">Excluir ✕</button>
                         </div>
 
                         <div class="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-200">
@@ -904,15 +1100,15 @@
                                 <img src="${u.imagem}" alt="Foto" class="max-h-full max-w-full object-contain">
                             </div>
                             <div class="flex-1 min-w-0">
-                                <label class="block font-bold text-slate-600 mb-1">Carregar Nova Imagem do Dispositivo:</label>
-                                <input type="file" accept="image/*" onchange="carregarImagemUniforme(${u.id}, event)" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                                <label class="block font-bold text-slate-600 mb-1">Carregar Foto do Dispositivo:</label>
+                                <input type="file" accept="image/*" onchange="carregarImagemUniforme(${u.id}, event)" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-teal-50 file:text-[#007e7a] hover:file:bg-teal-100 cursor-pointer">
                             </div>
                         </div>
 
                         <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
                             <div class="flex justify-between items-center">
-                                <span class="font-bold text-slate-700 uppercase">📏 Tamanhos e Códigos VALE:</span>
-                                <button onclick="adicionarCaixaTamanho(${u.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-[11px] shadow-sm flex items-center gap-1">➕ Adicionar Caixa</button>
+                                <span class="font-bold text-slate-700 uppercase">📏 Tamanhos e Códigos SAP (ERP Vale):</span>
+                                <button onclick="adicionarCaixaTamanho(${u.id})" class="bg-[#007e7a] hover:bg-[#005a57] text-white px-3 py-1.5 rounded-xl font-bold text-[11px] shadow-sm flex items-center gap-1">➕ Adicionar Tamanho</button>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                                 ${tamanhosListHtml || '<p class="text-xs text-slate-400 italic col-span-full">Nenhum tamanho configurado.</p>'}
@@ -927,17 +1123,19 @@
         function adicionarNovoUniforme() {
             let novo = {
                 id: Date.now(),
-                nome: "Novo Uniforme",
-                cor: "Verde Vale",
+                nome: "Nova Peça de Uniforme",
+                cor: "Verde Vale / Cinza",
                 referencia: "REF-000",
+                categoria: "geral",
                 imagem: "https://cdn-icons-png.flaticon.com/512/3163/3163179.png",
-                tamanhos: ["P", "M"],
-                codigos: {"P": "000000", "M": "000001"}
+                tamanhos: ["P", "M", "G"],
+                codigos: {"P": "00000000", "M": "00000001", "G": "00000002"}
             };
             dadosApp.uniformes.unshift(novo);
             salvarStorage();
             renderizarGerirUniformes();
             renderizarCatalogo();
+            mostrarToast("Nova peça adicionada ao catálogo.");
         }
 
         function atualizarUniformeProp(id, campo, val) {
@@ -960,6 +1158,7 @@
                         salvarStorage();
                         renderizarGerirUniformes();
                         renderizarCatalogo();
+                        mostrarToast("Foto atualizada!");
                     }
                 };
                 reader.readAsDataURL(file);
@@ -1020,11 +1219,12 @@
         }
 
         function apagarUniforme(id) {
-            if(confirm("Deseja realmente excluir este uniforme do catálogo?")) {
+            if(confirm("Confirmar exclusão definitiva deste uniforme?")) {
                 dadosApp.uniformes = dadosApp.uniformes.filter(item => item.id !== id);
                 salvarStorage();
                 renderizarGerirUniformes();
                 renderizarCatalogo();
+                mostrarToast("Uniforme excluído.");
             }
         }
     </script>
