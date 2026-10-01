@@ -1228,5 +1228,116 @@
             }
         }
     </script>
+    <style id="vale-patch">
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+@media screen{
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif!important;background:linear-gradient(180deg,#e6f0ef 0%,#f5f8f8 55%)!important;padding-bottom:190px!important}
+.text-xs{font-size:13px!important}
+.shadow-sm,.shadow-md,.shadow-xl,.shadow-2xl{box-shadow:0 1px 2px rgba(0,60,58,.05),0 10px 24px -12px rgba(0,60,58,.22)!important}
+.border-slate-200,.border-slate-300{border-color:rgba(0,90,87,.16)!important}
+.rounded-2xl{border-radius:20px!important}.rounded-3xl{border-radius:28px!important}
+button,a,label{transition:transform .15s,background-color .2s,box-shadow .2s}
+button:active{transform:scale(.97)}
+
+/* barra de cima flutuante */
+body>header{position:fixed!important;top:0;left:0;right:0;z-index:45!important;background:rgba(0,90,87,.86)!important;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:0!important;border-radius:0 0 24px 24px;padding-top:calc(env(safe-area-inset-top,0px) + 12px)!important;transition:transform .3s}
+body.bars-off>header{transform:translateY(-115%)}
+
+/* abas viram barra flutuante inferior */
+.mp-tabs{position:fixed!important;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 58px);max-width:640px;margin:0 auto!important;z-index:45;background:rgba(255,255,255,.85)!important;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(0,90,87,.2)!important;border-radius:24px!important;padding:6px!important;box-shadow:0 14px 30px -14px rgba(0,60,58,.4)!important;transition:bottom .3s}
+body.bars-off .mp-tabs{bottom:calc(env(safe-area-inset-bottom,0px) + 12px)}
+.mp-tabs>button{border-radius:18px!important;box-shadow:none!important;background:transparent!important;color:#4b6664!important;padding:10px 6px!important;font-size:12px!important;white-space:nowrap}
+.mp-tabs>button[class*="bg-[#007e7a]"]{background:linear-gradient(135deg,#00948f,#005a57)!important;color:#fff!important;box-shadow:0 8px 18px -8px rgba(0,126,122,.8)!important}
+.mp-tabs>button>span:first-child{font-size:17px}
+
+/* rodapé recolhe junto */
+body>footer{z-index:44!important;left:12px!important;right:12px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 6px)!important;border-radius:20px!important;border:0!important;transition:transform .3s}
+body.bars-off>footer{transform:translateY(170%)}
+#toastNotificacao{bottom:150px!important}
+
+/* catálogo mais vivo */
+#grelhaCatalogo>div{border-radius:22px!important;transition:transform .2s,box-shadow .2s,border-color .2s}
+#grelhaCatalogo>div:hover{transform:translateY(-3px);box-shadow:0 18px 34px -16px rgba(0,126,122,.5)!important}
+#grelhaCatalogo img{filter:drop-shadow(0 6px 8px rgba(0,60,58,.18))}
+.btn-cat{border-radius:99px!important;padding:7px 16px!important;white-space:nowrap}
+#contadorCarrinho.mp-pop,#contadorPedidos.mp-pop{animation:mp-pop .4s ease}
+@keyframes mp-pop{40%{transform:scale(1.6)}}
+
+/* troca de tela com deslize */
+.slide-r{animation:mp-r .28s ease}.slide-l{animation:mp-l .28s ease}
+@keyframes mp-r{from{opacity:0;transform:translateX(34px)}}
+@keyframes mp-l{from{opacity:0;transform:translateX(-34px)}}
+}
+@media screen and (prefers-color-scheme:dark){
+body{background:#0a1a19!important;color:#e6f2f1}
+.bg-white,.bg-white\/10{background-color:#12292a!important;color:#e6f2f1}
+.bg-slate-50,.bg-slate-100,.bg-slate-200\/80{background-color:#183433!important;color:#e6f2f1}
+.border-slate-100,.border-slate-200,.border-slate-300{border-color:#254745!important}
+.text-slate-900,.text-slate-800,.text-slate-700{color:#e6f2f1!important}
+.text-slate-600,.text-slate-500,.text-slate-400{color:#9ab8b5!important}
+input,select,textarea{background-color:#183433!important;color:#e6f2f1!important}
+.mp-tabs{background:rgba(10,32,31,.88)!important}
+.mp-tabs>button{color:#9ab8b5!important}
+}
+@media print{body{padding:0!important}}
+@media(prefers-reduced-motion:reduce){.slide-r,.slide-l,.mp-pop{animation:none!important}}
+</style>
+<script id="vale-patch-js">
+(function(){
+  var T=['catalogo','carrinho','admin','gerir'];
+  var b0=document.getElementById('tab-btn-catalogo');
+  if(b0&&b0.parentElement)b0.parentElement.classList.add('mp-tabs');
+
+  function visiveis(){return T.filter(function(t){var b=document.getElementById('tab-btn-'+t);return b&&!b.classList.contains('hidden')})}
+  function atual(){for(var i=0;i<T.length;i++){var e=document.getElementById('tab-'+T[i]);if(e&&!e.classList.contains('hidden'))return T[i]}return 'catalogo'}
+
+  /* anima a troca de aba sem mexer na função original */
+  var orig=window.mudarTab;
+  window.mudarTab=function(t){
+    var de=T.indexOf(atual());orig.apply(this,arguments);
+    var para=T.indexOf(t),el=document.getElementById('tab-'+t);
+    if(el&&para!==de){el.classList.remove('slide-l','slide-r');void el.offsetWidth;el.classList.add(para>de?'slide-r':'slide-l');window.scrollTo({top:0})}
+  };
+
+  /* deslizar o dedo troca de tela (só entre as abas visíveis) */
+  var sx=0,sy=0,st=0,ign=false;
+  var BLOQ='input,textarea,select,.overflow-x-auto,[id^="modal"]';
+  document.addEventListener('touchstart',function(e){var t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();ign=!!e.target.closest(BLOQ)},{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(ign||Date.now()-st>700||document.querySelector('[id^="modal"]:not(.hidden)'))return;
+    var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+    if(Math.abs(dx)<70||Math.abs(dy)>55)return;
+    var v=visiveis(),i=v.indexOf(atual())+(dx<0?1:-1);
+    if(i>=0&&i<v.length)window.mudarTab(v[i]);
+  },{passive:true});
+
+  /* barras somem ao descer e voltam ao subir */
+  var ly=0;
+  window.addEventListener('scroll',function(){
+    var y=window.scrollY;
+    if(y>ly+6&&y>90)document.body.classList.add('bars-off');
+    else if(y<ly-6||y<40)document.body.classList.remove('bars-off');
+    ly=y;
+  },{passive:true});
+
+  /* espaço para a barra de cima fixa */
+  function ajusta(){var h=document.querySelector('body>header');if(h)document.body.style.paddingTop=h.offsetHeight+'px'}
+  ajusta();window.addEventListener('resize',ajusta);setTimeout(ajusta,400);
+  var hd=document.querySelector('body>header');
+  if(hd&&window.MutationObserver)new MutationObserver(ajusta).observe(hd,{childList:true,subtree:true,characterData:true,attributes:true});
+
+  /* contadores "pulam" quando mudam */
+  ['contadorCarrinho','contadorPedidos'].forEach(function(id){
+    var el=document.getElementById(id);if(!el||!window.MutationObserver)return;
+    new MutationObserver(function(){el.classList.remove('mp-pop');void el.offsetWidth;el.classList.add('mp-pop')}).observe(el,{childList:true,characterData:true,subtree:true});
+  });
+
+  /* vibração leve ao tocar em botões */
+  document.addEventListener('click',function(e){if(navigator.vibrate&&e.target.closest('button'))navigator.vibrate(8)});
+
+  /* aviso para confirmar que o visual novo carregou */
+  window.addEventListener('load',function(){setTimeout(function(){if(window.mostrarToast)mostrarToast('Visual novo ativo ✓')},600)});
+})();
+</script>
 </body>
 </html>
