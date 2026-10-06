@@ -1,1343 +1,265 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Uniformes - Vale (v5.3)</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        vale: {
-                            DEFAULT: '#007e7a',
-                            dark: '#005a57',
-                            light: '#e6f4f4',
-                            amber: '#f59e0b'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        * { box-sizing: border-box; }
-        @media print {
-            @page { size: A4 portrait; margin: 8mm 10mm; }
-            body { background: #fff !important; color: #000 !important; padding: 0 !important; }
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
-            table { border-collapse: collapse !important; width: 100% !important; }
-            th, td { border: 1px solid #334155 !important; }
-            th { background-color: #007e7a !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        }
-        .print-only { display: none; }
-    </style>
-</head>
-<body class="bg-slate-100 text-slate-800 min-h-screen pb-24 font-sans select-none transition-colors">
-
-    <!-- TOAST NOTIFICAÇÃO -->
-    <div id="toastNotificacao" class="fixed bottom-16 right-6 bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-xl opacity-0 translate-y-3 pointer-events-none transition-all duration-300 z-[300]">
-        Mensagem
-    </div>
-
-    <!-- MODAL DE LOGIN / REGISTRO DE USUÁRIO -->
-    <div id="modalUserAuth" class="fixed inset-0 z-[200] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 hidden no-print">
-        <div class="bg-white p-6 sm:p-7 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative border border-slate-100">
-            <button onclick="fecharModalUserAuth()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
-
-            <div class="w-14 h-14 bg-teal-50 text-[#007e7a] rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">👕</div>
-            <div>
-                <h2 class="text-sm font-black text-slate-900">Uniformes Vale - Identificação</h2>
-                <p class="text-slate-500 mt-0.5 text-[11px]" id="authSubtitulo">Insira sua matrícula e senha para acessar.</p>
-            </div>
-
-            <div class="space-y-3 text-left">
-                <div>
-                    <label class="block font-bold text-slate-600 mb-1" id="labelMatricula">Matrícula</label>
-                    <input type="text" id="authMatricula" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900 focus:border-[#007e7a]" placeholder="Ex: 81025364">
-                </div>
-                <div id="divNomeRegistro" class="hidden">
-                    <label class="block font-bold text-slate-600 mb-1">Nome Completo</label>
-                    <input type="text" id="authNome" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900 focus:border-[#007e7a]" placeholder="Ex: Mariana Cruz">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-600 mb-1">Senha</label>
-                    <input type="password" id="authSenha" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900 focus:border-[#007e7a]" placeholder="••••">
-                </div>
-
-                <div id="erroAuth" class="text-rose-500 font-bold text-[11px] hidden text-center"></div>
-
-                <button onclick="processarAutenticacao()" id="btnAuthAcao" class="w-full bg-[#007e7a] hover:bg-[#005a57] text-white font-bold py-3 rounded-xl transition text-xs shadow-md">
-                    Entrar no Sistema
-                </button>
-            </div>
-
-            <div class="pt-2 border-t text-center">
-                <button onclick="alternarModoAuth()" id="linkTrocaAuth" class="text-[#007e7a] font-bold text-[11px] hover:underline">
-                    Primeiro acesso? Crie sua conta aqui.
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE LOGIN ADMIN -->
-    <div id="modalAdminLogin" class="fixed inset-0 z-[150] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
-        <div class="bg-white p-6 sm:p-7 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
-            <button onclick="fecharModalAdminLogin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
-
-            <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">🔒</div>
-            <div>
-                <h2 class="text-sm font-black text-slate-900">Acesso Administrativo</h2>
-                <p class="text-slate-500 mt-0.5 text-[11px]">Insira a matrícula e senha de gestor.</p>
-            </div>
-
-            <div class="space-y-3 text-left">
-                <div>
-                    <label class="block font-bold text-slate-600 mb-1">Matrícula</label>
-                    <input type="text" id="adminMatricula" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: 81025364">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-600 mb-1">Senha de Admin</label>
-                    <input type="password" id="adminSenha" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="••••">
-                </div>
-
-                <div id="erroAdminLogin" class="text-rose-500 font-bold text-[11px] hidden text-center">Matrícula ou senha de admin incorretas.</div>
-
-                <button onclick="verificarAdminLogin()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl transition text-xs shadow-md">
-                    🔓 Autenticar como Gestor
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE USUÁRIOS (ADMIN) -->
-    <div id="modalUtilizadoresAdmin" class="fixed inset-0 z-[160] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
-        <div class="bg-white p-6 rounded-3xl shadow-2xl max-w-lg w-full space-y-4 text-xs relative">
-            <button onclick="fecharModalUtilizadoresAdmin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
-            <div class="flex items-center gap-2 border-b pb-3">
-                <span class="text-xl">👥</span>
-                <div>
-                    <h3 class="font-black uppercase text-slate-900 text-sm">Usuários Cadastrados</h3>
-                    <p class="text-[11px] text-slate-500">Contas de colaboradores autorizados a solicitar uniformes.</p>
-                </div>
-            </div>
-
-            <div class="flex justify-between items-center gap-2">
-                <button onclick="abrirModalCadastrarUtilizador()" class="bg-[#007e7a] hover:bg-[#005a57] text-white px-3 py-2 rounded-xl font-bold text-xs transition shadow-sm flex items-center gap-1">
-                    ➕ Novo Usuário
-                </button>
-                <span id="totalUsuariosBadge" class="font-bold text-slate-400">0 usuário(s)</span>
-            </div>
-
-            <div id="listaUtilizadoresAdmin" class="max-h-64 overflow-y-auto space-y-2"></div>
-
-            <div class="flex justify-end pt-2 border-t">
-                <button onclick="fecharModalUtilizadoresAdmin()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl font-bold">Fechar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL CADASTRO USUÁRIO PELO ADMIN -->
-    <div id="modalCadastrarUtilizador" class="fixed inset-0 z-[170] bg-slate-900/90 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
-        <div class="bg-white p-6 sm:p-7 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 text-center text-xs relative">
-            <button onclick="fecharModalCadastrarUtilizador()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
-
-            <div class="w-14 h-14 bg-teal-50 text-[#007e7a] rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner">👤</div>
-            <div>
-                <h2 class="text-sm font-black text-slate-900">Cadastrar Colaborador</h2>
-                <p class="text-slate-500 mt-0.5 text-[11px]">Adicione os dados para habilitar o acesso.</p>
-            </div>
-
-            <div class="space-y-3 text-left">
-                <div>
-                    <label class="block font-bold text-slate-600 mb-1">Matrícula</label>
-                    <input type="text" id="novoAdminMatricula" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: 81025364">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-600 mb-1">Nome Completo</label>
-                    <input type="text" id="novoAdminNome" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: João da Silva">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-600 mb-1">Senha Inicial</label>
-                    <input type="password" id="novoAdminSenha" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="••••">
-                </div>
-
-                <div id="erroNovoUser" class="text-rose-500 font-bold text-[11px] hidden text-center"></div>
-
-                <button onclick="salvarNovoUtilizadorAdmin()" class="w-full bg-[#007e7a] hover:bg-[#005a57] text-white font-bold py-3 rounded-xl transition text-xs shadow-md">
-                    ✓ Salvar Usuário
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- CABEÇALHO SUPERIOR -->
-    <header class="bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white px-4 py-3 shadow-md border-b border-teal-800 text-xs flex justify-between items-center z-50 relative no-print">
-        <div class="flex items-center gap-3">
-            <span class="font-black text-base tracking-widest text-teal-100">VALE</span>
-            <div class="h-4 w-px bg-teal-300/40"></div>
-            <span class="font-extrabold tracking-wide text-xs sm:text-sm" id="headerSaudacao">Gestão de Uniformes & EPIs</span>
-        </div>
-        <div class="flex items-center gap-2">
-            <button onclick="abrirModalAuth()" class="bg-white/10 hover:bg-white/20 text-white px-2.5 py-1 rounded-lg font-bold text-[10px] transition border border-white/20">
-                Conta
-            </button>
-            <span id="badgeModo" class="bg-teal-950/60 px-2.5 py-1 rounded-lg font-bold text-[10px] uppercase text-teal-200 border border-teal-800">
-                Modo: Colaborador
-            </span>
-            <button onclick="toggleModoAdmin()" id="btnModoAdmin" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">
-                ⚙️ Admin
-            </button>
-            <button onclick="sairDaConta()" id="btnSair" class="bg-rose-700 hover:bg-rose-800 text-white px-2.5 py-1.5 rounded-xl font-bold text-xs transition shadow-sm hidden">
-                Sair
-            </button>
-        </div>
-    </header>
-
-    <!-- CONTEÚDO PRINCIPAL (TELA) -->
-    <div class="max-w-5xl mx-auto p-3 sm:p-6 space-y-4 pt-4 no-print">
-
-        <!-- ABAS DE NAVEGAÇÃO -->
-        <div class="flex gap-2 bg-slate-200/80 p-1.5 rounded-2xl shadow-inner overflow-x-auto">
-            <button onclick="mudarTab('catalogo')" id="tab-btn-catalogo" class="flex-1 py-2.5 rounded-xl bg-[#007e7a] text-white font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5">
-                <span>👕</span> Catálogo
-            </button>
-            <button onclick="mudarTab('carrinho')" id="tab-btn-carrinho" class="flex-1 py-2.5 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50">
-                <span>🛒</span> Carrinho <span id="contadorCarrinho" class="bg-[#007e7a] text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span>
-            </button>
-            <button onclick="mudarTab('admin')" id="tab-btn-admin" class="flex-1 py-2.5 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden">
-                <span>📊</span> Pedidos <span id="contadorPedidos" class="bg-amber-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span>
-            </button>
-            <button onclick="mudarTab('gerir')" id="tab-btn-gerir" class="flex-1 py-2.5 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50 hidden">
-                <span>✏️</span> Gerenciar Itens
-            </button>
-        </div>
-
-        <!-- TAB 1: CATÁLOGO DE UNIFORMES -->
-        <div id="tab-catalogo" class="space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                <div>
-                    <h2 class="text-sm font-black uppercase text-slate-800">Catálogo Oficial de Uniformes Vale</h2>
-                    <p class="text-[11px] text-slate-500">Selecione os tamanhos padronizados e adicione ao carrinho para solicitar.</p>
-                </div>
-                <div class="flex gap-2 w-full md:w-auto">
-                    <input type="text" id="filtroCatalogo" oninput="renderizarCatalogo()" placeholder="🔍 Buscar por nome, código SAP ou ref..." class="w-full md:w-64 p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold outline-none focus:border-[#007e7a]">
-                </div>
-            </div>
-
-            <!-- FILTRO DE CATEGORIAS RÁPIDAS -->
-            <div class="flex gap-2 overflow-x-auto pb-1 text-xs">
-                <button onclick="filtrarCategoria('todos')" class="btn-cat active px-3 py-1.5 rounded-lg font-bold bg-[#007e7a] text-white">Todos</button>
-                <button onclick="filtrarCategoria('masculino')" class="btn-cat px-3 py-1.5 rounded-lg font-bold bg-white text-slate-700 border border-slate-200">Masculino</button>
-                <button onclick="filtrarCategoria('feminino')" class="btn-cat px-3 py-1.5 rounded-lg font-bold bg-white text-slate-700 border border-slate-200">Feminino</button>
-                <button onclick="filtrarCategoria('calca')" class="btn-cat px-3 py-1.5 rounded-lg font-bold bg-white text-slate-700 border border-slate-200">Calças</button>
-                <button onclick="filtrarCategoria('polo')" class="btn-cat px-3 py-1.5 rounded-lg font-bold bg-white text-slate-700 border border-slate-200">Polos</button>
-            </div>
-
-            <div id="grelhaCatalogo" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-        </div>
-
-        <!-- TAB 2: CARRINHO -->
-        <div id="tab-carrinho" class="space-y-4 hidden">
-            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                <div class="border-b pb-3">
-                    <h2 class="text-sm font-black uppercase text-slate-800">🛒 Carrinho de Solicitação</h2>
-                    <p class="text-[11px] text-slate-500">Revise suas peças e preencha a data pretendida para retirada no almoxarifado.</p>
-                </div>
-
-                <div id="listaItensCarrinho" class="space-y-3"></div>
-
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-xs text-slate-700 uppercase">📝 Dados do Solicitante e Retirada</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                        <div>
-                            <label class="block font-bold text-slate-600 mb-1">Matrícula</label>
-                            <input type="text" id="pedidoMatricula" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: 81025364">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-600 mb-1">Nome Completo</label>
-                            <input type="text" id="pedidoNome" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold outline-none text-slate-900" placeholder="Ex: Mariana Cruz">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-600 mb-1">Data Desejada para Retirada</label>
-                            <input type="date" id="pedidoData" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-bold outline-none">
-                        </div>
-                    </div>
-                    <button onclick="finalizarPedido()" class="w-full bg-[#007e7a] hover:bg-[#005a57] text-white font-bold py-3 rounded-xl transition text-xs shadow-md">
-                        🚀 Enviar Pedido para Aprovação
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 3: APROVAÇÃO (ADMIN) -->
-        <div id="tab-admin" class="space-y-4 hidden">
-            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
-                    <div>
-                        <h2 class="text-sm font-black uppercase text-slate-800">📊 Painel de Aprovação e Almoxarifado</h2>
-                        <p class="text-[11px] text-slate-500">Aprove pedidos e emita o termo de entrega para assinatura.</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="exportarPedidosCSV()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition flex items-center gap-1 shadow-sm">
-                            📊 Exportar Excel
-                        </button>
-                        <button onclick="limparHistoricoPedidos()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-1.5 rounded-xl font-bold text-xs transition">
-                            Limpar Histórico
-                        </button>
-                    </div>
-                </div>
-
-                <div id="listaPedidosAdmin" class="space-y-3"></div>
-            </div>
-        </div>
-
-        <!-- TAB 4: GERENCIAR CATÁLOGO (ADMIN) -->
-        <div id="tab-gerir" class="space-y-4 hidden">
-            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                <div class="border-b pb-3 flex justify-between items-center flex-wrap gap-2">
-                    <div>
-                        <h2 class="text-sm font-black uppercase text-slate-800">✏️ Gerenciamento do Catálogo</h2>
-                        <p class="text-[11px] text-slate-500">Cadastre novas peças, fotos, tamanhos e códigos SAP da Vale.</p>
-                    </div>
-                    <button onclick="adicionarNovoUniforme()" class="bg-[#007e7a] hover:bg-[#005a57] text-white px-3 py-1.5 rounded-xl font-bold text-xs transition shadow-sm">
-                        ➕ Adicionar Nova Peça
-                    </button>
-                </div>
-
-                <div id="listaGerirUniformes" class="space-y-4"></div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- RODAPÉ FIXO -->
-    <footer class="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white px-4 py-2.5 flex justify-between items-center max-w-5xl mx-auto rounded-t-2xl shadow-2xl border-t border-teal-800 text-xs no-print">
-        <span class="font-bold tracking-wider text-[11px]">Uniformes Vale • Versão v5.3</span>
-        <button onclick="clicarBotaoBonequinhos()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 shadow-sm transition border border-white/20">
-            <span>👥</span> Usuários
-        </button>
-    </footer>
-
-    <!-- ========================================================================= -->
-    <!-- TERMO OFICIAL DE ENTREGA E CAUTELA (A4 PRINT NATIVO)                       -->
-    <!-- ========================================================================= -->
-    <div id="termoEntregaA4" class="print-only">
-        <div style="border: 1.5px solid #0f172a; margin-bottom: 8px;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                    <td style="width: 90px; text-align: center; font-weight: 900; font-size: 16px; color: #007e7a; padding: 8px; border-right: 1px solid #334155; background: #f8fafc;">VALE</td>
-                    <td style="text-align: center; font-weight: 800; font-size: 11px; text-transform: uppercase; color: #0f172a; padding: 6px;">
-                        TERMO DE ENTREGA E CAUTELA DE UNIFORMES E EQUIPAMENTOS
-                    </td>
-                    <td style="width: 120px; font-size: 8px; text-align: left; padding: 4px 6px; border-left: 1px solid #334155; background: #f8fafc;">
-                        <strong>Nº Pedido:</strong> <span id="printPedidoId">---</span><br>
-                        <strong>Data:</strong> <span id="printPedidoData">---</span>
-                    </td>
-                </tr>
-            </table>
-        </div>
-
-        <div style="font-size: 9px; margin-bottom: 8px; border: 1px solid #334155; padding: 6px; background: #f8fafc;">
-            <strong>COLABORADOR:</strong> <span id="printColaboradorNome">---</span> &nbsp;|&nbsp;
-            <strong>MATRÍCULA:</strong> <span id="printColaboradorMatricula">---</span> &nbsp;|&nbsp;
-            <strong>RETIRADA:</strong> <span id="printColaboradorRetirada">---</span>
-        </div>
-
-        <table style="width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 14px;">
-            <thead>
-                <tr style="background: #007e7a; color: #fff;">
-                    <th style="padding: 5px 4px; width: 35px; text-align: center;">ITEM</th>
-                    <th style="padding: 5px 6px; text-align: left;">DESCRIÇÃO DA PEÇA / UNIFORME</th>
-                    <th style="padding: 5px 6px; width: 60px; text-align: center;">REF.</th>
-                    <th style="padding: 5px 6px; width: 60px; text-align: center;">TAMANHO</th>
-                    <th style="padding: 5px 6px; width: 100px; text-align: center;">CÓDIGO SAP</th>
-                    <th style="padding: 5px 6px; width: 50px; text-align: center;">QTD</th>
-                </tr>
-            </thead>
-            <tbody id="printItensTabela"></tbody>
-        </table>
-
-        <div style="font-size: 8px; color: #475569; line-height: 1.4; border: 1px dashed #94a3b8; padding: 6px; margin-bottom: 30px;">
-            Declaro ter recebido da VALE S.A., a título de cautela, os uniformes e/ou EPIs acima discriminados, em perfeitas condições de uso, comprometendo-me a zelar pela sua conservação e a utilizá-los estritamente no exercício de minhas atividades profissionais.
-        </div>
-
-        <div style="display: flex; justify-content: space-between; font-size: 9px; text-align: center;">
-            <div style="width: 250px; border-top: 1px solid #000; padding-top: 4px;">
-                Assinatura do Colaborador<br><span style="font-size: 7.5px; color:#666;">(Recebedor)</span>
-            </div>
-            <div style="width: 250px; border-top: 1px solid #000; padding-top: 4px;">
-                Almoxarifado / Suprimentos<br><span style="font-size: 7.5px; color:#666;">(Responsável pela Entrega)</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- SCRIPT DA APLICAÇÃO -->
-    <script>
-        const CHAVE_APP = "mariana_uniformes_vale_dados_fixos_v3";
-        let modoAdmin = false;
-        let carrinho = [];
-        let usuarioAtual = null;
-        let modoRegisto = false;
-        let categoriaAtiva = 'todos';
-
-        let dadosUniformesPadrao = [
-            {
-                id: 1,
-                nome: "Camisa administrativa masculina manga curta",
-                cor: "Verde Vale / Cinza",
-                referencia: "CM-443",
-                categoria: "masculino",
-                imagem: "https://cdn-icons-png.flaticon.com/512/3163/3163179.png",
-                tamanhos: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13"],
-                codigos: {"01": "16724400", "02": "16724412", "03": "16724642", "04": "16724406", "05": "16724290", "06": "16725084", "07": "16724640", "08": "16724679", "09": "16724399", "10": "16724357", "11": "13300303", "12": "13308561", "13": "13329458"}
-            },
-            {
-                id: 2,
-                nome: "Camisa administrativa feminina manga curta",
-                cor: "Verde Vale / Cinza",
-                referencia: "CM-918",
-                categoria: "feminino",
-                imagem: "https://cdn-icons-png.flaticon.com/512/3163/3163179.png",
-                tamanhos: ["36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60"],
-                codigos: {"36": "16724419", "38": "16724632", "40": "15500269", "42": "16724557", "44": "16724179", "46": "16724435", "48": "16724631", "50": "16724654", "52": "15500271", "54": "16724434", "56": "13307872", "58": "13307871", "60": "13307870"}
-            },
-            {
-                id: 3,
-                nome: "Polo masculina (administrativa)",
-                cor: "Cinza / Branco",
-                referencia: "CM-540",
-                categoria: "polo",
-                imagem: "https://cdn-icons-png.flaticon.com/512/892/892458.png",
-                tamanhos: ["XP", "P", "M", "G", "GG", "3G", "4G", "5G", "6G"],
-                codigos: {"XP": "13306603", "P": "13306602", "M": "13306601", "G": "13306600", "GG": "13306549", "3G": "13306548", "4G": "13306547", "5G": "13306546", "6G": "13306545"}
-            },
-            {
-                id: 4,
-                nome: "Calça jeans administrativo feminina",
-                cor: "Azul Marinho",
-                referencia: "CL-285",
-                categoria: "calca",
-                imagem: "https://cdn-icons-png.flaticon.com/512/2613/2613204.png",
-                tamanhos: ["34", "36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60"],
-                codigos: {"34": "13315330", "36": "13315329", "38": "13315328", "40": "13315327", "42": "13315326", "44": "13315351", "46": "13315350", "48": "13315349", "50": "13315348", "52": "13315347", "54": "13315346", "56": "13315345", "58": "13315300", "60": "13314839"}
-            }
-        ];
-
-        let dadosApp = {
-            uniformes: dadosUniformesPadrao,
-            pedidos: [],
-            utilizadores: [
-                { matricula: "81025364", nome: "Mariana Pereira Cruz", senha: "1510" }
-            ]
-        };
-
-        function mostrarToast(msg) {
-            const toast = document.getElementById('toastNotificacao');
-            toast.innerText = msg;
-            toast.classList.remove('opacity-0', 'translate-y-3');
-            toast.classList.add('opacity-100', 'translate-y-0');
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-3');
-                toast.classList.remove('opacity-100', 'translate-y-0');
-            }, 2600);
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            let salvo = localStorage.getItem(CHAVE_APP);
-            if (salvo) {
-                try {
-                    let parsed = JSON.parse(salvo);
-                    if (parsed) {
-                        if (parsed.uniformes && parsed.uniformes.length > 0) dadosApp.uniformes = parsed.uniformes;
-                        if (parsed.pedidos) dadosApp.pedidos = parsed.pedidos;
-                        if (parsed.utilizadores) dadosApp.utilizadores = parsed.utilizadores;
-                    }
-                } catch(e) {}
-            }
-
-            if(!dadosApp.utilizadores.some(u => u.matricula === "81025364")) {
-                dadosApp.utilizadores.push({ matricula: "81025364", nome: "Mariana Pereira Cruz", senha: "1510" });
-            }
-
-            let sessaoSalva = sessionStorage.getItem('usuario_logado_vale');
-            if (sessaoSalva) {
-                usuarioAtual = JSON.parse(sessaoSalva);
-                atualizarCabecalhoUtilizador();
-                if(usuarioAtual.matricula === "81025364" && usuarioAtual.senha === "1510") {
-                    ativarModoAdminVisual();
-                }
-            } else {
-                usuarioAtual = null;
-                document.getElementById('headerSaudacao').innerText = "Gestão de Uniformes & EPIs";
-                document.getElementById('btnSair').classList.add('hidden');
-            }
-
-            atualizarTudo();
-            document.getElementById('pedidoData').valueAsDate = new Date();
-        });
-
-        function salvarStorage() {
-            localStorage.setItem(CHAVE_APP, JSON.stringify(dadosApp));
-        }
-
-        function atualizarTudo() {
-            renderizarCatalogo();
-            renderizarCarrinho();
-            renderizarAdminPedidos();
-            renderizarGerirUniformes();
-            renderizarUtilizadoresAdmin();
-        }
-
-        function filtrarCategoria(cat) {
-            categoriaAtiva = cat;
-            document.querySelectorAll('.btn-cat').forEach(b => {
-                b.className = "btn-cat px-3 py-1.5 rounded-lg font-bold bg-white text-slate-700 border border-slate-200";
-            });
-            event.target.className = "btn-cat px-3 py-1.5 rounded-lg font-bold bg-[#007e7a] text-white";
-            renderizarCatalogo();
-        }
-
-        function abrirModalAuth() {
-            document.getElementById('authMatricula').value = '';
-            document.getElementById('authSenha').value = '';
-            if(modoRegisto) alternarModoAuth();
-            document.getElementById('modalUserAuth').classList.remove('hidden');
-        }
-
-        function fecharModalUserAuth() {
-            document.getElementById('modalUserAuth').classList.add('hidden');
-        }
-
-        function alternarModoAuth() {
-            modoRegisto = !modoRegisto;
-            const sub = document.getElementById('authSubtitulo');
-            const btn = document.getElementById('btnAuthAcao');
-            const link = document.getElementById('linkTrocaAuth');
-            const divNome = document.getElementById('divNomeRegistro');
-            const erro = document.getElementById('erroAuth');
-            erro.classList.add('hidden');
-
-            if(modoRegisto) {
-                sub.innerText = "Cadastre sua conta informando matrícula, nome e senha.";
-                btn.innerText = "Criar Minha Conta";
-                link.innerText = "Já possui cadastro? Faça login aqui.";
-                divNome.classList.remove('hidden');
-            } else {
-                sub.innerText = "Insira sua matrícula e senha para acessar.";
-                btn.innerText = "Entrar no Sistema";
-                link.innerText = "Primeiro acesso? Crie sua conta aqui.";
-                divNome.classList.add('hidden');
-            }
-        }
-
-        function processarAutenticacao() {
-            let mat = document.getElementById('authMatricula').value.trim();
-            let senha = document.getElementById('authSenha').value.trim();
-            let erro = document.getElementById('erroAuth');
-            erro.classList.add('hidden');
-
-            if(!mat || !senha) {
-                erro.innerText = "Preencha todos os campos obrigatórios.";
-                erro.classList.remove('hidden');
-                return;
-            }
-
-            if(modoRegisto) {
-                let nome = document.getElementById('authNome').value.trim();
-                if(!nome) {
-                    erro.innerText = "Digite o seu nome completo.";
-                    erro.classList.remove('hidden');
-                    return;
-                }
-
-                let existente = dadosApp.utilizadores.find(u => u.matricula === mat);
-                if(existente) {
-                    erro.innerText = "Esta matrícula já possui cadastro. Faça login.";
-                    erro.classList.remove('hidden');
-                    return;
-                }
-
-                dadosApp.utilizadores.push({ matricula: mat, nome: nome, senha: senha });
-                salvarStorage();
-                mostrarToast("Conta criada com sucesso! Faça login.");
-                alternarModoAuth();
-                document.getElementById('authSenha').value = '';
-            } else {
-                let user = dadosApp.utilizadores.find(u => u.matricula === mat && u.senha === senha);
-                if(user) {
-                    usuarioAtual = user;
-                    sessionStorage.setItem('usuario_logado_vale', JSON.stringify(user));
-                    document.getElementById('modalUserAuth').classList.add('hidden');
-                    atualizarCabecalhoUtilizador();
-
-                    if(user.matricula === "81025364" && user.senha === "1510") {
-                        ativarModoAdminVisual();
-                    } else {
-                        modoAdmin = false;
-                        document.getElementById('badgeModo').innerText = "Modo: Colaborador";
-                        document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
-                        document.getElementById('tab-btn-catalogo').classList.remove('hidden');
-                        document.getElementById('tab-btn-carrinho').classList.remove('hidden');
-                        document.getElementById('tab-btn-admin').classList.add('hidden');
-                        document.getElementById('tab-btn-gerir').classList.add('hidden');
-                        mudarTab('catalogo');
-                    }
-                    mostrarToast(`Bem-vindo(a), ${user.nome.split(' ')[0]}!`);
-                } else {
-                    erro.innerText = "Matrícula ou senha incorretas.";
-                    erro.classList.remove('hidden');
-                }
-            }
-        }
-
-        function atualizarCabecalhoUtilizador() {
-            if(usuarioAtual) {
-                document.getElementById('headerSaudacao').innerText = `Olá, ${usuarioAtual.nome} (${usuarioAtual.matricula})`;
-                document.getElementById('btnSair').classList.remove('hidden');
-                document.getElementById('pedidoMatricula').value = usuarioAtual.matricula;
-                document.getElementById('pedidoNome').value = usuarioAtual.nome;
-            }
-        }
-
-        function sairDaConta() {
-            sessionStorage.removeItem('usuario_logado_vale');
-            usuarioAtual = null;
-            modoAdmin = false;
-            document.getElementById('badgeModo').innerText = "Modo: Colaborador";
-            document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
-            document.getElementById('headerSaudacao').innerText = "Gestão de Uniformes & EPIs";
-            document.getElementById('btnSair').classList.add('hidden');
-            document.getElementById('tab-btn-catalogo').classList.remove('hidden');
-            document.getElementById('tab-btn-carrinho').classList.remove('hidden');
-            document.getElementById('tab-btn-admin').classList.add('hidden');
-            document.getElementById('tab-btn-gerir').classList.add('hidden');
-            document.getElementById('pedidoMatricula').value = '';
-            document.getElementById('pedidoNome').value = '';
-            mudarTab('catalogo');
-            mostrarToast("Sessão finalizada.");
-        }
-
-        function ativarModoAdminVisual() {
-            modoAdmin = true;
-            document.getElementById('badgeModo').innerText = "Modo: Gestor / Admin";
-            document.getElementById('btnModoAdmin').innerText = "👤 Modo Colaborador";
-            
-            document.getElementById('tab-btn-catalogo').classList.add('hidden');
-            document.getElementById('tab-btn-carrinho').classList.add('hidden');
-            document.getElementById('tab-btn-admin').classList.remove('hidden');
-            document.getElementById('tab-btn-gerir').classList.remove('hidden');
-            
-            mudarTab('admin');
-            atualizarTudo();
-        }
-
-        function toggleModoAdmin() {
-            if(modoAdmin) {
-                modoAdmin = false;
-                document.getElementById('badgeModo').innerText = "Modo: Colaborador";
-                document.getElementById('btnModoAdmin').innerText = "⚙️ Admin";
-                document.getElementById('tab-btn-catalogo').classList.remove('hidden');
-                document.getElementById('tab-btn-carrinho').classList.remove('hidden');
-                document.getElementById('tab-btn-admin').classList.add('hidden');
-                document.getElementById('tab-btn-gerir').classList.add('hidden');
-                mudarTab('catalogo');
-            } else {
-                document.getElementById('adminMatricula').value = '';
-                document.getElementById('adminSenha').value = '';
-                document.getElementById('erroAdminLogin').classList.add('hidden');
-                document.getElementById('modalAdminLogin').classList.remove('hidden');
-            }
-        }
-
-        function fecharModalAdminLogin() {
-            document.getElementById('modalAdminLogin').classList.add('hidden');
-        }
-
-        function verificarAdminLogin() {
-            let mat = document.getElementById('adminMatricula').value.trim();
-            let senha = document.getElementById('adminSenha').value.trim();
-            let erro = document.getElementById('erroAdminLogin');
-            erro.classList.add('hidden');
-
-            if(mat === "81025364" && senha === "1510") {
-                fecharModalAdminLogin();
-                usuarioAtual = { matricula: mat, nome: "Mariana Pereira Cruz", senha: senha };
-                sessionStorage.setItem('usuario_logado_vale', JSON.stringify(usuarioAtual));
-                atualizarCabecalhoUtilizador();
-                ativarModoAdminVisual();
-                mostrarToast("Modo administrador liberado!");
-            } else {
-                erro.classList.remove('hidden');
-            }
-        }
-
-        function clicarBotaoBonequinhos() {
-            if(modoAdmin || (usuarioAtual && usuarioAtual.matricula === "81025364" && usuarioAtual.senha === "1510")) {
-                ativarModoAdminVisual();
-                abrirModalUtilizadoresAdmin();
-            } else {
-                toggleModoAdmin();
-            }
-        }
-
-        function abrirModalUtilizadoresAdmin() {
-            renderizarUtilizadoresAdmin();
-            document.getElementById('modalUtilizadoresAdmin').classList.remove('hidden');
-        }
-
-        function fecharModalUtilizadoresAdmin() {
-            document.getElementById('modalUtilizadoresAdmin').classList.add('hidden');
-        }
-
-        function abrirModalCadastrarUtilizador() {
-            document.getElementById('novoAdminMatricula').value = '';
-            document.getElementById('novoAdminNome').value = '';
-            document.getElementById('novoAdminSenha').value = '';
-            document.getElementById('erroNovoUser').classList.add('hidden');
-            document.getElementById('modalCadastrarUtilizador').classList.remove('hidden');
-        }
-
-        function fecharModalCadastrarUtilizador() {
-            document.getElementById('modalCadastrarUtilizador').classList.add('hidden');
-        }
-
-        function salvarNovoUtilizadorAdmin() {
-            let mat = document.getElementById('novoAdminMatricula').value.trim();
-            let nome = document.getElementById('novoAdminNome').value.trim();
-            let senha = document.getElementById('novoAdminSenha').value.trim();
-            let erro = document.getElementById('erroNovoUser');
-            erro.classList.add('hidden');
-
-            if(!mat || !nome || !senha) {
-                erro.innerText = "Preencha todos os campos.";
-                erro.classList.remove('hidden');
-                return;
-            }
-
-            let existente = dadosApp.utilizadores.find(u => u.matricula === mat);
-            if(existente) {
-                erro.innerText = "Esta matrícula já está cadastrada.";
-                erro.classList.remove('hidden');
-                return;
-            }
-
-            dadosApp.utilizadores.push({ matricula: mat, nome: nome, senha: senha });
-            salvarStorage();
-            renderizarUtilizadoresAdmin();
-            fecharModalCadastrarUtilizador();
-            mostrarToast("Usuário cadastrado com sucesso!");
-        }
-
-        function renderizarUtilizadoresAdmin() {
-            const container = document.getElementById('listaUtilizadoresAdmin');
-            if(!container) return;
-
-            document.getElementById('totalUsuariosBadge').innerText = `${dadosApp.utilizadores.length} usuário(s)`;
-
-            if(!dadosApp.utilizadores || dadosApp.utilizadores.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-4">Nenhum usuário cadastrado.</p>';
-                return;
-            }
-
-            let html = '';
-            dadosApp.utilizadores.forEach((u, idx) => {
-                html += `
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
-                        <div>
-                            <span class="font-bold text-slate-900">${u.nome}</span>
-                            <span class="text-slate-500 font-semibold ml-2">Matrícula: <b>${u.matricula}</b> | Senha: <b>${u.senha}</b></span>
-                        </div>
-                        <button onclick="removerUtilizador(${idx})" class="text-rose-600 font-bold bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-xl transition">✕ Apagar</button>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function removerUtilizador(idx) {
-            if(confirm("Confirmar exclusão deste usuário?")) {
-                dadosApp.utilizadores.splice(idx, 1);
-                salvarStorage();
-                renderizarUtilizadoresAdmin();
-                mostrarToast("Usuário removido.");
-            }
-        }
-
-        function mudarTab(tab) {
-            ['catalogo', 'carrinho', 'admin', 'gerir'].forEach(t => {
-                let el = document.getElementById('tab-' + t);
-                if(el) el.classList.add('hidden');
-                let btn = document.getElementById('tab-btn-' + t);
-                if(btn && !btn.classList.contains('hidden')) {
-                    btn.className = "flex-1 py-2.5 rounded-xl bg-white text-slate-700 font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50";
-                }
-            });
-
-            let target = document.getElementById('tab-' + tab);
-            if(target) target.classList.remove('hidden');
-
-            let activeBtn = document.getElementById('tab-btn-' + tab);
-            if(activeBtn) {
-                activeBtn.className = "flex-1 py-2.5 rounded-xl bg-[#007e7a] text-white font-bold shadow-sm transition text-center text-xs flex items-center justify-center gap-1.5";
-            }
-        }
-
-        function renderizarCatalogo() {
-            const container = document.getElementById('grelhaCatalogo');
-            const filtro = (document.getElementById('filtroCatalogo').value || "").toLowerCase();
-            if(!container) return;
-            container.innerHTML = '';
-
-            let lista = dadosApp.uniformes.filter(u => {
-                const matchTexto = u.nome.toLowerCase().includes(filtro) || u.referencia.toLowerCase().includes(filtro);
-                const matchCat = (categoriaAtiva === 'todos') || (u.categoria && u.categoria.toLowerCase().includes(categoriaAtiva)) || (u.nome.toLowerCase().includes(categoriaAtiva));
-                return matchTexto && matchCat;
-            });
-
-            if(lista.length === 0) {
-                container.innerHTML = '<p class="col-span-full text-center text-xs text-slate-400 py-8">Nenhum uniforme encontrado para os critérios selecionados.</p>';
-                return;
-            }
-
-            lista.forEach(item => {
-                let tamanhosHtml = '';
-                if(item.tamanhos && item.tamanhos.length > 0) {
-                    item.tamanhos.forEach(tam => {
-                        let cod = (item.codigos && item.codigos[tam]) ? item.codigos[tam] : '---';
-                        tamanhosHtml += `<option value="${tam}">Tam: ${tam} (Cód SAP: ${cod})</option>`;
-                    });
-                } else {
-                    tamanhosHtml = `<option value="">Sem tamanhos definidos</option>`;
-                }
-
-                container.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between hover:border-teal-300 transition-colors">
-                        <div class="flex gap-3 items-center">
-                            <div class="w-16 h-16 bg-slate-50 rounded-xl flex items-center justify-center p-2 border border-slate-200 shrink-0 overflow-hidden">
-                                <img src="${item.imagem}" alt="Uniforme" class="max-h-full max-w-full object-contain">
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <span class="bg-teal-50 text-[#007e7a] border border-teal-200 font-black px-2 py-0.5 rounded text-[10px]">${item.referencia}</span>
-                                <h3 class="font-bold text-xs text-slate-800 truncate mt-1" title="${item.nome}">${item.nome}</h3>
-                                <p class="text-[11px] text-slate-500 font-medium">Cor: ${item.cor}</p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2 pt-2 border-t border-slate-100 text-xs">
-                            <div class="flex items-center gap-2">
-                                <select id="sel-tam-${item.id}" class="flex-1 p-2 bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs outline-none">
-                                    ${tamanhosHtml}
-                                </select>
-                                <input type="number" id="qtd-${item.id}" value="1" min="1" max="10" class="w-14 p-2 bg-slate-50 border border-slate-300 rounded-xl font-black text-center text-xs outline-none" title="Quantidade">
-                            </div>
-                            <button onclick="adicionarAoCarrinho(${item.id})" class="w-full bg-[#007e7a] hover:bg-[#005a57] text-white font-bold py-2.5 rounded-xl transition text-xs shadow-sm flex items-center justify-center gap-1.5">
-                                🛒 Adicionar ao Carrinho
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function adicionarAoCarrinho(id) {
-            let item = dadosApp.uniformes.find(u => u.id === id);
-            let selTam = document.getElementById(`sel-tam-${id}`).value;
-            if(!selTam) {
-                mostrarToast("Selecione um tamanho válido.");
-                return;
-            }
-            let qtd = parseInt(document.getElementById(`qtd-${id}`).value) || 1;
-            let cod = (item.codigos && item.codigos[selTam]) ? item.codigos[selTam] : '---';
-
-            carrinho.push({
-                cartId: Date.now() + Math.random(),
-                id: item.id,
-                nome: item.nome,
-                cor: item.cor,
-                referencia: item.referencia,
-                tamanho: selTam,
-                codigo: cod,
-                quantidade: qtd
-            });
-
-            renderizarCarrinho();
-            mostrarToast(`${item.nome} (${selTam}) adicionado!`);
-        }
-
-        function renderizarCarrinho() {
-            const container = document.getElementById('listaItensCarrinho');
-            if(!container) return;
-            document.getElementById('contadorCarrinho').innerText = carrinho.length;
-
-            if(carrinho.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-6">O seu carrinho está vazio.</p>';
-                return;
-            }
-
-            let html = '';
-            carrinho.forEach((c, idx) => {
-                html += `
-                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-center text-xs">
-                        <div class="min-w-0 flex-1 pr-2">
-                            <span class="font-bold text-slate-900 block truncate">${c.nome}</span>
-                            <span class="text-[11px] text-slate-500 font-medium">Tam: <b>${c.tamanho}</b> | Cód SAP: <b>${c.codigo}</b> | Qtd: <b>${c.quantidade}</b></span>
-                        </div>
-                        <button onclick="removerDoCarrinho(${idx})" class="text-rose-600 font-bold bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-xl text-xs shrink-0 transition">✕</button>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function removerDoCarrinho(idx) {
-            carrinho.splice(idx, 1);
-            renderizarCarrinho();
-            mostrarToast("Item removido do carrinho.");
-        }
-
-        function finalizarPedido() {
-            let mat = document.getElementById('pedidoMatricula').value.trim();
-            let nome = document.getElementById('pedidoNome').value.trim();
-            let dataRet = document.getElementById('pedidoData').value;
-
-            if(!mat || !nome || !dataRet) {
-                mostrarToast("Preencha Matrícula, Nome e Data de Retirada.");
-                return;
-            }
-
-            if(carrinho.length === 0) {
-                mostrarToast("Seu carrinho está vazio.");
-                return;
-            }
-
-            let novoPedido = {
-                id: Date.now(),
-                matricula: mat,
-                nome: nome,
-                dataRetirada: dataRet,
-                dataPedido: new Date().toLocaleDateString('pt-BR'),
-                status: 'Pendente',
-                itens: [...carrinho]
-            };
-
-            dadosApp.pedidos.unshift(novoPedido);
-            salvarStorage();
-
-            carrinho = [];
-            renderizarCarrinho();
-            renderizarAdminPedidos();
-
-            mostrarToast("🚀 Pedido enviado com sucesso para aprovação!");
-            mudarTab('catalogo');
-        }
-
-        function renderizarAdminPedidos() {
-            const container = document.getElementById('listaPedidosAdmin');
-            if(!container) return;
-            
-            let pendentes = dadosApp.pedidos.filter(p => p.status === 'Pendente').length;
-            document.getElementById('contadorPedidos').innerText = pendentes;
-
-            if(dadosApp.pedidos.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-8">Nenhum pedido registrado no sistema.</p>';
-                return;
-            }
-
-            let html = '';
-            dadosApp.pedidos.forEach(p => {
-                let statusBadge = p.status === 'Pendente' ? 'bg-amber-100 text-amber-800 border-amber-300' : (p.status === 'Aprovado' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300');
-                
-                let itensStr = '';
-                p.itens.forEach(it => {
-                    itensStr += `<li class="text-[11px] text-slate-700">• ${it.quantidade}x ${it.nome} (Tam: <b>${it.tamanho}</b> | Cód SAP: <b>${it.codigo}</b>)</li>`;
-                });
-
-                let botoesAcao = `
-                    <div class="flex gap-2 pt-2 border-t border-slate-100 flex-wrap">
-                        ${p.status === 'Pendente' ? `
-                            <button onclick="mudarStatusPedido(${p.id}, 'Aprovado')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl font-bold text-xs transition">✓ Aprovar Pedido</button>
-                            <button onclick="mudarStatusPedido(${p.id}, 'Rejeitado')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-xl font-bold text-xs transition">✕ Rejeitar</button>
-                        ` : ''}
-                        <button onclick="imprimirCautelaEntrega(${p.id})" class="bg-slate-800 hover:bg-slate-900 text-white px-3.5 py-2 rounded-xl font-bold text-xs transition flex items-center gap-1 shadow-sm">
-                            🖨️ Imprimir Cautela (A4)
-                        </button>
-                    </div>
-                `;
-
-                html += `
-                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3 text-xs">
-                        <div class="flex justify-between items-center border-b pb-2 flex-wrap gap-2">
-                            <div>
-                                <span class="font-black text-slate-900 text-sm">${p.nome}</span>
-                                <span class="text-slate-500 font-semibold ml-2">Matrícula: <b>${p.matricula}</b></span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-slate-500">Retirada: ${p.dataRetirada.split('-').reverse().join('/')}</span>
-                                <span class="px-2.5 py-1 rounded-lg font-black text-[10px] uppercase border ${statusBadge}">${p.status}</span>
-                            </div>
-                        </div>
-                        <ul class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">${itensStr}</ul>
-                        ${botoesAcao}
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function mudarStatusPedido(id, novoStatus) {
-            let p = dadosApp.pedidos.find(item => item.id === id);
-            if(p) {
-                p.status = novoStatus;
-                salvarStorage();
-                renderizarAdminPedidos();
-                mostrarToast(`Pedido marcado como ${novoStatus}!`);
-            }
-        }
-
-        function limparHistoricoPedidos() {
-            if(confirm("Confirmar a exclusão de todos os pedidos do histórico?")) {
-                dadosApp.pedidos = [];
-                salvarStorage();
-                renderizarAdminPedidos();
-                mostrarToast("Histórico de pedidos limpo.");
-            }
-        }
-
-        function imprimirCautelaEntrega(id) {
-            let p = dadosApp.pedidos.find(item => item.id === id);
-            if(!p) return;
-
-            document.getElementById('printPedidoId').innerText = p.id;
-            document.getElementById('printPedidoData').innerText = p.dataPedido;
-            document.getElementById('printColaboradorNome').innerText = p.nome;
-            document.getElementById('printColaboradorMatricula').innerText = p.matricula;
-            document.getElementById('printColaboradorRetirada').innerText = p.dataRetirada.split('-').reverse().join('/');
-
-            const tbody = document.getElementById('printItensTabela');
-            tbody.innerHTML = '';
-
-            p.itens.forEach((it, idx) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="padding:4px; text-align:center;">${idx + 1}</td>
-                        <td style="padding:4px 6px; font-weight:bold;">${it.nome}</td>
-                        <td style="padding:4px 6px; text-align:center;">${it.referencia}</td>
-                        <td style="padding:4px 6px; text-align:center; font-weight:bold;">${it.tamanho}</td>
-                        <td style="padding:4px 6px; text-align:center;">${it.codigo}</td>
-                        <td style="padding:4px 6px; text-align:center; font-weight:bold;">${it.quantidade}</td>
-                    </tr>
-                `;
-            });
-
-            window.print();
-        }
-
-        function exportarPedidosCSV() {
-            if(dadosApp.pedidos.length === 0) {
-                mostrarToast("Nenhum pedido para exportar.");
-                return;
-            }
-
-            let csv = "ID Pedido;Data Pedido;Matricula;Nome;Data Retirada;Status;Peca;Tamanho;Codigo SAP;Quantidade\n";
-            dadosApp.pedidos.forEach(p => {
-                p.itens.forEach(it => {
-                    csv += `"${p.id}";"${p.dataPedido}";"${p.matricula}";"${p.nome}";"${p.dataRetirada}";"${p.status}";"${it.nome}";"${it.tamanho}";"${it.codigo}";"${it.quantidade}"\n`;
-                });
-            });
-
-            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `pedidos_uniformes_vale_${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-            mostrarToast("Planilha CSV de pedidos exportada!");
-        }
-
-        function renderizarGerirUniformes() {
-            const container = document.getElementById('listaGerirUniformes');
-            if(!container) return;
-
-            let html = '';
-            dadosApp.uniformes.forEach((u) => {
-                let tamanhosListHtml = '';
-                if(u.tamanhos) {
-                    u.tamanhos.forEach(tam => {
-                        let cod = (u.codigos && u.codigos[tam]) ? u.codigos[tam] : '';
-                        tamanhosListHtml += `
-                            <div class="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs shadow-sm">
-                                <div class="flex flex-col w-20">
-                                    <label class="text-[9px] font-extrabold text-slate-500 uppercase">Tamanho</label>
-                                    <input type="text" value="${tam}" onchange="atualizarNomeTamanho(${u.id}, '${tam}', this.value)" class="bg-white p-2 border border-slate-300 rounded-lg font-bold text-xs text-center" placeholder="Tam...">
-                                </div>
-                                <div class="flex flex-col flex-1 min-w-0">
-                                    <label class="text-[9px] font-extrabold text-slate-500 uppercase">Código SAP</label>
-                                    <input type="text" value="${cod}" oninput="atualizarCodigoTamanho(${u.id}, '${tam}', this.value)" class="bg-white p-2 border border-slate-300 rounded-lg font-mono font-bold text-xs" placeholder="Cód SAP...">
-                                </div>
-                                <button onclick="removerTamanhoUniforme(${u.id}, '${tam}')" class="text-rose-500 font-bold p-2 bg-rose-50 hover:bg-rose-100 rounded-lg mt-4 transition" title="Remover Tamanho">✕</button>
-                            </div>
-                        `;
-                    });
-                }
-
-                html += `
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-300 space-y-3 text-xs shadow-sm">
-                        <div class="flex justify-between items-center gap-2 flex-wrap border-b pb-3">
-                            <input type="text" value="${u.nome}" oninput="atualizarUniformeProp(${u.id}, 'nome', this.value)" class="flex-1 min-w-[200px] bg-white p-2 border border-slate-300 rounded-xl font-bold text-slate-900 outline-none" placeholder="Descrição do Uniforme...">
-                            <input type="text" value="${u.referencia}" oninput="atualizarUniformeProp(${u.id}, 'referencia', this.value)" class="w-24 bg-white p-2 border border-slate-300 rounded-xl font-bold text-center outline-none" placeholder="Ref...">
-                            <input type="text" value="${u.cor}" oninput="atualizarUniformeProp(${u.id}, 'cor', this.value)" class="w-28 bg-white p-2 border border-slate-300 rounded-xl font-bold text-center outline-none" placeholder="Cor...">
-                            <button onclick="apagarUniforme(${u.id})" class="text-rose-600 font-bold bg-rose-100 hover:bg-rose-200 px-3 py-2 rounded-xl transition">Excluir ✕</button>
-                        </div>
-
-                        <div class="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-200">
-                            <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center p-1 border shrink-0 overflow-hidden">
-                                <img src="${u.imagem}" alt="Foto" class="max-h-full max-w-full object-contain">
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <label class="block font-bold text-slate-600 mb-1">Carregar Foto do Dispositivo:</label>
-                                <input type="file" accept="image/*" onchange="carregarImagemUniforme(${u.id}, event)" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-teal-50 file:text-[#007e7a] hover:file:bg-teal-100 cursor-pointer">
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
-                            <div class="flex justify-between items-center">
-                                <span class="font-bold text-slate-700 uppercase">📏 Tamanhos e Códigos SAP (ERP Vale):</span>
-                                <button onclick="adicionarCaixaTamanho(${u.id})" class="bg-[#007e7a] hover:bg-[#005a57] text-white px-3 py-1.5 rounded-xl font-bold text-[11px] shadow-sm flex items-center gap-1">➕ Adicionar Tamanho</button>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                                ${tamanhosListHtml || '<p class="text-xs text-slate-400 italic col-span-full">Nenhum tamanho configurado.</p>'}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function adicionarNovoUniforme() {
-            let novo = {
-                id: Date.now(),
-                nome: "Nova Peça de Uniforme",
-                cor: "Verde Vale / Cinza",
-                referencia: "REF-000",
-                categoria: "geral",
-                imagem: "https://cdn-icons-png.flaticon.com/512/3163/3163179.png",
-                tamanhos: ["P", "M", "G"],
-                codigos: {"P": "00000000", "M": "00000001", "G": "00000002"}
-            };
-            dadosApp.uniformes.unshift(novo);
-            salvarStorage();
-            renderizarGerirUniformes();
-            renderizarCatalogo();
-            mostrarToast("Nova peça adicionada ao catálogo.");
-        }
-
-        function atualizarUniformeProp(id, campo, val) {
-            let u = dadosApp.uniformes.find(item => item.id === id);
-            if(u) {
-                u[campo] = val;
-                salvarStorage();
-                renderizarCatalogo();
-            }
-        }
-
-        function carregarImagemUniforme(id, event) {
-            const file = event.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    let u = dadosApp.uniformes.find(item => item.id === id);
-                    if(u) {
-                        u.imagem = evt.target.result;
-                        salvarStorage();
-                        renderizarGerirUniformes();
-                        renderizarCatalogo();
-                        mostrarToast("Foto atualizada!");
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function adicionarCaixaTamanho(id) {
-            let u = dadosApp.uniformes.find(item => item.id === id);
-            if(u) {
-                if(!u.tamanhos) u.tamanhos = [];
-                if(!u.codigos) u.codigos = {};
-                let novoTam = "TAM_" + (u.tamanhos.length + 1);
-                u.tamanhos.push(novoTam);
-                u.codigos[novoTam] = "";
-                salvarStorage();
-                renderizarGerirUniformes();
-                renderizarCatalogo();
-            }
-        }
-
-        function atualizarNomeTamanho(id, oldTam, newTam) {
-            let u = dadosApp.uniformes.find(item => item.id === id);
-            if(u && newTam && newTam.trim() !== "") {
-                let nTam = newTam.trim().toUpperCase();
-                let idx = u.tamanhos.indexOf(oldTam);
-                if(idx !== -1) {
-                    u.tamanhos[idx] = nTam;
-                    if(u.codigos && u.codigos[oldTam] !== undefined) {
-                        u.codigos[nTam] = u.codigos[oldTam];
-                        delete u.codigos[oldTam];
-                    }
-                    salvarStorage();
-                    renderizarGerirUniformes();
-                    renderizarCatalogo();
-                }
-            }
-        }
-
-        function atualizarCodigoTamanho(id, tam, val) {
-            let u = dadosApp.uniformes.find(item => item.id === id);
-            if(u) {
-                if(!u.codigos) u.codigos = {};
-                u.codigos[tam] = val.trim();
-                salvarStorage();
-                renderizarCatalogo();
-            }
-        }
-
-        function removerTamanhoUniforme(id, tam) {
-            let u = dadosApp.uniformes.find(item => item.id === id);
-            if(u) {
-                u.tamanhos = u.tamanhos.filter(t => t !== tam);
-                if(u.codigos) delete u.codigos[tam];
-                salvarStorage();
-                renderizarGerirUniformes();
-                renderizarCatalogo();
-            }
-        }
-
-        function apagarUniforme(id) {
-            if(confirm("Confirmar exclusão definitiva deste uniforme?")) {
-                dadosApp.uniformes = dadosApp.uniformes.filter(item => item.id !== id);
-                salvarStorage();
-                renderizarGerirUniformes();
-                renderizarCatalogo();
-                mostrarToast("Uniforme excluído.");
-            }
-        }
-    </script>
-    <style id="vale-patch">
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-@media screen{
-body{font-family:'Plus Jakarta Sans',system-ui,sans-serif!important;background:linear-gradient(180deg,#e6f0ef 0%,#f5f8f8 55%)!important;padding-bottom:190px!important}
-.text-xs{font-size:13px!important}
-.shadow-sm,.shadow-md,.shadow-xl,.shadow-2xl{box-shadow:0 1px 2px rgba(0,60,58,.05),0 10px 24px -12px rgba(0,60,58,.22)!important}
-.border-slate-200,.border-slate-300{border-color:rgba(0,90,87,.16)!important}
-.rounded-2xl{border-radius:20px!important}.rounded-3xl{border-radius:28px!important}
-button,a,label{transition:transform .15s,background-color .2s,box-shadow .2s}
-button:active{transform:scale(.97)}
-
-/* barra de cima flutuante */
-body>header{position:fixed!important;top:0;left:0;right:0;z-index:45!important;background:rgba(0,90,87,.86)!important;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:0!important;border-radius:0 0 24px 24px;padding-top:calc(env(safe-area-inset-top,0px) + 12px)!important;transition:transform .3s}
-body.bars-off>header{transform:translateY(-115%)}
-
-/* abas viram barra flutuante inferior */
-.mp-tabs{position:fixed!important;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 58px);max-width:640px;margin:0 auto!important;z-index:45;background:rgba(255,255,255,.85)!important;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(0,90,87,.2)!important;border-radius:24px!important;padding:6px!important;box-shadow:0 14px 30px -14px rgba(0,60,58,.4)!important;transition:bottom .3s}
-body.bars-off .mp-tabs{bottom:calc(env(safe-area-inset-bottom,0px) + 12px)}
-.mp-tabs>button{border-radius:18px!important;box-shadow:none!important;background:transparent!important;color:#4b6664!important;padding:10px 6px!important;font-size:12px!important;white-space:nowrap}
-.mp-tabs>button[class*="bg-[#007e7a]"]{background:linear-gradient(135deg,#00948f,#005a57)!important;color:#fff!important;box-shadow:0 8px 18px -8px rgba(0,126,122,.8)!important}
-.mp-tabs>button>span:first-child{font-size:17px}
-
-/* rodapé recolhe junto */
-body>footer{z-index:44!important;left:12px!important;right:12px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 6px)!important;border-radius:20px!important;border:0!important;transition:transform .3s}
-body.bars-off>footer{transform:translateY(170%)}
-#toastNotificacao{bottom:150px!important}
-
-/* catálogo mais vivo */
-#grelhaCatalogo>div{border-radius:22px!important;transition:transform .2s,box-shadow .2s,border-color .2s}
-#grelhaCatalogo>div:hover{transform:translateY(-3px);box-shadow:0 18px 34px -16px rgba(0,126,122,.5)!important}
-#grelhaCatalogo img{filter:drop-shadow(0 6px 8px rgba(0,60,58,.18))}
-.btn-cat{border-radius:99px!important;padding:7px 16px!important;white-space:nowrap}
-#contadorCarrinho.mp-pop,#contadorPedidos.mp-pop{animation:mp-pop .4s ease}
-@keyframes mp-pop{40%{transform:scale(1.6)}}
-
-/* troca de tela com deslize */
-.slide-r{animation:mp-r .28s ease}.slide-l{animation:mp-l .28s ease}
-@keyframes mp-r{from{opacity:0;transform:translateX(34px)}}
-@keyframes mp-l{from{opacity:0;transform:translateX(-34px)}}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#005a57">
+<title>Uniformes Vale (v6)</title>
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Uniformes%20Vale%22%2C%22short_name%22%3A%22Uniformes%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23005a57%22%2C%22theme_color%22%3A%22%23005a57%22%7D">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E👕%3C/text%3E%3C/svg%3E">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#eef4f3;color:#1e293b;font-size:14px;padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+#hd{position:sticky;top:0;z-index:30;background:linear-gradient(90deg,#007e7a,#005a57);color:#fff;padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+#nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid #cfe3e1;padding-bottom:env(safe-area-inset-bottom)}
+#nav>div{display:grid;max-width:640px;margin:0 auto}
+#nav button{position:relative;padding:8px 2px;display:flex;flex-direction:column;align-items:center;font-size:11px;font-weight:700;color:#64808d;min-height:56px}
+#nav button.on{color:#007e7a}#nav button span:first-child{font-size:20px}
+.bd{position:absolute;top:4px;right:calc(50% - 22px);background:#f59e0b;color:#fff;border-radius:99px;font-size:10px;padding:0 5px;min-width:16px}
+.card{background:#fff;border:1px solid #d5e5e3;border-radius:18px;padding:14px}
+.b{background:#007e7a;color:#fff;border-radius:12px;padding:10px 14px;font-weight:700;font-size:13px;min-height:44px}
+.b:active{background:#005a57}.b2{background:#e2eceb;color:#1e293b}.b3{background:#fee2e2;color:#b91c1c}.b4{background:#d1fae5;color:#065f46}
+.sm{min-height:36px;padding:6px 12px;font-size:12px}
+.inp{width:100%;padding:10px 12px;border:1px solid #c3d4d2;border-radius:12px;background:#fff;font-size:16px;min-height:44px}
+.inp:focus{outline:2px solid #007e7a;border-color:transparent}
+.chip{padding:7px 16px;border-radius:99px;background:#fff;border:1px solid #d5e5e3;font-weight:700;font-size:12px;white-space:nowrap}
+.chip.on{background:#007e7a;color:#fff;border-color:#007e7a}
+.tag{font-size:10px;font-weight:800;padding:2px 8px;border-radius:8px;border:1px solid}
+.Pendente{background:#fef3c7;color:#92400e;border-color:#fcd34d}.Aprovado{background:#d1fae5;color:#065f46;border-color:#6ee7b7}.Rejeitado{background:#fee2e2;color:#991b1b;border-color:#fca5a5}.Entregue{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
+#toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:#0f172a;color:#fff;font-weight:700;font-size:12px;padding:10px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:80;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#modal{position:fixed;inset:0;z-index:70;background:rgba(15,23,42,.8);display:none;align-items:center;justify-content:center;padding:16px}
+#modal.on{display:flex}
+summary{cursor:pointer;list-style:none}summary::-webkit-details-marker{display:none}
+#termo{display:none}
+@media print{
+ @page{size:A4 portrait;margin:8mm 10mm}
+ body{background:#fff!important;padding:0!important}
+ #hd,#nav,#view,#toast,#modal{display:none!important}
+ #termo{display:block!important}
+ #termo table{border-collapse:collapse;width:100%}
+ #termo th,#termo td{border:1px solid #334155;padding:4px 6px;font-size:10px}
+ #termo th{background:#007e7a!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
-@media screen and (prefers-color-scheme:dark){
-body{background:#0a1a19!important;color:#e6f2f1}
-.bg-white,.bg-white\/10{background-color:#12292a!important;color:#e6f2f1}
-.bg-slate-50,.bg-slate-100,.bg-slate-200\/80{background-color:#183433!important;color:#e6f2f1}
-.border-slate-100,.border-slate-200,.border-slate-300{border-color:#254745!important}
-.text-slate-900,.text-slate-800,.text-slate-700{color:#e6f2f1!important}
-.text-slate-600,.text-slate-500,.text-slate-400{color:#9ab8b5!important}
-input,select,textarea{background-color:#183433!important;color:#e6f2f1!important}
-.mp-tabs{background:rgba(10,32,31,.88)!important}
-.mp-tabs>button{color:#9ab8b5!important}
-}
-@media print{body{padding:0!important}}
-@media(prefers-reduced-motion:reduce){.slide-r,.slide-l,.mp-pop{animation:none!important}}
 </style>
-<script id="vale-patch-js">
+</head>
+<body>
+<header id="hd"></header>
+<main id="view" class="max-w-3xl mx-auto p-3 space-y-3"></main>
+<nav id="nav"></nav>
+<div id="toast"></div>
+<div id="modal"><div class="card w-full max-w-sm space-y-3" id="modal-c"></div></div>
+<div id="termo"></div>
+
+<script>
+const K="mariana_uniformes_vale_dados_fixos_v3", KS="vale_sessao_v6", KC="vale_carrinho_v6", ADM="81025364";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const IMG1="https://cdn-icons-png.flaticon.com/512/3163/3163179.png";
+const UNI=[
+{id:1,nome:"Camisa administrativa masculina manga curta",cor:"Verde Vale / Cinza",referencia:"CM-443",categoria:"masculino",imagem:IMG1,tamanhos:["01","02","03","04","05","06","07","08","09","10","11","12","13"],codigos:{"01":"16724400","02":"16724412","03":"16724642","04":"16724406","05":"16724290","06":"16725084","07":"16724640","08":"16724679","09":"16724399","10":"16724357","11":"13300303","12":"13308561","13":"13329458"}},
+{id:2,nome:"Camisa administrativa feminina manga curta",cor:"Verde Vale / Cinza",referencia:"CM-918",categoria:"feminino",imagem:IMG1,tamanhos:["36","38","40","42","44","46","48","50","52","54","56","58","60"],codigos:{"36":"16724419","38":"16724632","40":"15500269","42":"16724557","44":"16724179","46":"16724435","48":"16724631","50":"16724654","52":"15500271","54":"16724434","56":"13307872","58":"13307871","60":"13307870"}},
+{id:3,nome:"Polo masculina (administrativa)",cor:"Cinza / Branco",referencia:"CM-540",categoria:"polo",imagem:"https://cdn-icons-png.flaticon.com/512/892/892458.png",tamanhos:["XP","P","M","G","GG","3G","4G","5G","6G"],codigos:{"XP":"13306603","P":"13306602","M":"13306601","G":"13306600","GG":"13306549","3G":"13306548","4G":"13306547","5G":"13306546","6G":"13306545"}},
+{id:4,nome:"Calça jeans administrativo feminina",cor:"Azul Marinho",referencia:"CL-285",categoria:"calca",imagem:"https://cdn-icons-png.flaticon.com/512/2613/2613204.png",tamanhos:["34","36","38","40","42","44","46","48","50","52","54","56","58","60"],codigos:{"34":"13315330","36":"13315329","38":"13315328","40":"13315327","42":"13315326","44":"13315351","46":"13315350","48":"13315349","50":"13315348","52":"13315347","54":"13315346","56":"13315345","58":"13315300","60":"13314839"}}
+];
+let D={uniformes:UNI,pedidos:[],utilizadores:[]}, me=null, carrinho=[], tab='catalogo', cat='todos', q='', pf='todos', modoReg=false;
+const FILTROS={masculino:/masculin/,feminino:/feminin/,calca:/cal[cç]a/,polo:/polo/};
+
+/* ---------- util ---------- */
+const adm=()=>!!(me&&(me.admin||me.matricula===ADM));
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(D))}catch(e){toast('Sem espaço para salvar (fotos muito grandes?)')}};
+const saveC=()=>localStorage.setItem(KC,JSON.stringify(carrinho));
+async function hash(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('vale:'+s));return 'sha256:'+[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return s}}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2400)}
+const brData=d=>d?d.split('-').reverse().join('/'):'';
+const hoje=()=>new Date().toISOString().slice(0,10);
+
+/* ---------- início ---------- */
 (function(){
-  var T=['catalogo','carrinho','admin','gerir'];
-  var b0=document.getElementById('tab-btn-catalogo');
-  if(b0&&b0.parentElement)b0.parentElement.classList.add('mp-tabs');
-
-  function visiveis(){return T.filter(function(t){var b=document.getElementById('tab-btn-'+t);return b&&!b.classList.contains('hidden')})}
-  function atual(){for(var i=0;i<T.length;i++){var e=document.getElementById('tab-'+T[i]);if(e&&!e.classList.contains('hidden'))return T[i]}return 'catalogo'}
-
-  /* anima a troca de aba sem mexer na função original */
-  var orig=window.mudarTab;
-  window.mudarTab=function(t){
-    var de=T.indexOf(atual());orig.apply(this,arguments);
-    var para=T.indexOf(t),el=document.getElementById('tab-'+t);
-    if(el&&para!==de){el.classList.remove('slide-l','slide-r');void el.offsetWidth;el.classList.add(para>de?'slide-r':'slide-l');window.scrollTo({top:0})}
-  };
-
-  /* deslizar o dedo troca de tela (só entre as abas visíveis) */
-  var sx=0,sy=0,st=0,ign=false;
-  var BLOQ='input,textarea,select,.overflow-x-auto,[id^="modal"]';
-  document.addEventListener('touchstart',function(e){var t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();ign=!!e.target.closest(BLOQ)},{passive:true});
-  document.addEventListener('touchend',function(e){
-    if(ign||Date.now()-st>700||document.querySelector('[id^="modal"]:not(.hidden)'))return;
-    var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
-    if(Math.abs(dx)<70||Math.abs(dy)>55)return;
-    var v=visiveis(),i=v.indexOf(atual())+(dx<0?1:-1);
-    if(i>=0&&i<v.length)window.mudarTab(v[i]);
-  },{passive:true});
-
-  /* barras somem ao descer e voltam ao subir */
-  var ly=0;
-  window.addEventListener('scroll',function(){
-    var y=window.scrollY;
-    if(y>ly+6&&y>90)document.body.classList.add('bars-off');
-    else if(y<ly-6||y<40)document.body.classList.remove('bars-off');
-    ly=y;
-  },{passive:true});
-
-  /* espaço para a barra de cima fixa */
-  function ajusta(){var h=document.querySelector('body>header');if(h)document.body.style.paddingTop=h.offsetHeight+'px'}
-  ajusta();window.addEventListener('resize',ajusta);setTimeout(ajusta,400);
-  var hd=document.querySelector('body>header');
-  if(hd&&window.MutationObserver)new MutationObserver(ajusta).observe(hd,{childList:true,subtree:true,characterData:true,attributes:true});
-
-  /* contadores "pulam" quando mudam */
-  ['contadorCarrinho','contadorPedidos'].forEach(function(id){
-    var el=document.getElementById(id);if(!el||!window.MutationObserver)return;
-    new MutationObserver(function(){el.classList.remove('mp-pop');void el.offsetWidth;el.classList.add('mp-pop')}).observe(el,{childList:true,characterData:true,subtree:true});
-  });
-
-  /* vibração leve ao tocar em botões */
-  document.addEventListener('click',function(e){if(navigator.vibrate&&e.target.closest('button'))navigator.vibrate(8)});
-
-  /* aviso para confirmar que o visual novo carregou */
-  window.addEventListener('load',function(){setTimeout(function(){if(window.mostrarToast)mostrarToast('Visual novo ativo ✓')},600)});
+  try{const p=JSON.parse(localStorage.getItem(K)||'null');if(p){if(p.uniformes?.length)D.uniformes=p.uniformes;if(p.pedidos)D.pedidos=p.pedidos;if(p.utilizadores)D.utilizadores=p.utilizadores}}catch(e){}
+  if(!D.utilizadores.some(u=>u.matricula===ADM))D.utilizadores.push({matricula:ADM,nome:"Mariana Pereira Cruz",senha:"1510",admin:true});
+  try{carrinho=JSON.parse(localStorage.getItem(KC)||'[]')}catch(e){}
+  const s=localStorage.getItem(KS)||sessionStorage.getItem('usuario_logado_vale');
+  if(s){let m=s;try{m=JSON.parse(s).matricula||s}catch(e){}me=D.utilizadores.find(u=>u.matricula===m)||null}
+  addEventListener('DOMContentLoaded',R);
+  if(document.readyState!=='loading')R();
 })();
+
+/* ---------- render ---------- */
+function tabs(){
+  const n=carrinho.reduce((a,c)=>a+c.quantidade,0), pend=D.pedidos.filter(p=>p.status==='Pendente').length;
+  const t=[['catalogo','👕','Catálogo',0],['carrinho','🛒','Carrinho',n],['pedidos','📋',adm()?'Pedidos':'Meus',adm()?pend:0]];
+  if(adm())t.push(['itens','✏️','Itens',0],['usuarios','👥','Usuários',0]);
+  return t;
+}
+function R(){hd();navR();view()}
+function hd(){
+  $('hd').innerHTML=`<div><div style="font-weight:900;letter-spacing:.15em;font-size:11px;color:#a7f3d0">VALE</div><div style="font-weight:800;font-size:15px">Uniformes & EPIs</div></div>
+  <div class="flex items-center gap-2">${me?`<span style="font-size:12px;text-align:right;line-height:1.2"><b>${esc(me.nome.split(' ')[0])}</b><br><span style="opacity:.8">${esc(me.matricula)}${adm()?' · gestor':''}</span></span><button class="b sm" style="background:rgba(255,255,255,.18)" onclick="sair()">Sair</button>`:`<button class="b sm" style="background:#f59e0b" onclick="abrirLogin()">Entrar</button>`}</div>`;
+}
+function navR(){
+  const t=tabs();
+  $('nav').innerHTML=`<div style="grid-template-columns:repeat(${t.length},1fr)">${t.map(([id,i,l,n])=>`<button class="${tab===id?'on':''}" onclick="go('${id}')"><span>${i}</span><span>${l}</span>${n?`<i class="bd" style="font-style:normal">${n}</i>`:''}</button>`).join('')}</div>`;
+}
+function go(t){tab=t;R();scrollTo(0,0)}
+function view(){
+  if(!adm()&&(tab==='itens'||tab==='usuarios'))tab='catalogo';
+  const v=$('view');
+  ({catalogo:vCat,carrinho:vCar,pedidos:vPed,itens:vItens,usuarios:vUsers})[tab](v);
+}
+
+/* ---------- catálogo ---------- */
+function vCat(v){
+  v.innerHTML=`<input id="busca" class="inp" placeholder="🔍 Buscar por nome, ref ou código SAP" value="${esc(q)}" oninput="q=this.value;grid()">
+  <div class="flex gap-2 overflow-x-auto pb-1">${[['todos','Todos'],['masculino','Masculino'],['feminino','Feminino'],['calca','Calças'],['polo','Polos']].map(([k,l])=>`<button class="chip ${cat===k?'on':''}" onclick="cat='${k}';R()">${l}</button>`).join('')}</div>
+  <div id="grid" class="grid gap-3 sm:grid-cols-2"></div>`;
+  grid();
+}
+function grid(){
+  const f=q.toLowerCase().trim();
+  const l=D.uniformes.filter(u=>{
+    const txt=(u.nome+' '+(u.categoria||'')).toLowerCase();
+    const okC=cat==='todos'||FILTROS[cat].test(txt);
+    const okQ=!f||(u.nome+' '+u.referencia+' '+Object.values(u.codigos||{}).join(' ')).toLowerCase().includes(f);
+    return okC&&okQ;
+  });
+  $('grid').innerHTML=l.length?l.map(u=>`<div class="card space-y-3">
+   <div class="flex gap-3 items-center"><div style="width:64px;height:64px;background:#f1f5f9;border-radius:14px;display:flex;align-items:center;justify-content:center;padding:6px;flex-shrink:0"><img src="${esc(u.imagem)}" alt="" style="max-width:100%;max-height:100%;object-fit:contain"></div>
+    <div class="min-w-0"><span class="tag" style="color:#007e7a;border-color:#99d5d2;background:#e6f4f4">${esc(u.referencia)}</span><div style="font-weight:700;margin-top:4px">${esc(u.nome)}</div><div style="font-size:12px;color:#64748b">${esc(u.cor)}</div></div></div>
+   <div class="flex gap-2"><select id="t${u.id}" class="inp" style="flex:1">${(u.tamanhos||[]).map(t=>`<option value="${esc(t)}">Tam ${esc(t)} · SAP ${esc((u.codigos||{})[t]||'---')}</option>`).join('')||'<option value="">Sem tamanhos</option>'}</select>
+    <input id="q${u.id}" type="number" inputmode="numeric" min="1" max="20" value="1" class="inp" style="width:64px;text-align:center"></div>
+   <button class="b w-full" onclick="addCar(${u.id})">🛒 Adicionar</button></div>`).join(''):'<p class="text-center text-slate-400 py-8">Nenhum uniforme encontrado.</p>';
+}
+function addCar(id){
+  const u=D.uniformes.find(x=>x.id===id), t=$('t'+id).value;
+  if(!t)return toast('Selecione um tamanho.');
+  const qt=Math.max(1,Math.min(20,parseInt($('q'+id).value)||1)), ex=carrinho.find(c=>c.id===id&&c.tamanho===t);
+  if(ex)ex.quantidade=Math.min(20,ex.quantidade+qt);
+  else carrinho.push({cartId:Date.now()+Math.random(),id,nome:u.nome,cor:u.cor,referencia:u.referencia,tamanho:t,codigo:(u.codigos||{})[t]||'---',quantidade:qt});
+  saveC();navR();toast(`${u.nome} (${t}) adicionado`);
+}
+
+/* ---------- carrinho ---------- */
+function vCar(v){
+  v.innerHTML=`<h2 style="font-weight:800;font-size:16px">🛒 Carrinho</h2>
+  ${carrinho.length?carrinho.map((c,i)=>`<div class="card flex items-center gap-2"><div class="min-w-0 flex-1"><div style="font-weight:700">${esc(c.nome)}</div><div style="font-size:12px;color:#64748b">Tam <b>${esc(c.tamanho)}</b> · SAP <b>${esc(c.codigo)}</b></div></div>
+   <div class="flex items-center gap-1"><button class="b b2 sm" onclick="qtd(${i},-1)">−</button><b style="min-width:22px;text-align:center">${c.quantidade}</b><button class="b b2 sm" onclick="qtd(${i},1)">+</button><button class="b b3 sm" onclick="carrinho.splice(${i},1);saveC();R()">✕</button></div></div>`).join(''):'<p class="text-center text-slate-400 py-8">Seu carrinho está vazio.</p>'}
+  <div class="card space-y-3"><div style="font-weight:800">📝 Retirada no almoxarifado</div>
+   ${me?`<div style="font-size:13px">Solicitante: <b>${esc(me.nome)}</b> · Matrícula <b>${esc(me.matricula)}</b></div>`:`<button class="b w-full" onclick="abrirLogin()">Entrar para enviar o pedido</button>`}
+   <label style="font-size:12px;font-weight:700">Data desejada<input type="date" id="dt" class="inp" min="${hoje()}" value="${hoje()}"></label>
+   <button class="b w-full" onclick="enviar()">🚀 Enviar pedido para aprovação</button></div>`;
+}
+function qtd(i,d){carrinho[i].quantidade=Math.max(1,Math.min(20,carrinho[i].quantidade+d));saveC();R()}
+function enviar(){
+  if(!me)return abrirLogin();
+  if(!carrinho.length)return toast('Seu carrinho está vazio.');
+  const d=$('dt').value; if(!d)return toast('Informe a data de retirada.');
+  if(d<hoje())return toast('A data não pode ser no passado.');
+  D.pedidos.unshift({id:Date.now(),matricula:me.matricula,nome:me.nome,dataRetirada:d,dataPedido:new Date().toLocaleDateString('pt-BR'),status:'Pendente',itens:carrinho.map(c=>({...c}))});
+  carrinho=[];save();saveC();toast('🚀 Pedido enviado!');go('pedidos');
+}
+
+/* ---------- pedidos ---------- */
+function vPed(v){
+  if(!me){v.innerHTML='<div class="card text-center space-y-3"><p>Entre para ver seus pedidos.</p><button class="b" onclick="abrirLogin()">Entrar</button></div>';return}
+  const base=adm()?D.pedidos:D.pedidos.filter(p=>p.matricula===me.matricula);
+  const l=base.filter(p=>pf==='todos'||p.status===pf);
+  v.innerHTML=`<div class="flex items-center justify-between gap-2"><h2 style="font-weight:800;font-size:16px">${adm()?'📊 Pedidos':'📋 Meus pedidos'}</h2>
+   ${adm()?`<div class="flex gap-1.5"><button class="b b2 sm" onclick="csv()">📊 Excel</button><button class="b b3 sm" onclick="limparPed()">Limpar</button></div>`:''}</div>
+  <div class="flex gap-2 overflow-x-auto pb-1">${['todos','Pendente','Aprovado','Entregue','Rejeitado'].map(s=>`<button class="chip ${pf===s?'on':''}" onclick="pf='${s}';R()">${s==='todos'?'Todos':s}</button>`).join('')}</div>
+  ${l.length?l.map(p=>`<div class="card space-y-2"><div class="flex justify-between items-start gap-2"><div><b>${esc(p.nome)}</b><div style="font-size:12px;color:#64748b">Mat. ${esc(p.matricula)} · pedido em ${esc(p.dataPedido)}<br>Retirada: ${brData(p.dataRetirada)}</div></div><span class="tag ${esc(p.status)}">${esc(p.status)}</span></div>
+   <ul style="background:#f1f5f9;border-radius:12px;padding:10px;font-size:12px;line-height:1.7">${p.itens.map(i=>`<li>• ${i.quantidade}x ${esc(i.nome)} — Tam <b>${esc(i.tamanho)}</b> · SAP <b>${esc(i.codigo)}</b></li>`).join('')}</ul>
+   <div class="flex gap-2 flex-wrap">${adm()?(p.status==='Pendente'?`<button class="b b4 sm flex-1" onclick="status(${p.id},'Aprovado')">✓ Aprovar</button><button class="b b3 sm" onclick="status(${p.id},'Rejeitado')">✕ Rejeitar</button>`:'')+(p.status==='Aprovado'?`<button class="b sm flex-1" onclick="status(${p.id},'Entregue')">📦 Marcar entregue</button>`:'')+`<button class="b b2 sm" onclick="imprimir(${p.id})">🖨️ Cautela A4</button>`:(p.status==='Pendente'?`<button class="b b3 sm" onclick="cancelar(${p.id})">Cancelar pedido</button>`:'')}</div></div>`).join(''):'<p class="text-center text-slate-400 py-8">Nenhum pedido.</p>'}`;
+}
+function status(id,s){const p=D.pedidos.find(x=>x.id===id);if(p){p.status=s;save();R();toast('Pedido '+s.toLowerCase())}}
+function cancelar(id){if(confirm('Cancelar este pedido?')){D.pedidos=D.pedidos.filter(p=>p.id!==id);save();R()}}
+function limparPed(){if(confirm('Apagar TODOS os pedidos do histórico?')){D.pedidos=[];save();R()}}
+function imprimir(id){
+  const p=D.pedidos.find(x=>x.id===id);if(!p)return;
+  $('termo').innerHTML=`<table style="margin-bottom:8px"><tr><td style="width:80px;text-align:center;font-weight:900;font-size:16px;color:#007e7a">VALE</td><td style="text-align:center;font-weight:800;text-transform:uppercase">Termo de entrega e cautela de uniformes e equipamentos</td><td style="width:130px;font-size:9px"><b>Nº Pedido:</b> ${p.id}<br><b>Data:</b> ${esc(p.dataPedido)}</td></tr></table>
+  <div style="font-size:10px;border:1px solid #334155;padding:6px;margin-bottom:8px"><b>COLABORADOR:</b> ${esc(p.nome)} &nbsp;|&nbsp; <b>MATRÍCULA:</b> ${esc(p.matricula)} &nbsp;|&nbsp; <b>RETIRADA:</b> ${brData(p.dataRetirada)}</div>
+  <table style="margin-bottom:14px"><thead><tr><th>ITEM</th><th style="text-align:left">DESCRIÇÃO</th><th>REF.</th><th>TAM.</th><th>CÓDIGO SAP</th><th>QTD</th></tr></thead><tbody>${p.itens.map((i,n)=>`<tr><td align="center">${n+1}</td><td><b>${esc(i.nome)}</b></td><td align="center">${esc(i.referencia)}</td><td align="center"><b>${esc(i.tamanho)}</b></td><td align="center">${esc(i.codigo)}</td><td align="center"><b>${i.quantidade}</b></td></tr>`).join('')}</tbody></table>
+  <div style="font-size:9px;border:1px dashed #94a3b8;padding:6px;margin-bottom:34px">Declaro ter recebido da VALE S.A., a título de cautela, os uniformes e/ou EPIs acima discriminados, em perfeitas condições de uso, comprometendo-me a zelar pela sua conservação e a utilizá-los estritamente no exercício de minhas atividades profissionais.</div>
+  <div style="display:flex;justify-content:space-between;font-size:10px;text-align:center"><div style="width:250px;border-top:1px solid #000;padding-top:4px">Assinatura do Colaborador<br><small>(Recebedor)</small></div><div style="width:250px;border-top:1px solid #000;padding-top:4px">Almoxarifado / Suprimentos<br><small>(Responsável pela Entrega)</small></div></div>`;
+  print();
+}
+function csv(){
+  if(!D.pedidos.length)return toast('Nenhum pedido para exportar.');
+  const c=s=>`"${String(s).replace(/"/g,'""')}"`;
+  let t="ID Pedido;Data Pedido;Matricula;Nome;Data Retirada;Status;Peca;Tamanho;Codigo SAP;Quantidade\n";
+  D.pedidos.forEach(p=>p.itens.forEach(i=>t+=[p.id,p.dataPedido,p.matricula,p.nome,p.dataRetirada,p.status,i.nome,i.tamanho,i.codigo,i.quantidade].map(c).join(';')+'\n'));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+t],{type:'text/csv;charset=utf-8'}));a.download=`pedidos_uniformes_vale_${hoje()}.csv`;a.click();toast('Planilha exportada');
+}
+
+/* ---------- itens (admin) ---------- */
+function vItens(v){
+  v.innerHTML=`<div class="flex items-center justify-between"><h2 style="font-weight:800;font-size:16px">✏️ Itens do catálogo</h2><button class="b sm" onclick="novoItem()">➕ Nova peça</button></div>
+  ${D.uniformes.map(u=>`<details class="card"><summary class="flex items-center gap-3"><img src="${esc(u.imagem)}" alt="" style="width:40px;height:40px;object-fit:contain;background:#f1f5f9;border-radius:10px"><div class="min-w-0 flex-1"><b class="block truncate">${esc(u.nome)}</b><span style="font-size:12px;color:#64748b">${esc(u.referencia)} · ${(u.tamanhos||[]).length} tamanhos</span></div><span>▾</span></summary>
+   <div class="space-y-2 pt-3">
+    <input class="inp" value="${esc(u.nome)}" onchange="setU(${u.id},'nome',this.value)" placeholder="Descrição">
+    <div class="grid grid-cols-2 gap-2"><input class="inp" value="${esc(u.referencia)}" onchange="setU(${u.id},'referencia',this.value)" placeholder="Ref."><input class="inp" value="${esc(u.cor)}" onchange="setU(${u.id},'cor',this.value)" placeholder="Cor"></div>
+    <select class="inp" onchange="setU(${u.id},'categoria',this.value)">${[['masculino','Masculino'],['feminino','Feminino'],['calca','Calça'],['polo','Polo'],['geral','Geral']].map(([k,l])=>`<option value="${k}" ${u.categoria===k?'selected':''}>${l}</option>`).join('')}</select>
+    <label style="font-size:12px;font-weight:700">Foto<input type="file" accept="image/*" class="inp" onchange="foto(${u.id},event)"></label>
+    <div style="font-weight:700;font-size:12px">📏 Tamanhos e códigos SAP</div>
+    ${(u.tamanhos||[]).map((t,i)=>`<div class="flex gap-2"><input class="inp" style="width:84px;text-align:center" value="${esc(t)}" onchange="setTam(${u.id},${i},this.value)"><input class="inp" inputmode="numeric" value="${esc((u.codigos||{})[t]||'')}" onchange="setCod(${u.id},${i},this.value)" placeholder="Cód. SAP"><button class="b b3 sm" onclick="delTam(${u.id},${i})">✕</button></div>`).join('')}
+    <div class="flex gap-2"><button class="b b2 sm flex-1" onclick="addTam(${u.id})">➕ Tamanho</button><button class="b b3 sm" onclick="delItem(${u.id})">Excluir peça</button></div></div></details>`).join('')}`;
+}
+const U=id=>D.uniformes.find(x=>x.id===id);
+function setU(id,k,v){U(id)[k]=v.trim();save();toast('Salvo')}
+function novoItem(){D.uniformes.unshift({id:Date.now(),nome:"Nova peça",cor:"Verde Vale / Cinza",referencia:"REF-000",categoria:"geral",imagem:IMG1,tamanhos:["P","M","G"],codigos:{P:"",M:"",G:""}});save();R()}
+function delItem(id){if(confirm('Excluir esta peça do catálogo?')){D.uniformes=D.uniformes.filter(x=>x.id!==id);save();R()}}
+function addTam(id){const u=U(id);let n=u.tamanhos.length+1,t='TAM'+n;u.tamanhos.push(t);(u.codigos=u.codigos||{})[t]='';save();R()}
+function setTam(id,i,v){const u=U(id),o=u.tamanhos[i],n=v.trim().toUpperCase();if(!n||u.tamanhos.includes(n))return R();u.tamanhos[i]=n;u.codigos[n]=u.codigos[o]||'';delete u.codigos[o];save();R()}
+function setCod(id,i,v){const u=U(id);u.codigos[u.tamanhos[i]]=v.trim();save();toast('Salvo')}
+function delTam(id,i){const u=U(id);delete u.codigos[u.tamanhos[i]];u.tamanhos.splice(i,1);save();R()}
+function foto(id,e){ // reduz a foto para caber no armazenamento
+  const f=e.target.files[0];if(!f)return;
+  const im=new Image();im.onload=()=>{const s=Math.min(1,400/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);U(id).imagem=c.toDataURL('image/jpeg',.8);save();R();toast('Foto atualizada')};
+  im.src=URL.createObjectURL(f);
+}
+
+/* ---------- usuários (admin) ---------- */
+function vUsers(v){
+  v.innerHTML=`<h2 style="font-weight:800;font-size:16px">👥 Usuários (${D.utilizadores.length})</h2>
+  <div class="card space-y-2"><div style="font-weight:700">Cadastrar colaborador</div><input id="nm" class="inp" inputmode="numeric" placeholder="Matrícula"><input id="nn" class="inp" placeholder="Nome completo"><input id="ns" class="inp" type="password" placeholder="Senha inicial"><button class="b w-full" onclick="novoUser()">✓ Salvar usuário</button></div>
+  ${D.utilizadores.map((u,i)=>`<div class="card flex items-center gap-2"><div class="min-w-0 flex-1"><b>${esc(u.nome)}</b><div style="font-size:12px;color:#64748b">Mat. ${esc(u.matricula)}${u.admin||u.matricula===ADM?' · gestor':''}</div></div>
+   ${u.matricula!==ADM?`<button class="b b2 sm" onclick="toggleAdm(${i})">${u.admin?'Tirar gestor':'Tornar gestor'}</button>`:''}${u.matricula!==me.matricula?`<button class="b b3 sm" onclick="delUser(${i})">✕</button>`:''}</div>`).join('')}`;
+}
+async function novoUser(){
+  const m=$('nm').value.trim(),n=$('nn').value.trim(),s=$('ns').value.trim();
+  if(!m||!n||!s)return toast('Preencha todos os campos.');
+  if(D.utilizadores.some(u=>u.matricula===m))return toast('Matrícula já cadastrada.');
+  D.utilizadores.push({matricula:m,nome:n,senha:await hash(s)});save();R();toast('Usuário cadastrado');
+}
+function toggleAdm(i){D.utilizadores[i].admin=!D.utilizadores[i].admin;save();R()}
+function delUser(i){if(confirm('Remover este usuário?')){D.utilizadores.splice(i,1);save();R()}}
+
+/* ---------- login ---------- */
+function abrirLogin(){
+  $('modal-c').innerHTML=`<div class="flex justify-between items-center"><b style="font-size:16px">${modoReg?'Criar conta':'Entrar'}</b><button onclick="fechar()" style="font-size:20px;padding:4px 8px">✕</button></div>
+  <input id="am" class="inp" inputmode="numeric" placeholder="Matrícula">${modoReg?'<input id="an" class="inp" placeholder="Nome completo">':''}<input id="as" class="inp" type="password" placeholder="Senha" onkeydown="if(event.key==='Enter')auth()">
+  <div id="ae" class="hidden" style="color:#e11d48;font-weight:700;font-size:12px"></div>
+  <button class="b w-full" onclick="auth()">${modoReg?'Criar minha conta':'Entrar'}</button>
+  <button class="w-full" style="color:#007e7a;font-weight:700;font-size:12px;padding:8px" onclick="modoReg=!modoReg;abrirLogin()">${modoReg?'Já tenho conta — entrar':'Primeiro acesso? Criar conta'}</button>`;
+  $('modal').classList.add('on');
+}
+const fechar=()=>$('modal').classList.remove('on');
+async function auth(){
+  const m=$('am').value.trim(),s=$('as').value.trim(),e=$('ae');
+  const erro=t=>{e.textContent=t;e.classList.remove('hidden')};
+  if(!m||!s)return erro('Preencha matrícula e senha.');
+  if(modoReg){
+    const n=$('an').value.trim();if(!n)return erro('Digite seu nome completo.');
+    if(D.utilizadores.some(u=>u.matricula===m))return erro('Esta matrícula já tem cadastro. Faça login.');
+    D.utilizadores.push({matricula:m,nome:n,senha:await hash(s)});save();modoReg=false;toast('Conta criada! Entre agora.');return abrirLogin();
+  }
+  const u=D.utilizadores.find(x=>x.matricula===m),h=await hash(s);
+  if(!u||(u.senha!==s&&u.senha!==h))return erro('Matrícula ou senha incorretas.');
+  if(u.senha===s&&h!==s){u.senha=h;save()} // migra senha antiga para hash
+  me=u;localStorage.setItem(KS,u.matricula);fechar();tab=adm()?'pedidos':tab;R();toast(`Bem-vindo(a), ${u.nome.split(' ')[0]}!`);
+}
+function sair(){me=null;localStorage.removeItem(KS);sessionStorage.removeItem('usuario_logado_vale');tab='catalogo';R();toast('Sessão encerrada')}
 </script>
 </body>
 </html>
